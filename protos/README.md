@@ -5,9 +5,7 @@ Copyright (C) 2015 Princeton University.
 http://www.coniks.org
 
 ##Introduction
-CONIKS is a key management service that provides consistency and privacy for end-user public keys. It protects users against malicious or coerced key servers which may want to impersonate these users to compromise their secure communications: CONIKS will quickly detect any spurious keys, or any versions of the key directory that are inconsistent between two or more users. Nonetheless, CONIKS users do not need to worry about or even see these protocols, or the encryption keys, as CONIKS seamlessly integrates into any existing secure messaging application.
-
-These are protobuf sourcefiles that define the message format for all communication between the CONIKS test client and the basic server. They are based on [Google Protobufs](https://github.com/google/protobuf) (proto2) and require you to have the protocol buffer compiler protoc installed.
+These are protobuf source files that define the message format for all communication between the CONIKS test client and the basic server. They are based on [Google Protobufs](https://github.com/google/protobuf) (proto2) and require you to have the protocol buffer compiler protoc installed.
 
 ##Using the Protobufs
 ### Editing

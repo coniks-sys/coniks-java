@@ -1,7 +1,5 @@
 #CONIKS Protos
 
-Copyright (C) 2015 Marcela S. Melara
-
 http://www.coniks.org
 
 ##Introduction

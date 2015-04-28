@@ -3,9 +3,7 @@
 http://www.coniks.org
 
 ##Introduction
-CONIKS is a key management service that provides consistency and privacy for end-user public keys. It protects users against malicious or coerced key servers which may want to impersonate these users to compromise their secure communications: CONIKS will quickly detect any spurious keys, or any versions of the key directory that are inconsistent between two or more users. Nonetheless, CONIKS users do not need to worry about or even see these protocols, or the encryption keys, as CONIKS seamlessly integrates into any existing secure messaging application.
-
-This is a basic implementation of a CONIKS server that currently only supports new key registrations and key lookups. It is designed to communicate with the CONIKS test client.
+This is a basic implementation of a server for the CONIKS key management service. It currently supports new key registrations, key lookups, and can generate consistency proofs and signed directory snapshots. It is designed to communicate with the [CONIKS test client](https://github.com/coniks-sys/coniks-ref-implementation/tree/master/coniks_test_client).
 
 ##Using the Server
 
@@ -71,4 +69,4 @@ For example, to start the server, use
 Analogously to stop the server, and remove the logs.
 
 ##Documentation
-[Read the server's Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation)
+[Read the server's Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation/org/coniks/coniks_server/package-summary.html)

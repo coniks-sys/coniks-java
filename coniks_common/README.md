@@ -3,8 +3,6 @@
 http://www.coniks.org
 
 ##Introduction
-CONIKS is a key management service that provides consistency and privacy for end-user public keys. It protects users against malicious or coerced key servers which may want to impersonate these users to compromise their secure communications: CONIKS will quickly detect any spurious keys, or any versions of the key directory that are inconsistent between two or more users. Nonetheless, CONIKS users do not need to worry about or even see these protocols, or the encryption keys, as CONIKS seamlessly integrates into any existing secure messaging application.
-
 These are the files common to the basic implementation of a CONIKS server and the simple CONIKS test client, and include the binaries for two supporting libraries: [Google Protobufs](https://github.com/google/protobuf/tree/master/java) and [Javatuples](https://github.com/javatuples/javatuples).
 
 ##Using the Common Files
@@ -14,7 +12,7 @@ CONIKS uses Google Protobufs to define the message format for all communication 
 ### Building
 All common files (including the supporting libraries) are compiled when either component of the CONIKS system (the server or the client) is compiled. As part of the compilation process for a given CONIKS component, the compiled common files are bundled automatically with the component: the Makefile for the given component places the *coniks_common* and library packages in the same location as the component's .class files. This way each component can be built separately while sharing the common files.
 
-**Note: If you have edited any of the common Java files in this package, you will need to rebuild both the client and the server to ensure that the common files remain consistent between both components.**
+**Note: If you have edited/recompiled any of the common Java files in this package, you will need to rebuild both the client and the server to ensure that the common files remain consistent between both components.**
 
 ##Documentation
-[Read the common files' Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation)
+[Read the common files' Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation/org/coniks/coniks_common/package-summary.html)

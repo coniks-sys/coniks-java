@@ -1,4 +1,4 @@
-#Update: We've begun active CONIKS development again. As part of this effort, this repository will be migrated to the Princeton CITP organization on Github. Please join the [CONIKS discussion mailing list] (https://lists.cs.princeton.edu/mailman/listinfo/coniks) for updates on CONIKS!
+##Update: We've begun active CONIKS development again. As part of this effort, this repository will be migrated to the Princeton CITP organization on Github. Please join the [CONIKS discussion mailing list] (https://lists.cs.princeton.edu/mailman/listinfo/coniks) for updates on CONIKS!
 
 #CONIKS
 

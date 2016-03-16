@@ -1,8 +1,10 @@
+#Update: We've begun active CONIKS development again. As part of this effort, this repository will be migrated to the Princeton CITP organization on Github. Please join the [CONIKS discussion mailing list] (https://lists.cs.princeton.edu/mailman/listinfo/coniks) for updates on CONIKS!
+
 #CONIKS
 
-Copyright (C) 2015 Princeton University.
+Copyright (C) 2015-16 Princeton University.
 
-http://www.coniks.org
+https://coniks.cs.princeton.edu
 
 ##Introduction
 CONIKS is a key management service that provides consistency and privacy for end-user public keys. It protects users against malicious or coerced key servers which may want to impersonate these users to compromise their secure communications: CONIKS will quickly detect any spurious keys, or any versions of the key directory that are inconsistent between two or more users. Nonetheless, CONIKS users do not need to worry about or even see these protocols, or the encryption keys, as CONIKS seamlessly integrates into any existing secure messaging application.

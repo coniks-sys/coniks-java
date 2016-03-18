@@ -1,6 +1,6 @@
 #CONIKS Common
 
-http://www.coniks.org
+https://coniks.cs.princeton.edu
 
 ##Introduction
 These are the files common to the basic implementation of a CONIKS server and the simple CONIKS test client, and include the binaries for two supporting libraries: [Google Protobufs](https://github.com/google/protobuf/tree/master/java) and [Javatuples](https://github.com/javatuples/javatuples).
@@ -15,4 +15,4 @@ All common files (including the supporting libraries) are compiled when either c
 **Note: If you have edited/recompiled any of the common Java files in this package, you will need to rebuild both the client and the server to ensure that the common files remain consistent between both components.**
 
 ##Documentation
-[Read the common files' Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation/org/coniks/coniks_common/package-summary.html)
+[Read the common files' Java API (javadoc)](https://citp.github.io/coniks-ref-implementation/org/coniks/coniks_common/package-summary.html)

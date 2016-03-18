@@ -1,9 +1,9 @@
 #CONIKS Server
 
-http://www.coniks.org
+https://coniks.cs.princeton.edu
 
 ##Introduction
-This is a basic implementation of a server for the CONIKS key management service. It currently supports new key registrations, key lookups, and can generate consistency proofs and signed directory snapshots. It is designed to communicate with the [CONIKS test client](https://github.com/coniks-sys/coniks-ref-implementation/tree/master/coniks_test_client).
+This is a basic implementation of a server for the CONIKS key management service. It currently supports new key registrations, key lookups, and can generate consistency proofs and signed directory snapshots. It is designed to communicate with the [CONIKS test client](https://github.com/citp/coniks-ref-implementation/tree/master/coniks_test_client).
 
 ##Using the Server
 
@@ -69,4 +69,4 @@ For example, to start the server, use
 Analogously to stop the server, and remove the logs.
 
 ##Documentation
-[Read the server's Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation/org/coniks/coniks_server/package-summary.html)
+[Read the server's Java API (javadoc)](https://citp.github.io/coniks-ref-implementation/org/coniks/coniks_server/package-summary.html)

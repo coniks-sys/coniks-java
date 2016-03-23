@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-16, Princeton University.
+  Copyright (c) 2015, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -62,8 +62,8 @@ import java.util.Arrays;
 /** Implements the operations that interface
  * a CONIKS client with a CONIKS server.
  * 
- *@author Marcela S. Melara (@masomel)
- *@author Michael Rochlin (@marisbest2)
+ *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin
  */
 public class ConiksClient {
 

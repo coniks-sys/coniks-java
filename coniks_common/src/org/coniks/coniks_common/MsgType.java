@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-16, Princeton University.
+  Copyright (c) 2015, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,8 @@ package org.coniks.coniks_common;
 /** Defines constants representing the types
  * of messages exchanged by CONIKS clients and servers.
  *
- *@author Marcela Melara (@masomel)
- *@author Michael Rochlin (@marisbest2)
+ *@author Marcela Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin
  */
 public final class MsgType {
 

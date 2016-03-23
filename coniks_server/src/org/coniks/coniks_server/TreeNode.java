@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -116,10 +116,6 @@ public class TreeNode implements Serializable {
         this.level = l;
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> Adding the new files
     /** Sets this tree node's name to {@code name}
      */
     public void setName(String name) {

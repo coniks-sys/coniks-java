@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -34,11 +34,8 @@
 package org.coniks.coniks_test_client;
 
 import org.coniks.coniks_common.C2SProtos.AuthPath;
-<<<<<<< HEAD
-=======
 import org.coniks.coniks_common.C2SProtos.*;
 
->>>>>>> Adding the new files
 import org.coniks.coniks_common.UtilProtos.Commitment;
 import org.coniks.coniks_common.UtilProtos.Hash;
 
@@ -48,20 +45,18 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-<<<<<<< HEAD
-=======
+
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.interfaces.DSAParams;
 import java.math.BigInteger;
 
->>>>>>> Adding the new files
-
 /** Implements various utility functions
  * used by various components of a CONIKS
  * client.
  *
- *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Marcela S. Melara (@masomel)
+ *@author Michael Rochlin (@marisbest)
  */
 public class ClientUtils{
 
@@ -269,32 +264,6 @@ public class ClientUtils{
 	return true;
     }
 
-    /** Converts an AuthPath.UserLeafNode protobuf {@code uln} 
-     * to a byte[].
-     */
-<<<<<<< HEAD
-    public static byte[] ulnProtoToBytes(AuthPath.UserLeafNode uln){
-        // TODO: add the generic blob of data and the change key fields
-        byte[] pubKey = strToBytes(uln.getPublickey());
-	byte[] usr = strToBytes(uln.getName());
-        byte[] ep_add = longToBytes(uln.getEpochAdded());
-        byte[] auk = new byte[]{(byte)(uln.getAllowsUnsignedKeychange() ? 0x01 : 0x00)};
-        byte[] apl = new byte[]{(byte)(uln.getAllowsPublicLookup() ? 0x01 : 0x00)};
-
-	byte[] leafBytes = new byte[pubKey.length+usr.length+ep_add.length+auk.length+
-                                    apl.length];
-	
-	ByteBuffer arr = ByteBuffer.wrap(leafBytes);
-	arr.put(usr);
-	arr.put(pubKey);
-	arr.put(ep_add);
-	arr.put(auk);
-        arr.put(apl);
-
-	return arr.array();
-    }
-
-=======
     /** Converts the DSAPublicKey {@code pub} to a byte array in g-p-q-y order */
     public static byte[] convertDSAPubKey(DSAPublicKey pub){
         byte[] g = strToBytes(pub.getParams().getG().toString());
@@ -390,7 +359,7 @@ public class ClientUtils{
 
 
     }
->>>>>>> Adding the new files
+
     /** Takes the hash of a user leaf node {@code ulnHash} and recomputes
      * the hashes of each given interior node on the authentication path
      * {@code inList} up to the root's left or right child and returns this hash

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -33,30 +33,24 @@
 
 package org.coniks.coniks_server;
 
-<<<<<<< HEAD
-=======
 import org.coniks.coniks_common.*;
 import org.coniks.coniks_common.C2SProtos.*;
->>>>>>> Adding the new files
 import java.security.*;
 import java.security.interfaces.RSAPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import javax.crypto.*;
-<<<<<<< HEAD
-=======
 import java.security.spec.*;
 import java.security.interfaces.*;
 import javax.crypto.*;
 import java.math.BigInteger;
 import java.util.Arrays;
 
->>>>>>> Adding the new files
-
 /** Implements all operations involving digital signatures
  * that a CONIKS server must perform.
  * Current encryption/signing algorithm used: RSA with SHA-256.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin (@marisbest2)
  */
 public class SignatureOps{
 
@@ -100,13 +94,8 @@ public class SignatureOps{
 	catch(InvalidKeyException e){
 	    TimerLogger.error("The given key is invalid.");
 	}
-<<<<<<< HEAD
-        catch(SignatureException e){
-	    TimerLogger.error("The format of the input is invalid.");
-=======
   catch(SignatureException e){
-	    TimerLogger.error("The format of the sign input is invalid.");
->>>>>>> Adding the new files
+	    TimerLogger.error("The format of the sig input is invalid.");
 	}
 	
 	return signed;
@@ -144,8 +133,6 @@ public class SignatureOps{
 
     }
 
-<<<<<<< HEAD
-=======
     /** Makes a DSAPublicKey from the params */
     public static DSAPublicKey makeDSAPublicKeyFromParams(BigInteger p, BigInteger q, BigInteger g, BigInteger y) {
         try {
@@ -200,6 +187,5 @@ public class SignatureOps{
         }
         return false;
     }
->>>>>>> Adding the new files
 
 } //ends SignatureOps class

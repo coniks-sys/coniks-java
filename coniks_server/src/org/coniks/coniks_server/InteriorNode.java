@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -40,14 +40,11 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> Adding the new files
 /** Represents an interior node in the CONIKS binary Merkle
  * prefix tree.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin (@marisbest2)
  */
 public class InteriorNode extends TreeNode implements Serializable {
   

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -34,11 +34,7 @@
 package org.coniks.coniks_server;
 
 import org.coniks.coniks_common.C2SProtos.AuthPath;
-<<<<<<< HEAD
-=======
 import org.coniks.coniks_common.C2SProtos.*;
-
->>>>>>> Adding the new files
 import org.coniks.coniks_common.UtilProtos.Hash;
 
 import java.util.ArrayList;
@@ -54,11 +50,13 @@ import org.javatuples.*;
 
 // TODO: Might want to separate this into more specialized classes
 // for consistency checks vs internal ops
+
 /** Implements all operations done by a CONIKS server
  * necessary for a CONIKS client to perform the consistency checks.
  * These include generating data binding proofs and signed tree roots (STR).
  * 
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin (@marisbest2)
  */
 public class ServerOps{
 
@@ -91,10 +89,7 @@ public class ServerOps{
         AuthPath.Builder authPath = AuthPath.newBuilder();
 
         //first take care of setting the UserLeafNode
-<<<<<<< HEAD
-=======
         // TODO update for new uln version
->>>>>>> Adding the new files
         AuthPath.UserLeafNode.Builder ulnBuilder = AuthPath.UserLeafNode.newBuilder();
         ulnBuilder.setName(uln.getUsername());
         ulnBuilder.setPublickey(uln.getPublicKey());
@@ -102,8 +97,6 @@ public class ServerOps{
         ulnBuilder.setAllowsUnsignedKeychange(uln.allowsUnsignedKeychange());
         ulnBuilder.setAllowsPublicLookup(uln.allowsPublicLookups());
         ulnBuilder.addAllLookupIndex(ServerUtils.byteArrToIntList(uln.getIndex()));
-<<<<<<< HEAD
-=======
         ulnBuilder.setEpochChanged(uln.getEpochChanged());
         if (uln.getSignature() != null)
             ulnBuilder.addAllSignature(ServerUtils.byteArrToIntList(uln.getSignature()));
@@ -121,7 +114,6 @@ public class ServerOps{
         }
         if (uln.getLastMsg() != null)
             ulnBuilder.addAllLastMsg(ServerUtils.byteArrToIntList(uln.getLastMsg()));
->>>>>>> Adding the new files
 
         // book-keeping for interior nodes
         int numInteriors = 0;
@@ -257,10 +249,6 @@ public class ServerOps{
 
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> Adding the new files
     /** Builds a Merkle prefix tree consisting of only a root node
      * with the previous root hash {@code prevRootHash} for
      * epoch {@code ep}. This tree "skeleton"
@@ -287,11 +275,7 @@ public class ServerOps{
      * the server's namespace or {@code null} in case of an error.
      */
     public static RootNode buildFirstEpochTree(
-<<<<<<< HEAD
-                                               PriorityQueue<Pair<byte[],UserLeafNode>> pendingQ,
-=======
                                                PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
->>>>>>> Adding the new files
 					       byte[] initRootHash,
 					       long ep){
 
@@ -310,11 +294,7 @@ public class ServerOps{
      *@return The {@link RootNode} for the next epoch or {@code null} in case of an error.
      */
     public static RootNode buildNextEpochTree(
-<<<<<<< HEAD
-                                              PriorityQueue<Pair<byte[],UserLeafNode>> pendingQ,
-=======
                                               PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
->>>>>>> Adding the new files
 					      RootNode curRoot, 
 					      long ep, int epInt){
 

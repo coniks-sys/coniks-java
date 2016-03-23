@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,8 @@
   POSSIBILITY OF SUCH DAMAGE.
  */
 
-// author: Marcela S. Melara (melara@cs.princeton.edu)
+// author: Marcela S. Melara (@masomel)
+// author: Michael Rochlin (@marisbest2)
 
 package org.coniks.coniks_common;
 
@@ -57,12 +58,9 @@ message ServerResp{
              MALFORMED_ERR = 2;
              SERVER_ERR = 3;
              NAME_NOT_FOUND_ERR = 4;
-<<<<<<< HEAD
-=======
              COMMITMENT_RESP = 5;
              AUTH_PATH = 6;
              VERIFICATION_ERR = 7;
->>>>>>> Adding the new files
         }
         optional Message message = 1;
 }

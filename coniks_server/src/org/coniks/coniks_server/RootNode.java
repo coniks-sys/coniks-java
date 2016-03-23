@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -114,10 +114,6 @@ public class RootNode extends InteriorNode{
         this.rightHash= r;
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> Adding the new files
      /** Clones (i.e. duplicates) this root node from the current
      * epoch {@code ep0} for the next epoch {@code ep1} with the. 
      * It then recursively 

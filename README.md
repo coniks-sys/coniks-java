@@ -1,4 +1,4 @@
-##Update: We've begun active CONIKS development again. As part of this effort, this repository has been migrated to the Princeton CITP organization on Github. Please join the [CONIKS discussion mailing list] (https://lists.cs.princeton.edu/mailman/listinfo/coniks) for updates on CONIKS!
+##Status: We've begun active CONIKS development again. As part of this effort, this repository has been migrated to the Princeton CITP organization on Github. Please join the [CONIKS discussion mailing list] (https://lists.cs.princeton.edu/mailman/listinfo/coniks) for updates on CONIKS!
 
 #CONIKS
 
@@ -11,6 +11,9 @@ CONIKS is a key management service that provides consistency and privacy for end
 
 ##CONIKS Reference Implementation
 This software package serves as a reference implementation for the CONIKS system. The basic [CONIKS server](https://github.com/citp/coniks-ref-implementation/tree/master/coniks_server) and simple [CONIKS test client](https://github.com/citp/coniks-ref-implementation/tree/master/coniks_test_client) demonstrate the functionality of the system and the CONIKS protocols, so anyone interested in deploying CONIKS in their secure messaging system can then use this software package as a reference when implementing the service. This package also contains the [common message format definitions](https://github.com/citp/coniks-ref-implementation/tree/master/coniks_common) that CONIKS servers and clients use to communicate. 
+
+## Disclaimer
+Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/citp/coniks-ref-implementation/releases).
 
 ##Documentation
 [Read the package's Java API (javadoc)](https://citp.github.io/coniks-ref-implementation/)

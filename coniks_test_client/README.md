@@ -2,10 +2,19 @@
 
 Copyright (C) 2015 Princeton University.
 
+<<<<<<< HEAD
 https://coniks.cs.princeton.edu
 
 ##Introduction
 This is a simple test client for the CONIKS key management service. It supports new key registrations, key lookups and key consistency checks. It is designed to communicate with the basic implementation of a [CONIKS server](https://github.com/citp/coniks-ref-implementation/tree/master/coniks_server).
+=======
+http://www.coniks.org
+
+##Introduction
+CONIKS is a key management service that provides consistency and privacy for end-user public keys. It protects users against malicious or coerced key servers which may want to impersonate these users to compromise their secure communications: CONIKS will quickly detect any spurious keys, or any versions of the key directory that are inconsistent between two or more users. Nonetheless, CONIKS users do not need to worry about or even see these protocols, or the encryption keys, as CONIKS seamlessly integrates into any existing secure messaging application.
+
+This is a simple test client that supports new key registrations, key lookups and key consistency checks. It is designed to communicate with the basic implementation of a CONIKS server.
+>>>>>>> Adding the new files
 
 ##Using the Test Client
 
@@ -74,4 +83,8 @@ This example will verify the consistency proof obtained from looking up user *te
 ```
 
 ##Documentation
+<<<<<<< HEAD
 [Read the test client's Java API (javadoc)](https://citp.github.io/coniks-ref-implementation/org/coniks/coniks_test_client/package-summary.html)
+=======
+[Read the test client's Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation)
+>>>>>>> Adding the new files

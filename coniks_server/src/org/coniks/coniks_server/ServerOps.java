@@ -34,6 +34,11 @@
 package org.coniks.coniks_server;
 
 import org.coniks.coniks_common.C2SProtos.AuthPath;
+<<<<<<< HEAD
+=======
+import org.coniks.coniks_common.C2SProtos.*;
+
+>>>>>>> Adding the new files
 import org.coniks.coniks_common.UtilProtos.Hash;
 
 import java.util.ArrayList;
@@ -86,6 +91,10 @@ public class ServerOps{
         AuthPath.Builder authPath = AuthPath.newBuilder();
 
         //first take care of setting the UserLeafNode
+<<<<<<< HEAD
+=======
+        // TODO update for new uln version
+>>>>>>> Adding the new files
         AuthPath.UserLeafNode.Builder ulnBuilder = AuthPath.UserLeafNode.newBuilder();
         ulnBuilder.setName(uln.getUsername());
         ulnBuilder.setPublickey(uln.getPublicKey());
@@ -93,6 +102,26 @@ public class ServerOps{
         ulnBuilder.setAllowsUnsignedKeychange(uln.allowsUnsignedKeychange());
         ulnBuilder.setAllowsPublicLookup(uln.allowsPublicLookups());
         ulnBuilder.addAllLookupIndex(ServerUtils.byteArrToIntList(uln.getIndex()));
+<<<<<<< HEAD
+=======
+        ulnBuilder.setEpochChanged(uln.getEpochChanged());
+        if (uln.getSignature() != null)
+            ulnBuilder.addAllSignature(ServerUtils.byteArrToIntList(uln.getSignature()));
+
+
+        DSAPublicKeyProto.Builder dsaBuilder = DSAPublicKeyProto.newBuilder();
+        DSAPublicKey dsa = uln.getChangeKey();
+        if (dsa != null) {
+            dsaBuilder.setP(dsa.getParams().getP().toString());
+            dsaBuilder.setQ(dsa.getParams().getQ().toString());
+            dsaBuilder.setG(dsa.getParams().getG().toString());
+            dsaBuilder.setY(dsa.getY().toString()); // don't ask me why java is so inconsistent (mrochlin)
+
+            ulnBuilder.setChangeKey(dsaBuilder.build());
+        }
+        if (uln.getLastMsg() != null)
+            ulnBuilder.addAllLastMsg(ServerUtils.byteArrToIntList(uln.getLastMsg()));
+>>>>>>> Adding the new files
 
         // book-keeping for interior nodes
         int numInteriors = 0;
@@ -228,6 +257,10 @@ public class ServerOps{
 
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Adding the new files
     /** Builds a Merkle prefix tree consisting of only a root node
      * with the previous root hash {@code prevRootHash} for
      * epoch {@code ep}. This tree "skeleton"
@@ -254,7 +287,11 @@ public class ServerOps{
      * the server's namespace or {@code null} in case of an error.
      */
     public static RootNode buildFirstEpochTree(
+<<<<<<< HEAD
                                                PriorityQueue<Pair<byte[],UserLeafNode>> pendingQ,
+=======
+                                               PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
+>>>>>>> Adding the new files
 					       byte[] initRootHash,
 					       long ep){
 
@@ -273,7 +310,11 @@ public class ServerOps{
      *@return The {@link RootNode} for the next epoch or {@code null} in case of an error.
      */
     public static RootNode buildNextEpochTree(
+<<<<<<< HEAD
                                               PriorityQueue<Pair<byte[],UserLeafNode>> pendingQ,
+=======
+                                              PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
+>>>>>>> Adding the new files
 					      RootNode curRoot, 
 					      long ep, int epInt){
 

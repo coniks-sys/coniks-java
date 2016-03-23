@@ -116,6 +116,10 @@ public class TreeNode implements Serializable {
         this.level = l;
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Adding the new files
     /** Sets this tree node's name to {@code name}
      */
     public void setName(String name) {

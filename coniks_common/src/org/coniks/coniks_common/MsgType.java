@@ -46,6 +46,10 @@ public final class MsgType {
     private MsgType() {
     }
 
+<<<<<<< HEAD
+=======
+    
+>>>>>>> Adding the new files
     /** A username-to-data binding registration message.
      */
     public static final int REGISTRATION = 0;
@@ -85,4 +89,10 @@ public final class MsgType {
      */
     public static final int OBSERVED_STR_PUSH = 7;
 
+<<<<<<< HEAD
+=======
+    public static final int ULNCHANGE_REQ = 8;
+    public static final int SIGNED_ULNCHANGE_REQ = 9;
+
+>>>>>>> Adding the new files
 }

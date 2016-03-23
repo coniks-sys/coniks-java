@@ -100,6 +100,10 @@ public class ServerLogger {
      */
     public static void error (String msg) {
         logger.severe(msg);
+<<<<<<< HEAD
     }
     
+=======
+    }    
+>>>>>>> Adding the new files
 }

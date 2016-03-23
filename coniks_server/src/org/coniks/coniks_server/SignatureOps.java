@@ -33,10 +33,24 @@
 
 package org.coniks.coniks_server;
 
+<<<<<<< HEAD
+=======
+import org.coniks.coniks_common.*;
+import org.coniks.coniks_common.C2SProtos.*;
+>>>>>>> Adding the new files
 import java.security.*;
 import java.security.interfaces.RSAPublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import javax.crypto.*;
+<<<<<<< HEAD
+=======
+import java.security.spec.*;
+import java.security.interfaces.*;
+import javax.crypto.*;
+import java.math.BigInteger;
+import java.util.Arrays;
+
+>>>>>>> Adding the new files
 
 /** Implements all operations involving digital signatures
  * that a CONIKS server must perform.
@@ -86,8 +100,13 @@ public class SignatureOps{
 	catch(InvalidKeyException e){
 	    TimerLogger.error("The given key is invalid.");
 	}
+<<<<<<< HEAD
         catch(SignatureException e){
 	    TimerLogger.error("The format of the input is invalid.");
+=======
+  catch(SignatureException e){
+	    TimerLogger.error("The format of the sign input is invalid.");
+>>>>>>> Adding the new files
 	}
 	
 	return signed;
@@ -125,5 +144,62 @@ public class SignatureOps{
 
     }
 
+<<<<<<< HEAD
+=======
+    /** Makes a DSAPublicKey from the params */
+    public static DSAPublicKey makeDSAPublicKeyFromParams(BigInteger p, BigInteger q, BigInteger g, BigInteger y) {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("DSA");
+            KeySpec publicKeySpec = new DSAPublicKeySpec(y, p, q, g);
+            return (DSAPublicKey) keyFactory.generatePublic(publicKeySpec);
+        }
+        catch(InvalidParameterException e) {
+            TimerLogger.error("The given DSA key is invalid.");
+        }
+        catch (InvalidKeySpecException e) {
+            TimerLogger.error("The given key params are invalid.");
+        }
+        catch(NoSuchAlgorithmException e){
+            TimerLogger.error("DSA is invalid for some reason.");
+        }
+        return null;
+    }
+
+    // makes a DSA key from the DSAPublicKeyProto protobuf
+    public static DSAPublicKey makeDSAPublicKeyFromParams(DSAPublicKeyProto pkProto) {
+        BigInteger p = new BigInteger(pkProto.getP());
+        BigInteger q = new BigInteger(pkProto.getQ());
+        BigInteger g = new BigInteger(pkProto.getG());
+        BigInteger y = new BigInteger(pkProto.getY());
+        return makeDSAPublicKeyFromParams(p,q,g,y);
+    }
+
+    /** Verify {@code msg} with {@code sig} using {@code pk} */
+    public static boolean verifySigFromDSA(byte[] msg, byte[] sig, PublicKey pk) {
+        try {
+            Signature verifyalg = Signature.getInstance("DSA");
+            verifyalg.initVerify(pk);
+            verifyalg.update(msg);
+            if (!verifyalg.verify(sig)) {
+                TimerLogger.error("Failed to validate signature");
+                TimerLogger.error("Sig was:\n" + Arrays.toString(sig));
+                return false;
+            }
+            TimerLogger.error("Good Sig was:\n" + Arrays.toString(sig));
+            return true;
+        }
+        catch(NoSuchAlgorithmException e){
+            TimerLogger.error("DSA is invalid for some reason.");
+        }
+        catch(InvalidKeyException e){
+            TimerLogger.error("The given DSA key to verify is invalid.");
+        }
+        catch(SignatureException e){
+            TimerLogger.error("The format of the dsa input is invalid: "+ e.getMessage());
+            TimerLogger.error("Sig was:\n" + Arrays.toString(sig));
+        }
+        return false;
+    }
+>>>>>>> Adding the new files
 
 } //ends SignatureOps class

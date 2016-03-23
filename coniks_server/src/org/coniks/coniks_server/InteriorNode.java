@@ -40,6 +40,10 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Adding the new files
 /** Represents an interior node in the CONIKS binary Merkle
  * prefix tree.
  *

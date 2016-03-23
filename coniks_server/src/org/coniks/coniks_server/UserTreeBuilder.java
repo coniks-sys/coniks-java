@@ -51,7 +51,11 @@ import org.javatuples.*;
 public class UserTreeBuilder{
     
     private int lastLevel;
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> Adding the new files
     private RootNode out;
     private long prevEpoch, epoch;
 
@@ -60,11 +64,19 @@ public class UserTreeBuilder{
      * {@link UserTreeBuilder#createNewTree(PriorityQueue<Pair<byte[], UserLeafNode>>, byte[], long)}.
      */
     public void clearTemps(){
+<<<<<<< HEAD
 	out = null;
     }
 
     private UserTreeBuilder(){
 	lastLevel = 0;
+=======
+        out = null;
+    }
+    
+    private UserTreeBuilder(){
+        lastLevel = 0;
+>>>>>>> Adding the new files
     }
 
     /** Generates a single instance of the user tree builder.
@@ -72,6 +84,7 @@ public class UserTreeBuilder{
      *@return A new user tree builder.
      */
     public static UserTreeBuilder getInstance(){
+<<<<<<< HEAD
 	return new UserTreeBuilder();
     }
 
@@ -175,21 +188,160 @@ public class UserTreeBuilder{
 	}
     }
 
+=======
+        return new UserTreeBuilder();
+    }
+    
+    private void insertNode(byte[] key, UserLeafNode toAdd, RootNode root, Operation op){
+        int curOffset = 0;
+        // This code would be a lot more natural
+        //   if our tries were byte-branching rather than bit-branching, but whatevs.
+        
+        toAdd.level = 0;
+        TreeNode curNode = root;
+        
+        curNode.setName("root");
+        int counter = 1;
+        
+        insertLoop:
+            while(true){
+            int arrayOffset = curOffset / 8;
+            int bitOfByte = curOffset % 8;
+            // 0 is left-most byte in string
+            // 0 of left-most byte is the *left-most* bit of that byte. 
+            toAdd.level++;
+            
+            if( curNode instanceof UserLeafNode ){
+                // reached a "bottom" of the tree.
+                // add a new interior node and push the previous leaf down
+                // then continue insertion
+                if (curNode.parent == null){
+                    throw new UnsupportedOperationException("parent is null!!");
+                }
+
+                // TODO: Does this need to be moved?
+                InteriorNode newInt = new InteriorNode(curNode.parent,
+                                                       curNode.level);
+                
+                UserLeafNode curNodeUL = (UserLeafNode) curNode;
+                if (curNodeUL.username.equals( toAdd.username )) {
+                    if (op instanceof Register) {
+                        // registration cant re-register the same name
+                        throw new UnsupportedOperationException("Username of added node already exists!");
+                    }
+                    // must be some kind of key-change or flag change
+                    else if (op instanceof KeyChange) {
+                        if (((KeyChange)op).changeInfo(curNodeUL)) {
+                            curNodeUL.setEpochChanged(epoch);
+                            return;
+                        }
+                        else {
+                            throw new UnsupportedOperationException("Failed to validate key change");
+                        }
+                    }
+                    else {
+                        // TODO
+                        // Something got messed up or we added some functionality without implementing the change
+                        throw new UnsupportedOperationException("Weird operation happened. Make sure you've added this functionality");
+                    }
+                }
+                
+                if (!(op instanceof Register)) {
+                    throw new UnsupportedOperationException("Failed to make key-change!");
+                }
+
+                byte[] curNodeKey = ServerUtils.unameToIndex(curNodeUL.username);
+                curNodeUL.setIndex(curNodeKey);
+                // This is what's happening below:
+                // int maskedBit = curNodeKey[(curOffset + 1)/8] & (1 << (7 - ((curOffset + 1) % 8)));
+                int maskedBit = curNodeKey[arrayOffset] & (1 << (7 - bitOfByte));
+                // direction here is going to be false = left,
+                //                               true = right
+                
+                boolean direction = (maskedBit != 0);
+                if (direction){
+                    newInt.right = curNodeUL;
+                }else{
+                    newInt.left = curNodeUL;
+                }
+                curNode.level++;
+                curNode.parent = newInt;
+                
+                if (newInt.parent.left == curNode) {
+                    newInt.parent.left = newInt;
+                }
+                else {
+                    newInt.parent.right = newInt;
+                }
+                curNode = newInt;
+                // msm: why is this next line here?
+                toAdd.level--;                
+            } 
+            else {
+                InteriorNode curNodeI = (InteriorNode) curNode;
+                int maskedBit = key[arrayOffset] & (1 << (7 - bitOfByte));
+                // direction here is going to be false = left,
+                //                               true = right
+                
+                boolean direction = (maskedBit != 0);
+                
+                if(direction){
+                    // mark right tree as needing hash recompute
+                    curNodeI.rightHash = null;
+                    if (curNodeI.right == null){
+                        curNodeI.right = toAdd;
+                        toAdd.parent = curNode;
+                        break insertLoop;
+                    }else{
+                        curNode = curNodeI.right;
+                    }
+                }else{
+                    // mark left tree as needing hash recompute
+                    curNodeI.leftHash = null;
+                    if (curNodeI.left == null){
+                        curNodeI.left = toAdd;
+                        toAdd.parent = curNode;
+                        break insertLoop;
+                    }else{
+                        curNode = curNodeI.left;
+                    }
+                }
+                curOffset++;
+            }
+            curNode.setName("n"+counter);
+            counter++;
+        }
+            if (toAdd.level > lastLevel){
+                lastLevel = toAdd.level;
+            }
+    }
+    
+>>>>>>> Adding the new files
     // Compute the hashes of the left and right subtrees
     // of the Merkle tree root
     // Wrapper for innerComputeHash
     private static void computeHashes(RootNode root){
+<<<<<<< HEAD
 	if (root.leftHash == null){
 	    root.leftHash = innerComputeHash(root.left);	    
 	}
 	if (root.rightHash == null){
 	    root.rightHash = innerComputeHash(root.right);
 	}
+=======
+        if (root.leftHash == null){
+            root.leftHash = innerComputeHash(root.left);     
+        }
+        if (root.rightHash == null){
+            root.rightHash = innerComputeHash(root.right);
+        }
+>>>>>>> Adding the new files
     }
     
     // this recursively computes the hash of the subtree specified
     // by curNode
     private static byte[] innerComputeHash(TreeNode curNode){
+<<<<<<< HEAD
 	if(curNode == null){
 	    return ServerUtils.hash(new byte[ServerUtils.HASH_SIZE_BYTES]);
 	}
@@ -210,6 +362,28 @@ public class UserTreeBuilder{
 	    UserLeafNode curNodeU = (UserLeafNode) curNode;
 	    return ServerUtils.hash(ServerUtils.convertUserLeafNode(curNodeU));
 	}
+=======
+    	if(curNode == null){
+    	    return ServerUtils.hash(new byte[ServerUtils.HASH_SIZE_BYTES]);
+    	}
+
+    	if(curNode instanceof InteriorNode){
+    	    InteriorNode curNodeI = (InteriorNode) curNode; 
+    	    if(curNodeI.leftHash == null){
+    		// compute left-side hash
+    		curNodeI.leftHash = innerComputeHash(curNode.left);
+    	    }
+    	    if(curNodeI.rightHash == null){
+    		// compute right-side hash
+    		curNodeI.rightHash = innerComputeHash(curNode.right);
+    	    }
+    	    return ServerUtils.hash(ServerUtils.convertInteriorNode(curNodeI));
+    	}else{
+    	    // assertion: must be user leaf node.
+    	    UserLeafNode curNodeU = (UserLeafNode) curNode;
+    	    return ServerUtils.hash(ServerUtils.convertUserLeafNode(curNodeU));
+    	}
+>>>>>>> Adding the new files
     }
 
     /** Clones the previous epoch's tree {@code prevRoot} and 
@@ -222,6 +396,7 @@ public class UserTreeBuilder{
      *@return The {@link RootNode} for the next epoch's Merkle tree.
      */
     public RootNode copyExtendTree(RootNode prevRoot,
+<<<<<<< HEAD
 				   byte[] prevRootHash,
 				   PriorityQueue<Pair<byte[], UserLeafNode>> pendingQ, 
 				   long epoch){
@@ -244,6 +419,30 @@ public class UserTreeBuilder{
 	if(pendingQ == null)
 	    return null;
 	return extendTree(pendingQ);
+=======
+                                   byte[] prevRootHash,
+                                   PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ, 
+                                   long epoch){
+        // clone old tree
+        RootNode out;
+        long prevEpoch;
+        if (prevRoot != null){
+            prevEpoch = prevRoot.epoch;
+            out = (prevRoot.clone(prevEpoch, epoch));
+        }else{
+            out = new RootNode(null, null, 0, null, 0);
+            prevEpoch = -1;
+        }
+        out.prev = prevRootHash;
+        
+        this.prevEpoch = prevEpoch;
+        this.epoch = epoch;
+        this.out = out;
+        
+        if(pendingQ == null)
+            return null;
+        return extendTree(pendingQ);
+>>>>>>> Adding the new files
     }
 
     /** Inserts any new nodes in {@code pendingQ} ordered by the 24-bit prefix
@@ -252,6 +451,7 @@ public class UserTreeBuilder{
      *
      *@return The {@link RootNode} of the extended Merkle tree.
      */
+<<<<<<< HEAD
     public RootNode extendTree(PriorityQueue<Pair<byte[], UserLeafNode>> pendingQ){
         
         // set up new root
@@ -259,11 +459,20 @@ public class UserTreeBuilder{
 	
 	// insert nodes
 
+=======
+    public RootNode extendTree(PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ){        
+        // set up new root
+        out.epoch = epoch;
+        
+        // insert nodes
+        
+>>>>>>> Adding the new files
         // record the prefix for each index and compare to the prefix of the
         // previous node added
         byte[] prefix = null;
         byte[] prevPrefix = null;        
         
+<<<<<<< HEAD
 	int prevPrefixLevel = 0;
 	int insCount = 0;
         // need to insert all nodes with the same prefix into the correct prefix subtree
@@ -296,15 +505,65 @@ public class UserTreeBuilder{
 	return out;
     }
 
+=======
+        int prevPrefixLevel = 0;
+        int insCount = 0;
+        // need to insert all nodes with the same prefix into the correct prefix subtree
+        
+        int toInsert = pendingQ.size();
+        
+        if (prevEpoch == -1) {
+            System.out.println("Inserting " + toInsert);
+        }
+        
+        Triplet<byte[], UserLeafNode, Operation> p = pendingQ.poll();
+        while(p != null){
+            // while we're handing the same prefix,
+            // insert as normal
+            byte[] index = p.getValue0();
+            prefix = ServerUtils.getPrefixBytes(index);
+            
+            UserLeafNode toAdd = p.getValue1();
+            Operation op = p.getValue2();
+            
+            insertNode(index, toAdd, out, op);
+            
+            if (prevPrefixLevel < toAdd.getLevel())
+                prevPrefixLevel = toAdd.getLevel(); 
+            
+
+            prevPrefix = prefix;
+            
+            p = pendingQ.poll();
+            
+        }
+        
+        // recompute hashes
+        computeHashes(out);
+        
+        return out;
+    }
+    
+>>>>>>> Adding the new files
     /** Creates a completely new Merkle tree with any nodes in {@code pendingQ},
      * and with the previous epoch's root hash {@code prevRootHash} for the new epoch
      * {@code epoch}.
      *
      *@return The {@link RootNode} of the new Merkle tree.
      */
+<<<<<<< HEAD
     public RootNode createNewTree(PriorityQueue<Pair<byte[], UserLeafNode>> pendingQ,
 				  byte[] prevRootHash, long epoch){
 	return copyExtendTree(null, prevRootHash, pendingQ, epoch);
     }
+=======
+    public RootNode createNewTree(PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
+                                  byte[] prevRootHash, long epoch){
+        return copyExtendTree(null, prevRootHash, pendingQ, epoch);
+
+    }
+    
+
+>>>>>>> Adding the new files
 
 }

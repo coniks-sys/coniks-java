@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-16, Princeton University.
+  Copyright (c) 2015, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,8 @@
 /** Sets various configuration parameters 
  * for a {@link ConiksClient}.
  *
- *@author Marcela Melara (@masomel)
- *@author Michael Rochlin (@marisbest2)
+ *@author Marcela Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin
  */
 
 package org.coniks.coniks_test_client;

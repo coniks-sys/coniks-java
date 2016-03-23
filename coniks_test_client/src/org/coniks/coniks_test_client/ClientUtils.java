@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-16, Princeton University.
+  Copyright (c) 2015, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -55,8 +55,8 @@ import java.math.BigInteger;
  * used by various components of a CONIKS
  * client.
  *
- *@author Marcela S. Melara (@masomel)
- *@author Michael Rochlin (@marisbest)
+ *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin
  */
 public class ClientUtils{
 

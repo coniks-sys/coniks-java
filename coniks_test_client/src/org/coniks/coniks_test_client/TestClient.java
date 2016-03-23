@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-16, Princeton University.
+  Copyright (c) 2015, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -47,8 +47,8 @@ import java.math.BigInteger;
  * of the messages sent to the server (it only needs to know 
  * whether it's using protobufs (TODO: or json)).
  * 
- *@author Marcela S. Melara (@masomel)
- *@author Michael Rochlin (@marisbest2)
+ *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin
  */
 public class TestClient {
 

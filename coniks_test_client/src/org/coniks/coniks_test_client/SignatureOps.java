@@ -1,7 +1,36 @@
-package org.coniks.coniks_test_client;
+/*
+  Copyright (c) 2016, Princeton University.
+  All rights reserved.
+  
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are 
+  met:
+  * Redistributions of source code must retain the above copyright 
+  notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above 
+  copyright notice, this list of conditions and the following disclaimer 
+  in the documentation and/or other materials provided with the 
+  distribution.
+  * Neither the name of Princeton University nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  POSSIBILITY OF SUCH DAMAGE.
+ */
 
-// import server.ServerConfig;
-// import utils.*;
+package org.coniks.coniks_test_client;
 
 import java.security.*;
 import java.security.KeyPair;
@@ -21,7 +50,11 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-
+/** Implements all operations involving digital signatures
+ * that a CONIKS client must perform.
+ *
+ *@author Michael Rochlin
+ */
 public class SignatureOps{
 
     private static ClientConfig CONFIG = null;
@@ -29,55 +62,6 @@ public class SignatureOps{
     public static void initSignatureOps(ClientConfig config){
         CONFIG = config;
     }
-
-
-    // public static DSAPrivateKey loadPublicKey(ClientConfig config, String keyOwner){
-
-    //     KeyStore ks = null;
-    //     DSAPrivateKey publicKey = null;
-
-    //     try{
-    //         ks = KeyStore.getInstance(KeyStore.getDefaultType());
-
-    //         char[] ts_password = config.PRIVATE_KEYSTORE_PWD.toCharArray();
-            
-    //         FileInputStream fis = null;
-      
-    //         fis = new FileInputStream(config.PRIVATE_KEYSTORE_PATH);
-    //         ks.load(fis, ts_password);
-
-    //         if(ks.isKeyEntry(keyOwner)){
-    //             KeyStore.ProtectionParameter protParam = 
-    //                 new KeyStore.PasswordProtection(ts_password);
-
-    //             KeyStore.TrustedCertificateEntry pkEntry = (KeyStore.TrustedCertificateEntry)
-    //                 ks.getEntry(keyOwner, protParam);
-    //             publicKey = (DSAPublicKey)pkEntry.getTrustedCertificate().getPublicKey();
-    //         }
-    //         else{
-    //             throw new CertificateException();
-    //         }
-    //         fis.close();
-    //         return publicKey;
-    //     }
-    //     catch(IOException e){
-    //         ServerLogger.error("KeyOps:loadPublicKey: Problem loading the keystore");
-    //     }   
-    //     catch(NoSuchAlgorithmException e){
-    //         ServerLogger.error("KeyOps:loadPublicKey: Problem with integrity check algorithm");
-    //     }
-    //     catch(CertificateException e){
-    //         ServerLogger.error("KeyOps:loadPublicKey: Problem with the cert(s) in keystore");
-    //     }   
-    //     catch(KeyStoreException e){
-    //         ServerLogger.error("KeyOps:loadPublicKey: Problem getting Keystore instance");
-    //     }
-    //     catch(UnrecoverableEntryException e){
-    //         ServerLogger.error("KeyOps:loadPublicKey: specified protParam were insufficient or invalid");
-    //     }
-    //     return null;
-    // }
-
 
     /*********************************************************************
      * The following code is used in the reference client, but does not 
@@ -174,35 +158,6 @@ public class SignatureOps{
         return true;
     }
 
-
-    // // TODO(mrochlin)
-    // // Should use protected keystore instead of just file streams
-    // public static boolean unsafeSavePublicKey(DSAPublicKey pubKey, String fileName, String username) {
-    //     try {
-    //         ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName));
-    //         out.writeObject(pubKey);
-    //         out.close();
-    //     }
-    //     catch (Exception e) {
-    //         return false;
-    //     }
-    //     return true;
-    // }
-
-    // // TODO(mrochlin)
-    // // Should use protected keystore instead of just file streams
-    // public static boolean unsafeSavePrivateKey(DSAPrivateKey prKey, String fileName, String username) {
-    //     try {
-    //         ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName));
-    //         out.writeObject(prKey);
-    //         out.close();
-    //     }
-    //     catch (Exception e) {
-    //         return false;
-    //     }
-    //     return true;
-    // }
-
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static KeyPair unsafeLoadDSAKeyPair() {
@@ -289,66 +244,6 @@ public class SignatureOps{
             return null;
         }
     }
-
-
-    // digitally sign a given array of bytes
-    // public static byte[] sign(byte[] input){
-
-    //     RSAPrivateKey MY_PRIV_KEY = KeyOps.loadSigningKey(CONFIG);
-
-    // byte[] signed = null;
-
-    //     if(MY_PRIV_KEY == null){
-    //     throw new RuntimeException("borked pk?");
-    //     }
-    
-    // try{
-    //     Signature signer = Signature.getInstance("SHA256withRSA");
-    //     signer.initSign(MY_PRIV_KEY, new SecureRandom());
-    //         signer.update(input);
-            
-    //     signed = signer.sign();
-    //     return signed;
-    // }
-    // catch(NoSuchAlgorithmException e){
-    //     System.out.println("RSA is invalid for some reason.");
-    // }
-    // catch(InvalidKeyException e){
-    //     System.out.println("The given key is invalid.");
-    // }
-    //     catch(SignatureException e){
-    //     System.out.println("The format of the input is invalid.");
-    // }
-    
-    // return signed;
-    // }
-
-    // // verify the specified key owner's (i.e. server's) signature on the given message 
-    // public static boolean verifySig(byte[] msg, byte[] signature, String keyOwner){
-
-    //     RSAPublicKey pubKey = KeyOps.loadPublicKey(CONFIG, keyOwner);
-
-    // try{
-
-    //     Signature verifier = Signature.getInstance("SHA256withRSA");
-    //     verifier.initVerify(pubKey);
-    //     verifier.update(msg);
-        
-    //     return verifier.verify(signature);
-    // }
-    // catch(NoSuchAlgorithmException e){
-    //     System.out.println("SHA256withRSA is invalid for some reason.");
-    // }
-    // catch(InvalidKeyException e){
-    //     System.out.println("The given key is invalid.");
-    // }
-    // catch(SignatureException e){
-    //     System.out.println("The format of the input is invalid: "+e.getMessage());
-    // }
-    
-    // return false;
-
-    // }
 
     /** Makes a DSA PublicKey from the given parameters */
     public static PublicKey makeDSAPublicKeyFromParams(BigInteger p, BigInteger q, BigInteger g, BigInteger y) {

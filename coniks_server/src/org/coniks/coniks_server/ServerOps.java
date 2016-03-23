@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-16, Princeton University.
+  Copyright (c) 2015, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ import org.javatuples.*;
  * These include generating data binding proofs and signed tree roots (STR).
  * 
  *@author Marcela S. Melara (melara@cs.princeton.edu)
- *@author Michael Rochlin (@marisbest2)
+ *@author Michael Rochlin
  */
 public class ServerOps{
 

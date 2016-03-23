@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-16, Princeton University.
+  Copyright (c) 2015, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -50,7 +50,7 @@ import java.util.Arrays;
  * Current encryption/signing algorithm used: RSA with SHA-256.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
- *@author Michael Rochlin (@marisbest2)
+ *@author Michael Rochlin
  */
 public class SignatureOps{
 

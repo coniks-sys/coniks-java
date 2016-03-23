@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-16, Princeton University.
+  Copyright (c) 2015, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ import java.io.InvalidObjectException;
  * prefix tree.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
- *@author Michael Rochlin (@marisbest2)
+ *@author Michael Rochlin
  */
 public class InteriorNode extends TreeNode implements Serializable {
   

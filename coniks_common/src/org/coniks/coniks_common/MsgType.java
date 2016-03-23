@@ -36,8 +36,8 @@ package org.coniks.coniks_common;
 /** Defines constants representing the types
  * of messages exchanged by CONIKS clients and servers.
  *
- *@author Marcela Melara
- *@author Michael Rochlin
+ *@author Marcela Melara (@masomel)
+ *@author Michael Rochlin (@marisbest2)
  */
 public final class MsgType {
 

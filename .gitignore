@@ -1,0 +1,4 @@
+.DS_Store
+coniks_common/src/org/coniks/coniks_common/*.class
+coniks_server/src/org/coniks/coniks_server/*.class
+coniks_test_client/src/org/coniks/coniks_test_client/*.class

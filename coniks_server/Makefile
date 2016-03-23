@@ -3,7 +3,11 @@
 #
 
 #This can be a relative path
+<<<<<<< HEAD
 CLASS_DEST = /path/to/classes
+=======
+CLASS_DEST = ../server_files
+>>>>>>> Adding the new files
 # Do not modify SRC
 SRC = src
 # Do not modify COMMON

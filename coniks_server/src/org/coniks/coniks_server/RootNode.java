@@ -114,6 +114,10 @@ public class RootNode extends InteriorNode{
         this.rightHash= r;
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Adding the new files
      /** Clones (i.e. duplicates) this root node from the current
      * epoch {@code ep0} for the next epoch {@code ep1} with the. 
      * It then recursively 

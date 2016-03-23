@@ -57,6 +57,12 @@ message ServerResp{
              MALFORMED_ERR = 2;
              SERVER_ERR = 3;
              NAME_NOT_FOUND_ERR = 4;
+<<<<<<< HEAD
+=======
+             COMMITMENT_RESP = 5;
+             AUTH_PATH = 6;
+             VERIFICATION_ERR = 7;
+>>>>>>> Adding the new files
         }
         optional Message message = 1;
 }

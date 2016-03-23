@@ -34,6 +34,11 @@
 package org.coniks.coniks_test_client;
 
 import org.coniks.coniks_common.C2SProtos.AuthPath;
+<<<<<<< HEAD
+=======
+import org.coniks.coniks_common.C2SProtos.*;
+
+>>>>>>> Adding the new files
 import org.coniks.coniks_common.UtilProtos.Commitment;
 import org.coniks.coniks_common.UtilProtos.Hash;
 
@@ -43,6 +48,14 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+<<<<<<< HEAD
+=======
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.interfaces.DSAParams;
+import java.math.BigInteger;
+
+>>>>>>> Adding the new files
 
 /** Implements various utility functions
  * used by various components of a CONIKS
@@ -259,6 +272,7 @@ public class ClientUtils{
     /** Converts an AuthPath.UserLeafNode protobuf {@code uln} 
      * to a byte[].
      */
+<<<<<<< HEAD
     public static byte[] ulnProtoToBytes(AuthPath.UserLeafNode uln){
         // TODO: add the generic blob of data and the change key fields
         byte[] pubKey = strToBytes(uln.getPublickey());
@@ -280,6 +294,103 @@ public class ClientUtils{
 	return arr.array();
     }
 
+=======
+    /** Converts the DSAPublicKey {@code pub} to a byte array in g-p-q-y order */
+    public static byte[] convertDSAPubKey(DSAPublicKey pub){
+        byte[] g = strToBytes(pub.getParams().getG().toString());
+        byte[] p = strToBytes(pub.getParams().getP().toString());
+        byte[] q = strToBytes(pub.getParams().getQ().toString());
+        byte[] y = strToBytes(pub.getY().toString());
+
+        byte[] pubKey = new byte[g.length+p.length+q.length+y.length];
+
+        ByteBuffer arr = ByteBuffer.wrap(pubKey);
+        arr.put(g);
+        arr.put(p);
+        arr.put(q);
+        arr.put(y);
+
+        return arr.array();
+    }
+
+    /** Converts the DSAPublicKeyProto {@code pub} to a byte array in g-p-q-y order */
+    public static byte[] convertDSAPubKey(DSAPublicKeyProto pub){
+        byte[] g = strToBytes(pub.getG());
+        byte[] p = strToBytes(pub.getP());
+        byte[] q = strToBytes(pub.getQ());
+        byte[] y = strToBytes(pub.getY());
+
+        byte[] pubKey = new byte[g.length+p.length+q.length+y.length];
+
+        ByteBuffer arr = ByteBuffer.wrap(pubKey);
+        arr.put(g);
+        arr.put(p);
+        arr.put(q);
+        arr.put(y);
+
+        return arr.array();
+    }
+
+    /** Builds a DSAPublicKeyProto protobuf from the DSA public key {@code pub} */
+    public static DSAPublicKeyProto buildDSAPublicKeyProto(DSAPublicKey pub) {
+        return buildDSAPublicKeyProto(pub.getParams().getP(),
+                                      pub.getParams().getQ(),
+                                      pub.getParams().getG(),
+                                      pub.getY()); // don't ask me why java is so inconsistent (mrochlin)
+
+    }
+
+    /** Builds a DSAPublicKeyProto protobuf from the DSA parameters */
+    public static DSAPublicKeyProto buildDSAPublicKeyProto(BigInteger p, 
+                                                            BigInteger q,
+                                                            BigInteger g,
+                                                            BigInteger y) {
+
+        DSAPublicKeyProto.Builder dsaBuilder = DSAPublicKeyProto.newBuilder();
+        dsaBuilder.setP(p.toString());
+        dsaBuilder.setQ(q.toString());
+        dsaBuilder.setG(g.toString());
+        dsaBuilder.setY(y.toString());
+        return dsaBuilder.build();
+    }
+
+
+    /** Converts an AuthPath.UserLeafNode protobuf {@code uln} 
+     * to a byte[].
+     */
+    public static byte[] ulnProtoToBytes(AuthPath.UserLeafNode uln){
+        // TODO: add the generic blob of data and the change key fields
+        byte[] pubKey = strToBytes(uln.getPublickey());
+        byte[] usr = strToBytes(uln.getName());
+        byte[] ep_add = longToBytes(uln.getEpochAdded());
+        byte[] ep_changed = longToBytes(uln.getEpochChanged());
+        byte[] auk = new byte[]{(byte)(uln.getAllowsUnsignedKeychange() ? 0x01 : 0x00)};
+        byte[] apl = new byte[]{(byte)(uln.getAllowsPublicLookup() ? 0x01 : 0x00)};
+        byte[] ck = convertDSAPubKey(uln.getChangeKey());
+        byte[] sig = ClientUtils.intListToByteArr(new ArrayList<Integer>(uln.getSignatureList()));
+        byte[] lastMsg = ClientUtils.intListToByteArr(new ArrayList<Integer>(uln.getLastMsgList()));
+
+
+
+        byte[] leafBytes = new byte[pubKey.length+usr.length+ep_add.length+auk.length+
+                                    apl.length+ep_changed.length+ck.length+sig.length+lastMsg.length];
+    
+        ByteBuffer arr = ByteBuffer.wrap(leafBytes);
+        arr.put(usr);
+        arr.put(pubKey);
+        arr.put(ep_add);
+        arr.put(ep_changed);
+        arr.put(auk);
+        arr.put(apl);
+        arr.put(ck);
+        arr.put(sig);
+        arr.put(lastMsg);
+
+        return arr.array();
+
+
+    }
+>>>>>>> Adding the new files
     /** Takes the hash of a user leaf node {@code ulnHash} and recomputes
      * the hashes of each given interior node on the authentication path
      * {@code inList} up to the root's left or right child and returns this hash

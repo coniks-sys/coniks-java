@@ -39,6 +39,7 @@ import "util.proto";
 option java_package = "org.coniks.coniks_common";
 option java_outer_classname = "C2SProtos";
 
+<<<<<<< HEAD
 message Registration{
         // server must make sure that these two fields are specified
         optional string name = 1; // this name MUST be in DB for server to accept
@@ -46,16 +47,62 @@ message Registration{
 }
 
 message CommitmentReq{
+=======
+message DSAPublicKeyProto {
+    // send the bigintegers (or something) as strings across the wire
+    required string p = 1;
+    required string q = 2;
+    required string g = 3;
+    required string y = 4;
+}
+
+message Registration {
+    // server must make sure that these two fields are specified
+    optional string name = 1; // this name MUST be in DB for server to accept
+    optional string blob = 2; //server will parse this from C S expression
+    optional DSAPublicKeyProto changeKey = 3;
+    optional bool allows_unsigned_keychange = 4;
+    optional bool allows_public_lookup = 5;
+} 
+
+message ULNChangeReq {
+    optional string name = 1;
+    optional string newBlob = 2;
+    optional DSAPublicKeyProto newChangeKey = 3;
+    optional bool allowsUnsignedKeychange = 4;
+    optional bool allowsPublicLookup = 5;
+}
+
+message SignedULNChangeReq {
+    // This should be generated / verified
+    // by parsing / building the ULNChangeReq
+    // Then converting to a byte[]
+    // Then signing/verifying
+    optional ULNChangeReq req = 1;
+    repeated fixed32 sig = 2 [packed = true];
+}
+
+
+message CommitmentReq {
+>>>>>>> Adding the new files
         // ok to use same format for getComm and getWitness calls
         enum CommitmentType{
                  SELF = 0;
                  WITNESS = 1;
+<<<<<<< HEAD
        }         
+=======
+        }         
+>>>>>>> Adding the new files
                  
         // server checks that type, and epoch are specified
         optional CommitmentType type = 1; 
         // epoch  should <= than current epoch
+<<<<<<< HEAD
         optional  uint64 epoch = 2;
+=======
+        optional uint64 epoch = 2;
+>>>>>>> Adding the new files
         // provider MUST be specified if type is WITNESS
         optional string provider = 3;
 }
@@ -79,11 +126,23 @@ message AuthPath{
                 optional string name = 1;
                 optional string publickey = 2;
                 optional uint64 epoch_added = 3;
+<<<<<<< HEAD
                 optional bool allows_unsigned_keychange = 4;
                 optional bool allows_public_lookup = 5;
                 repeated fixed32 lookup_index = 6;
                 //repeated fixed32 signature = 7;
                 optional uint32 intlevels = 7; // needed so client can loop over interior nodes
+=======
+                optional uint64 epoch_changed = 4;
+                optional bool allows_unsigned_keychange = 5;
+                optional bool allows_public_lookup = 6;
+                repeated fixed32 lookup_index = 7 [packed = true];
+                //repeated fixed32 signature = 7;
+                optional uint32 intlevels = 8; // needed so client can loop over interior nodes
+                repeated fixed32 signature = 9 [packed = true];
+                optional DSAPublicKeyProto changeKey = 10;
+                repeated fixed32 lastMsg = 11 [packed = true];
+>>>>>>> Adding the new files
         }
         
         optional UserLeafNode leaf = 1; // client checks if leaf is specified

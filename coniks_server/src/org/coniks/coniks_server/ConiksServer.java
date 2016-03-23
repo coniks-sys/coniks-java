@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -39,11 +39,6 @@ import org.coniks.coniks_common.C2SProtos.CommitmentReq;
 import org.coniks.coniks_common.C2SProtos.KeyLookup;
 import org.coniks.coniks_common.C2SProtos.RegistrationResp;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
-<<<<<<< HEAD
-import org.coniks.coniks_common.UtilProtos.Hash;
-import org.coniks.coniks_common.UtilProtos.Commitment;
-import org.coniks.coniks_common.UtilProtos.ServerResp;
-=======
 import org.coniks.coniks_common.C2SProtos.*;
 
 import org.coniks.coniks_common.UtilProtos.Hash;
@@ -51,10 +46,7 @@ import org.coniks.coniks_common.UtilProtos.Commitment;
 import org.coniks.coniks_common.UtilProtos.ServerResp;
 import org.coniks.coniks_common.UtilProtos.*;
 
-
-
 import java.security.interfaces.DSAPublicKey;
->>>>>>> Adding the new files
 
 import java.io.*;
 import java.net.*;
@@ -75,11 +67,8 @@ import java.util.concurrent.Executors;
 import org.javatuples.*;
 import com.google.protobuf.*;
 
-<<<<<<< HEAD
-=======
 import java.util.Arrays;
 
->>>>>>> Adding the new files
 // TODO: Clean this up and structure more like client:
 // separate "networking" from other functionality
 // such as STR generation.
@@ -89,10 +78,7 @@ import java.util.Arrays;
  * and signed tree root (STR) generation.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
-<<<<<<< HEAD
-=======
- *@author  
->>>>>>> Adding the new files
+ *@author Michael Rochlin
  */
 public class ConiksServer{
 
@@ -111,16 +97,11 @@ public class ConiksServer{
     
     private static int epochCounter = 0; 
 
-<<<<<<< HEAD
-    // keeps all the new users on a day-by-day basis
-    private static PriorityQueue<Pair<byte[],UserLeafNode>> pendingQueue;   
-=======
     // this is a counter to be used to sort the uln changes so they happen in-order for the same person
     private static long ulnCounter = 0;
 
     // keeps all the new users on a day-by-day basis
     private static PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQueue;   
->>>>>>> Adding the new files
 
     // logs are useful
     private static MsgHandlerLogger msgLog = null;
@@ -132,11 +113,6 @@ public class ConiksServer{
      */
     public static synchronized void register(String uname, String pk){            
         byte[] index = ServerUtils.unameToIndex(uname);
-<<<<<<< HEAD
-        UserLeafNode uln = new UserLeafNode(uname, pk, 
-                                            curEpoch+CONFIG.EPOCH_INTERVAL, 0, index);
-        pendingQueue.add(Pair.with(index, uln));
-=======
         UserLeafNode uln = new UserLeafNode(uname, pk, curEpoch+CONFIG.EPOCH_INTERVAL, 0, true, true, null, index);
         pendingQueue.add(Triplet.with(index, uln, (Operation)new Register()));
     }
@@ -149,7 +125,6 @@ public class ConiksServer{
         UserLeafNode uln = new UserLeafNode(uname, newKey, curEpoch+CONFIG.EPOCH_INTERVAL, 0, true, true, kPrime, index);
         pendingQueue.add(Triplet.with(index, uln, 
             (Operation)new KeyChange(newKey, kPrime, allowsUnsignedKC, allowsPublicLookup, msg, sig, curEpoch, epochCounter++)));
->>>>>>> Adding the new files
     }
     
     /** Updates the server's STR history: inserts any pending registrations 
@@ -159,14 +134,6 @@ public class ConiksServer{
      *@return {@code true} if the update succeeded, {@code false} otherwise.
      */
     public static synchronized boolean updateHistory(){
-<<<<<<< HEAD
-        RootNode curRoot = null;
-        boolean isGoodExit = true; // the exit status
-        RootNode newRoot = null;
-
-	int toAdd = pendingQueue.size();
-        // msm: these two cases can probably be condensed
-=======
       RootNode curRoot = null;
       boolean isGoodExit = true; // the exit status
       RootNode newRoot = null;
@@ -174,7 +141,6 @@ public class ConiksServer{
     	int toAdd = pendingQueue.size();
     	long timeUpdateStart = System.nanoTime();
       // msm: these two cases can probably be condensed
->>>>>>> Adding the new files
         if(curRecord != null){
             ServerUtils.Record r = curRecord;
             curRoot = r.getRoot();
@@ -211,12 +177,9 @@ public class ConiksServer{
 
             // increment curEpoch for the new record
             curEpoch+=CONFIG.EPOCH_INTERVAL;
-<<<<<<< HEAD
-=======
 
             // reset the uln counter
             ulnCounter = 0;
->>>>>>> Adding the new files
             
             // add the new STR to the linked list
             addNewRecord(newRoot, commSig);
@@ -245,13 +208,8 @@ public class ConiksServer{
      * N.B. Designed for few restarts in mind.
      */
     private static void initNamespace(){
-<<<<<<< HEAD
-	PriorityQueue<Pair<byte[], UserLeafNode>> initUsers = 
-	    new PriorityQueue<Pair<byte[],UserLeafNode>>(
-=======
 	PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> initUsers = 
 	    new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>(
->>>>>>> Adding the new files
 		16384, new ServerUtils.PrefixComparator());
 
 	serverLog.log("Beginning initNamespace()");
@@ -270,56 +228,33 @@ public class ConiksServer{
         UserTreeBuilder utb = ServerOps.startBuildInitTree(ServerUtils.hash(new byte[10]), 
                                                            initEpoch);
         
-<<<<<<< HEAD
-        RootNode initRoot = null;
-    
-        // add <size> dummy users
-        for (int i = 0 ; i < size; i++){
-            String userId = "test-"+i;
-=======
         RootNode initRoot = null;    
         // add <size> dummy users
         for (int i = 0 ; i < size; i++){
             String userId = String.format("test-%8d", i);
->>>>>>> Adding the new files
             String pubKey = "(dsa  (p #test-10000007712ECAF91762ED4E46076D846624D2A71C67A991D1FEA059593163C2B19690B1A5CA3C603F52A62D73BB91D521BA55682D38E3543CC34E384420AA32CFF440A90D28A6F54C586BB856460969C658B20ABF65A767063FE94A5DDBC2D0D5D1FD154116AE7039CC4E482DCF1245A9E4987EB6C91B32834B49052284027#) (q #00B84E385FA6263B26E9F46BF90E78684C245D5B35#) (g #77F6AA02740EF115FDA233646AAF479367B34090AEC0D62BA3E37F793D5CB995418E4F3F57F31612561A4BEA41FAC3EE05679D90D2F79A581905E432B85F4C109164EB7846DC9C3669B013D67063747ABCC4B07EAA4AC44D9DE9FC2A349859994DB683DFC7784D0F1DF1DA25014A40D8617E3EC94D8DB8FBBBC37A5C5AAEE5DC#) (y #4B41A8AA7B6F23F740DEF994D1A6582E00E4B821F65AC30BDC6710CD6111FA24DE70EACE6F4A92A84038D4B928D79F6A0DF35F729B861A6713BECC934309DE0822B8C9D2A6D3C0A4F0D0FB28A77B0393D72568D72EE60C73B2C5F6E4E1A1347EDC20AC449EFF250AC1C251E16403A610DB9EB90791E63207601714A78679283))";
             long epochAdded = initEpoch;
             byte[] index = ServerUtils.unameToIndex(userId);
             
             UserLeafNode uln = new UserLeafNode(userId, pubKey, epochAdded, 0, index);
-<<<<<<< HEAD
-            initUsers.add(Pair.with(index, uln));
-            
-        }
-        initRoot = utb.extendTree(initUsers);
-        
-=======
             initUsers.add(Triplet.with(index, uln, (Operation)new Register()));
             
         }
         initRoot = utb.extendTree(initUsers);
          
->>>>>>> Adding the new files
         if(initRoot == null) {
             serverLog.error("An error occured while trying to build the initial tree");
             throw new RuntimeException("initialization error.");
         }
         
         initUsers.clear();
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> Adding the new files
         utb.clearTemps();
             
         byte[] commSig = ServerOps.generateSTR(initRoot);
         serverLog.log("initial root epoch: "+initRoot.getEpoch()+"\n"+
                       "comm sig: "+ServerUtils.bytesToHex(commSig));
-<<<<<<< HEAD
-=======
         serverLog.log("epoch len: " + CONFIG.EPOCH_INTERVAL);
->>>>>>> Adding the new files
         curRecord = new ServerUtils.Record(initRoot,
                                            initRoot.getEpoch(), commSig, null);
         // headRecord = curRecord;
@@ -336,17 +271,10 @@ public class ConiksServer{
         
         ServerUtils.Record newRecord = new ServerUtils.Record(newRoot, 
                                                               curEpoch, str, curRecord);
-<<<<<<< HEAD
-	if (curRecord != null){
-	    // let's not keep more than one back in memory
-	    curRecord.setPrev(null);
-	}
-=======
       	if (curRecord != null){
       	    // let's not keep more than one back in memory
       	    curRecord.setPrev(null);
       	}
->>>>>>> Adding the new files
 
         // reassign pointer
         curRecord = newRecord;	
@@ -360,16 +288,9 @@ public class ConiksServer{
      * head of the list is reached before the requested record is found.
      */
     public static synchronized ServerUtils.Record getRecord(long ep){
-<<<<<<< HEAD
-            ServerUtils.Record runner = curRecord;
-            
-            while(runner.getRoot().getEpoch() > ep && runner != null){
-                
-=======
         ServerUtils.Record runner = curRecord;
         
         while(runner.getRoot().getEpoch() > ep && runner != null){                
->>>>>>> Adding the new files
                 // need to check if we reached the head of the list
                 if (runner.getPrev() == null) {
                     throw new UnsupportedOperationException("reached the head of the list!");
@@ -377,15 +298,9 @@ public class ConiksServer{
                 else{
                     runner = runner.getPrev();
                 }
-<<<<<<< HEAD
-            }
-            
-            return runner;
-=======
         }
         
         return runner;
->>>>>>> Adding the new files
     }
     
     /** Sets up several configurations and begins listening for
@@ -400,44 +315,26 @@ public class ConiksServer{
         timerLog = TimerLogger.getInstance(CONFIG.TIMER_LOG_PATH);
         serverLog = ServerLogger.getInstance(CONFIG.SERVER_LOG_PATH);
 
-<<<<<<< HEAD
-=======
         pendingQueue = new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>( 
 	    16384, new ServerUtils.PrefixComparator());
 
->>>>>>> Adding the new files
         // this is needed to set up the SSL connection
         System.setProperty("javax.net.ssl.keyStore", CONFIG.KEYSTORE_PATH);
         System.setProperty("javax.net.ssl.keyStorePassword", CONFIG.KEYSTORE_PWD);
         System.setProperty("javax.net.ssl.trustStore", CONFIG.TRUSTSTORE_PATH);
         System.setProperty("javax.net.ssl.trustStorePassword", CONFIG.TRUSTSTORE_PWD);
 
-<<<<<<< HEAD
-        pendingQueue = new PriorityQueue<Pair<byte[],UserLeafNode>>( 
-	    16384, new ServerUtils.PrefixComparator());
-
-=======
->>>>>>> Adding the new files
         SignatureOps.initSignatureOps(CONFIG);
         initNamespace(); // initializes the namespace with latest stored snapshot and all registered users
         
         EpochTimerTask epochSnapshotTaker = new EpochTimerTask();
         
-<<<<<<< HEAD
-	ScheduledExecutorService scheduler =
-	    Executors.newScheduledThreadPool(1);
-        scheduler.scheduleWithFixedDelay(epochSnapshotTaker, 
-					 CONFIG.EPOCH_INTERVAL, 
-					 CONFIG.EPOCH_INTERVAL,
-					 TimeUnit.MILLISECONDS);
-=======
     	ScheduledExecutorService scheduler =
     	    Executors.newScheduledThreadPool(1);
             scheduler.scheduleWithFixedDelay(epochSnapshotTaker, 
     					 CONFIG.EPOCH_INTERVAL, 
     					 CONFIG.EPOCH_INTERVAL,
     					 TimeUnit.MILLISECONDS);
->>>>>>> Adding the new files
         
         SSLServerSocket s;
         
@@ -536,8 +433,7 @@ public class ConiksServer{
                 else if (msgType == MsgType.KEY_LOOKUP) {
                     handleKeyLookupProto((KeyLookup) clientMsg);
                 }
-<<<<<<< HEAD
-=======
+
                 else if (msgType == MsgType.ULNCHANGE_REQ) {
                     // TODO
                     handleULNChangeProto((ULNChangeReq) clientMsg);
@@ -546,7 +442,6 @@ public class ConiksServer{
                     // TODO
                     handleSignedULNChangeProto((SignedULNChangeReq) clientMsg);
                 }
->>>>>>> Adding the new files
                 
                 clientSocket.close();
                 
@@ -567,11 +462,7 @@ public class ConiksServer{
          *@return The specific protobuf message according to the message type
          * indicated by the client.
          */
-<<<<<<< HEAD
-        private synchronized AbstractMessage receiveMsgProto () {
-=======
         private synchronized AbstractMessage receiveMsgProto() {
->>>>>>> Adding the new files
             
             try {
                 // get the message type of the message and read in the stream
@@ -580,11 +471,7 @@ public class ConiksServer{
                 if (msgType == MsgType.REGISTRATION){
                     Registration reg = Registration.parseDelimitedFrom(din);
                     
-<<<<<<< HEAD
-                    if(!reg.hasPublickey()){
-=======
                     if(!reg.hasBlob()){
->>>>>>> Adding the new files
                         msgLog.log("Malformed registration message");
                     }
                     else {
@@ -612,8 +499,6 @@ public class ConiksServer{
                         return commReq;
                     }
                 }
-<<<<<<< HEAD
-=======
                 else if (msgType == MsgType.ULNCHANGE_REQ) {
                     ULNChangeReq ulnChange = ULNChangeReq.parseDelimitedFrom(din);
                     if (!ulnChange.hasName()) {
@@ -636,7 +521,6 @@ public class ConiksServer{
                     // result = ServerUtils.RespType.SERVER_ERR;
                     msgLog.log("Unknown incoming message type");
                 }
->>>>>>> Adding the new files
             }
             catch (InvalidProtocolBufferException e) {
                 System.out.println("An error occurred while parsing a protobuf message");
@@ -644,29 +528,20 @@ public class ConiksServer{
             catch (IOException e) {
                 System.out.println("An error occurred while receiving data from the server");
             }
-<<<<<<< HEAD
-            
+
             // unexpected message type from the client
             return null;
-            
-=======
-            // unexpected message type from the client
-            return null;
->>>>>>> Adding the new files
         }
 
         private synchronized void handleRegistrationProto(Registration reg) 
             throws IOException{
             msgLog.log("Handling registration message... ");
 
-<<<<<<< HEAD
-=======
             if(!reg.hasBlob()){
                 msgLog.log("Malformed registration message");
                 // result = ServerUtils.RespType.MALFORMED_ERR;
                 // return result;
             }
->>>>>>> Adding the new files
             //OTR has bug: adds slash to end of account name if not immediately 
             // registered with server so remove this slash
             String name =reg.getName();
@@ -694,11 +569,7 @@ public class ConiksServer{
             // If using a DB, insert the new user
 
             // we register the user in the pendingQueue
-<<<<<<< HEAD
-            register(name, reg.getPublickey());
-=======
             register(name, reg.getBlob());
->>>>>>> Adding the new files
 
             sendRegistrationRespResponse(regEpoch, CONFIG.EPOCH_INTERVAL);
         
@@ -707,12 +578,7 @@ public class ConiksServer{
         /* Helper functions for commitment requests */
 
         // retrieves the root node and commitment signature given a specific commitment request
-<<<<<<< HEAD
-        private synchronized void handleCommitmentReqProto 
-            (CommitmentReq commReq) 
-=======
         private synchronized void handleCommitmentReqProto(CommitmentReq commReq) 
->>>>>>> Adding the new files
             throws IOException{
             
             long epoch = commReq.getEpoch();
@@ -758,26 +624,13 @@ public class ConiksServer{
 
             msgLog.log("Getting key for "+username+"... ");
 
-<<<<<<< HEAD
-	    msgLog.log("SHA256 of name: " + ServerUtils.bytesToHex(ServerUtils.unameToIndex(username)));
-=======
     	    msgLog.log("SHA256 of name: " + ServerUtils.bytesToHex(ServerUtils.unameToIndex(username)));
->>>>>>> Adding the new files
 	    
             ServerUtils.Record r = getRecord(epoch);
             RootNode root = r.getRoot();	  
 
             UserLeafNode uln = getUlnFromTree(username, root);
 
-<<<<<<< HEAD
-	    if(uln == null){
-		msgLog.error(username + " not found...");
-                sendSimpleResponse(ServerUtils.RespType.NAME_NOT_FOUND_ERR);
-                return;
-	    }
-  
-            sendAuthPathResponse(uln, root);
-=======
     	    if(uln == null){
     		msgLog.error(username + " not found...");
                     sendSimpleResponse(ServerUtils.RespType.NAME_NOT_FOUND_ERR);
@@ -871,7 +724,6 @@ public class ConiksServer{
 
             // now pass to the unsigned version of the handler
             handleULNChangeProto(changeReq, sig);
->>>>>>> Adding the new files
         }
 
         // traverses down the tree until we reach the requested user leaf node
@@ -1037,8 +889,6 @@ public class ConiksServer{
             case MALFORMED_ERR:
                 respMsg.setMessage(ServerResp.Message.MALFORMED_ERR);
                 break;
-<<<<<<< HEAD
-=======
             case COMMITMENT_RESP:
                 respMsg.setMessage(ServerResp.Message.COMMITMENT_RESP);
                 break;
@@ -1048,7 +898,6 @@ public class ConiksServer{
             case VERIFICATION_ERR:
                 respMsg.setMessage(ServerResp.Message.VERIFICATION_ERR);
                 break;
->>>>>>> Adding the new files
             default:
                 respMsg.setMessage(ServerResp.Message.SERVER_ERR);
                 break;                

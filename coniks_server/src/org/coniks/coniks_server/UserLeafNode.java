@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -42,21 +42,8 @@ import java.util.HashMap;
  *  in the CONIKS binary Merkle prefix tree.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin (@marisbest2)
  */
-<<<<<<< HEAD
-public class UserLeafNode extends LeafNode implements Serializable{
-
-    String username;
-    String pubKey;
-    long epochAdded;
-    boolean allowUnsignedKeychange;
-    boolean allowPublicLookup;
-    byte[] index;
-    byte[] signature;
-
-    // TODO: use real dsa key
-   
-=======
 public class UserLeafNode extends LeafNode implements Serializable {
     
     String username;
@@ -72,28 +59,12 @@ public class UserLeafNode extends LeafNode implements Serializable {
     DSAPublicKey changeKey; // The public DSA key for changing
     byte[] lastMsg; // The last msg
 
->>>>>>> Adding the new files
     /** Constructs a user leaf node for the username {@code u}
      * and the public key {@code pub} with the given
      * epoch {@code ep}, its level {@code lvl} within the tree, and
      * the lookup index {@code index} for the username.
      */
-<<<<<<< HEAD
-    public UserLeafNode(String u, String pub, long e, int lvl, byte[] index){
-	this.username = u;
-	this.pubKey = pub;
-	this.epochAdded = e;
-	this.allowUnsignedKeychange = true; // this is the default for now
-        this.allowPublicLookup = true; // default for now
-	this.left = null;
-	this.right = null;
-	this.parent = null;
-	this.level = lvl;
-        this.index = index;
-        this.signature = new byte[256]; // dummy array
-    }
 
-=======
     public UserLeafNode(String u, String blob, long e, int lvl){
         this(u,blob,e,lvl,true,true);
     }
@@ -176,8 +147,6 @@ public class UserLeafNode extends LeafNode implements Serializable {
         this.allowUnsignedKeychange = b;
     }
     
-   
->>>>>>> Adding the new files
     /** Gets the username contained in this UserLeafNode.
      *
      *@return The username as a {@code String}.
@@ -221,8 +190,6 @@ public class UserLeafNode extends LeafNode implements Serializable {
         return this.allowPublicLookup;
     }
 
-<<<<<<< HEAD
-=======
     public void setAllowsPublicLookup(boolean b) {
         this.allowPublicLookup = b;
     }
@@ -265,7 +232,6 @@ public class UserLeafNode extends LeafNode implements Serializable {
         return this.lastMsg;
     }
     
->>>>>>> Adding the new files
     /** Gets the lookup index for the username in this UserLeafNode.
      *
      *@return The lookup index as a {@code byte[]}.
@@ -281,7 +247,6 @@ public class UserLeafNode extends LeafNode implements Serializable {
         this.index = i;
     }
 
-<<<<<<< HEAD
     /** Clones (i.e. duplicates) this user leaf node from the current
      * epoch {@code ep0} for the next epoch {@code ep1} with the
      * given {@code parent} tree node.
@@ -299,6 +264,4 @@ public class UserLeafNode extends LeafNode implements Serializable {
 	return cloneN;
     }
 
-=======
->>>>>>> Adding the new files
 } // ends UserLeafNode

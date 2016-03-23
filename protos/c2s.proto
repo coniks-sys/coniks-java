@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,8 @@
   POSSIBILITY OF SUCH DAMAGE.
  */
 
-// author: Marcela S. Melara (melara@cs.princeton.edu)
+// author: Marcela S. Melara (@masomel)
+// author: Michael Rochlin (@marisbest2)
 
 package org.coniks.coniks_common;
 
@@ -39,15 +40,6 @@ import "util.proto";
 option java_package = "org.coniks.coniks_common";
 option java_outer_classname = "C2SProtos";
 
-<<<<<<< HEAD
-message Registration{
-        // server must make sure that these two fields are specified
-        optional string name = 1; // this name MUST be in DB for server to accept
-        optional string publickey = 2; //server will parse this from C S expression
-}
-
-message CommitmentReq{
-=======
 message DSAPublicKeyProto {
     // send the bigintegers (or something) as strings across the wire
     required string p = 1;
@@ -84,25 +76,16 @@ message SignedULNChangeReq {
 
 
 message CommitmentReq {
->>>>>>> Adding the new files
         // ok to use same format for getComm and getWitness calls
         enum CommitmentType{
                  SELF = 0;
                  WITNESS = 1;
-<<<<<<< HEAD
-       }         
-=======
         }         
->>>>>>> Adding the new files
                  
         // server checks that type, and epoch are specified
         optional CommitmentType type = 1; 
         // epoch  should <= than current epoch
-<<<<<<< HEAD
-        optional  uint64 epoch = 2;
-=======
         optional uint64 epoch = 2;
->>>>>>> Adding the new files
         // provider MUST be specified if type is WITNESS
         optional string provider = 3;
 }
@@ -126,13 +109,6 @@ message AuthPath{
                 optional string name = 1;
                 optional string publickey = 2;
                 optional uint64 epoch_added = 3;
-<<<<<<< HEAD
-                optional bool allows_unsigned_keychange = 4;
-                optional bool allows_public_lookup = 5;
-                repeated fixed32 lookup_index = 6;
-                //repeated fixed32 signature = 7;
-                optional uint32 intlevels = 7; // needed so client can loop over interior nodes
-=======
                 optional uint64 epoch_changed = 4;
                 optional bool allows_unsigned_keychange = 5;
                 optional bool allows_public_lookup = 6;
@@ -142,7 +118,6 @@ message AuthPath{
                 repeated fixed32 signature = 9 [packed = true];
                 optional DSAPublicKeyProto changeKey = 10;
                 repeated fixed32 lastMsg = 11 [packed = true];
->>>>>>> Adding the new files
         }
         
         optional UserLeafNode leaf = 1; // client checks if leaf is specified

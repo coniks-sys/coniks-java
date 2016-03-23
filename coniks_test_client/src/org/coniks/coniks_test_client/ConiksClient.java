@@ -1,6 +1,5 @@
-<<<<<<< HEAD
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -32,13 +31,6 @@
   POSSIBILITY OF SUCH DAMAGE.
  */
 
-=======
-/** Implements the operations that interface
- * a CONIKS client with a CONIKS server.
- * 
- *@author Marcela Melara
- */
->>>>>>> Adding the new files
 package org.coniks.coniks_test_client;
 
 import javax.net.ssl.*;
@@ -53,19 +45,6 @@ import org.coniks.coniks_common.C2SProtos.CommitmentReq;
 import org.coniks.coniks_common.C2SProtos.KeyLookup;
 import org.coniks.coniks_common.C2SProtos.RegistrationResp;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
-<<<<<<< HEAD
-import org.coniks.coniks_common.UtilProtos.Commitment;
-import org.coniks.coniks_common.UtilProtos.ServerResp;
-
-/** Implements the operations that interface
- * a CONIKS client with a CONIKS server.
- * 
- *@author Marcela S. Melara (melara@cs.princeton.edu)
- */
-public class ConiksClient {
-
-    private static final ClientConfig CONFIG = new ClientConfig();
-=======
 import org.coniks.coniks_common.C2SProtos.*;
 
 import org.coniks.coniks_common.UtilProtos.Hash;
@@ -80,11 +59,15 @@ import javax.crypto.*;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-
+/** Implements the operations that interface
+ * a CONIKS client with a CONIKS server.
+ * 
+ *@author Marcela S. Melara (@masomel)
+ *@author Michael Rochlin (@marisbest2)
+ */
 public class ConiksClient {
 
     public static final ClientConfig CONFIG = new ClientConfig();
->>>>>>> Adding the new files
 
     private static DataOutputStream dout;
     private static DataInputStream din;
@@ -97,11 +80,8 @@ public class ConiksClient {
                            CONFIG.TRUSTSTORE_PATH);
         System.setProperty("javax.net.ssl.trustStorePassword",
                            CONFIG.TRUSTSTORE_PWD);
-<<<<<<< HEAD
-=======
         System.setProperty("javax.net.ssl.keyStore", CONFIG.PRIVATE_KEYSTORE_PATH);
         System.setProperty("javax.net.ssl.keyStorePassword", CONFIG.PRIVATE_KEYSTORE_PWD);
->>>>>>> Adding the new files
     }
 
     /* Functions for sending CONIKS messages to the server */
@@ -130,42 +110,29 @@ public class ConiksClient {
 
     }
 
-    /** Sends a CommitmentReq protobuf message requesting {@code provider}'s 
-<<<<<<< HEAD
-      commitment for {@code epoch} from {@code server}.
+    /** Sends a CommitmentReq protobuf message requesting {@code provider}'s commitment for {@code epoch} from {@code server}.
         If the server and provider are the same, {@code commitmentType} 
         is {@code SELF}, otherwise it is {@code WITNESSED}.
-=======
-        commitment for {@code epoch} from {@code server}.
-        If the server and provider are the same, {@code commitmentType} is {@code SELF},
-        otherwise it is {@code WITNESSED}.
->>>>>>> Adding the new files
     */
     public static void sendCommitmentReqProto (
                                                CommitmentReq.CommitmentType commitmentType, 
                                                long epoch, String provider,
                                                String server) {
         
-<<<<<<< HEAD
-        CommitmentReq commReq = buildCommitmentReqMsgProto(
-                                                           commitmentType, epoch, provider);
-=======
-        CommitmentReq commReq = buildCommitmentReqMsgProto(commitmentType, epoch, 
-                                                           provider);
->>>>>>> Adding the new files
+        CommitmentReq commReq = buildCommitmentReqMsgProto(commitmentType, epoch, provider);
         sendMsgProto(MsgType.COMMITMENT_REQ, commReq, server);
 
     }
 
-<<<<<<< HEAD
-=======
     /** Sends a ULNChangeReq protobuf message with all the arguments */
-    public static void sendULNChangeReqProto(String username, String newBlob, DSAPublicKey newChangeKey,
-                                             boolean allowsUnsignedKeychange, boolean allowsPublicLookup,
-                                             String server) {
-        ULNChangeReq changeReq = buildULNChangeReqMsgProto(username, newBlob, newChangeKey, 
-                                                           allowsUnsignedKeychange, allowsPublicLookup);
-        // System.out.println("ulnChange: " + Arrays.toString(changeReq.toByteArray()));
+    public static void sendULNChangeReqProto(String username, 
+                                             String newBlob, DSAPublicKey newChangeKey,
+                                             boolean allowsUnsignedKeychange, 
+                                             boolean allowsPublicLookup, String server) {
+        ULNChangeReq changeReq = buildULNChangeReqMsgProto(
+                                                           username, newBlob, newChangeKey, 
+                                                           allowsUnsignedKeychange, 
+                                                           allowsPublicLookup);
         sendMsgProto(MsgType.ULNCHANGE_REQ, changeReq, server);
     }
 
@@ -176,12 +143,10 @@ public class ConiksClient {
                                          String server) {
         ULNChangeReq changeReq = buildULNChangeReqMsgProto(username, newBlob, newChangeKey, 
                                                            allowsUnsignedKeychange, allowsPublicLookup);
-        // System.out.println("Signed ulnChange: " + Arrays.toString(changeReq.toByteArray()));
         SignedULNChangeReq signed = buildSignedULNChangeReqMsgProto(changeReq, prk);
         sendMsgProto(MsgType.SIGNED_ULNCHANGE_REQ, signed, server);
     }
 
->>>>>>> Adding the new files
     /* Helper functions for implementing the sending functions */
 
     /** Sends any protobuf message {@code msg} of type {@code msgType}
@@ -209,19 +174,10 @@ public class ConiksClient {
     /** Builds the Registration protobuf message with a given
         {@code username} and {@code publicKey}.
     */
-<<<<<<< HEAD
-    private static Registration buildRegistrationMsgProto(String username, 
-                                                          String publicKey) {
-        Registration.Builder regBuild = Registration.newBuilder();
-        regBuild.setName(username);
-        regBuild.setPublickey(publicKey);
-=======
     private static Registration buildRegistrationMsgProto(String username, String publicKey) {
         Registration.Builder regBuild = Registration.newBuilder();
         regBuild.setName(username);
         regBuild.setBlob(publicKey);
->>>>>>> Adding the new files
-
         return regBuild.build();
     }
 
@@ -234,10 +190,6 @@ public class ConiksClient {
         keyLookupBuild.setEpoch(epoch);
      
         return keyLookupBuild.build();
-<<<<<<< HEAD
-    
-=======
->>>>>>> Adding the new files
     }
 
     /** Builds the CommitmentReq protobuf message with a given
@@ -252,9 +204,6 @@ public class ConiksClient {
         commReqBuild.setProvider(server);
      
         return commReqBuild.build();
-<<<<<<< HEAD
-    
-=======
     }
 
     /** Builds the ULNChangeReq protobuf message with a given 
@@ -302,7 +251,6 @@ public class ConiksClient {
             return null;
         }
         return ulnChangeBuilder.build();
->>>>>>> Adding the new files
     }
 
     /* Functions for handling messages received from the server */
@@ -404,11 +352,7 @@ public class ConiksClient {
             // get the message type of the message and read in the stream
             int msgType = din.readUnsignedByte();
              
-<<<<<<< HEAD
-            // TODO: this should be a temporary binding
-=======
             // TODO: this should be a signed promise/temporary binding
->>>>>>> Adding the new files
             if (msgType == MsgType.REGISTRATION_RESP){
                 RegistrationResp regResp = RegistrationResp.parseDelimitedFrom(din);
                 
@@ -466,7 +410,8 @@ public class ConiksClient {
 
     }
 
-    /** Retrieves the simple server response message from {@code serverResp}
+    /** Retrieves the simple server response message from 
+        {@code serverResp}
      * and prints out an appropriate message to stdout.
      */
     private static void printServerRespMsgProto(ServerResp serverResp) {
@@ -486,12 +431,9 @@ public class ConiksClient {
         case MALFORMED_ERR:
             System.out.println("The message received by the server was malformed.");
             break;
-<<<<<<< HEAD
-=======
         case VERIFICATION_ERR:
             System.out.println("There was a VERIFICATION_ERR");
             break;
->>>>>>> Adding the new files
         default:
             System.out.println("Some server error occurred.");
             break;                
@@ -503,11 +445,7 @@ public class ConiksClient {
 
     /** Establishes an SSL connection to {@code server}.
      *
-<<<<<<< HEAD
-     *@throws an {@link java.io.IOException} if any of the socket operations fail.
-=======
      *@throws an {@code IOException} if any of the socket operations fail.
->>>>>>> Adding the new files
      */
     private static void connect (String server) 
         throws IOException {
@@ -532,9 +470,4 @@ public class ConiksClient {
             System.out.println("An error occurred while closing the connection");
         }
     }
-
-<<<<<<< HEAD
-=======
-
->>>>>>> Adding the new files
 }

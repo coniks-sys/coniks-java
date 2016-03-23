@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -39,10 +39,6 @@ import java.lang.NumberFormatException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> Adding the new files
 /** Sets various configuration parameters 
  * for a {@link ConiksServer}.
  *
@@ -128,17 +124,9 @@ public class ServerConfig{
         this.KEYSTORE_PWD = "";
         this.TRUSTSTORE_PATH = "/path/to/truststore";
         this.TRUSTSTORE_PWD = "";
-<<<<<<< HEAD
-
         this.STARTUP_TIME = System.currentTimeMillis();
     }
 
-=======
-        this.STARTUP_TIME = System.currentTimeMillis();
-    }
-
-
->>>>>>> Adding the new files
     /** Set a {@link ConiksServer}'s configuration according to the parameters in
      * {@code configFile}.
      * To avoid problems in case of an Exception, this constructor will first

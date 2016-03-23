@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -32,16 +32,13 @@
  */
 
 package org.coniks.coniks_test_client;
-<<<<<<< HEAD
-=======
+
 import java.security.*;
 import java.security.spec.*;
 import java.security.interfaces.*;
 import javax.crypto.*;
 import java.util.Random;
 import java.math.BigInteger;
-
->>>>>>> Adding the new files
 
 /** Implementation of a simple CONIKS test client
  * that simply displays how each component of the
@@ -50,7 +47,8 @@ import java.math.BigInteger;
  * of the messages sent to the server (it only needs to know 
  * whether it's using protobufs (TODO: or json)).
  * 
- *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Marcela S. Melara (@masomel)
+ *@author Michael Rochlin (@marisbest2)
  */
 public class TestClient {
 
@@ -123,8 +121,6 @@ public class TestClient {
         return false;
     }
 
-<<<<<<< HEAD
-=======
         /** Performs a key change by randomly changing the user's data-blob
         and signing and sending a new changekey 
     */
@@ -185,16 +181,11 @@ public class TestClient {
 
     }
 
->>>>>>> Adding the new files
     /** Prints the usage of the TestClient.
      */
     private static void usage() {
         System.out.println("TestClient <server> <command> [iterations = 1] [offset = 0] [verbosity = 0]");
-<<<<<<< HEAD
-        System.out.println("command := (REGISTER LOOKUP VERIFY)");
-=======
         System.out.println("command := (REGISTER LOOKUP VERIFY SIGNED UNSIGNED CHANGES MIXED)");
->>>>>>> Adding the new files
     }
 
     /** Usage:
@@ -240,22 +231,12 @@ public class TestClient {
                     System.out.println ("An error occurred.");
                 
             }
-<<<<<<< HEAD
             else if (command.equalsIgnoreCase("REGISTER")){
-=======
-            else if (command.equals("REGISTER")){
->>>>>>> Adding the new files
-
                 if (!register(uname, server))
                     System.out.println ("An error occurred.");
 
             }
-<<<<<<< HEAD
             else if (command.equalsIgnoreCase("VERIFY")){
-=======
-            else if (command.equals("VERIFY")){
->>>>>>> Adding the new files
-
                 if (verbosity == 1) {
                     System.out.println("checking: "+uname);
                 }
@@ -264,31 +245,28 @@ public class TestClient {
                     System.out.println("An error occurred.");
 
             }
-<<<<<<< HEAD
-=======
-            else if (command.equals("SIGNED")) {
+            else if (command.equalsIgnoreCase("SIGNED")) {
                 if (!doSignedKeyChange(uname, server)) {
                     System.out.println("An error occured");
                 }
             }
-            else if (command.equals("UNSIGNED")) {
+            else if (command.equalsIgnoreCase("UNSIGNED")) {
                 if (!doUnsignedKeyChange(uname, server)) {
                     System.out.println("An error occured");
                 }
 
             }
-            else if (command.equals("CHANGES")) {
+            else if (command.equalsIgnoreCase("CHANGES")) {
                 if (!doChangeToAllowsUnsigned(uname, server)) {
                     System.out.println("An error occured");
                 }
 
             }
-            else if (command.equals("MIXED")) {
+            else if (command.equalsIgnoreCase("MIXED")) {
                 if (!doSignedKeyChange(uname, server)) {
                     System.out.println("An error occured");
                 }
             }
->>>>>>> Adding the new files
             else {
                 System.out.println("Unknown command: "+command);
                 usage();

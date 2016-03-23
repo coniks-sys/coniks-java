@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -47,16 +47,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import org.javatuples.Pair;
-<<<<<<< HEAD
-=======
 import org.javatuples.Triplet;
->>>>>>> Adding the new files
 
 /** Implements various utility functions
  * used by various components of a CONIKS
  * server.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin (@marisbest2)
  */
 public class ServerUtils{
 
@@ -95,12 +93,8 @@ public class ServerUtils{
         NAME_EXISTS_ERR, //name is already in server's Coniks namespace
         MALFORMED_ERR,
         COMMITMENT_RESP,
-<<<<<<< HEAD
-        AUTH_PATH
-=======
         AUTH_PATH,
         VERIFICATION_ERR
->>>>>>> Adding the new files
      }
 
     /** Generates the cryptographic hash of {@code input}.
@@ -469,12 +463,7 @@ public class ServerUtils{
      *
      *@author Marcela S. Melara (melara@cs.princeton.edu)
      */
-<<<<<<< HEAD
-    public static class PrefixComparator implements Comparator<Pair<byte[], UserLeafNode>> {
-=======
-    public static class PrefixComparator implements Comparator<Triplet<byte[], UserLeafNode, Operation>> {
->>>>>>> Adding the new files
-	
+    public static class PrefixComparator implements Comparator<Triplet<byte[], UserLeafNode, Operation>> {	
         
         /** Compares the first 24 bits of two data binding lookup indeces.
          *
@@ -484,11 +473,7 @@ public class ServerUtils{
          *is smaller than 3 bytes.
          */
         @Override
-<<<<<<< HEAD
-	public int compare(Pair<byte[], UserLeafNode> p1,  Pair<byte[], UserLeafNode> p2) {
-=======
         public int compare(Triplet<byte[], UserLeafNode, Operation> p1,  Triplet<byte[], UserLeafNode, Operation> p2) {
->>>>>>> Adding the new files
 	    byte[] buf1 = p1.getValue0();
 	    byte[] buf2 = p2.getValue0();
 
@@ -497,14 +482,6 @@ public class ServerUtils{
 	    }
 	    
 	    for(int i = 0; i < 3; i++){
-<<<<<<< HEAD
-		if(buf1[i] > buf2[i]){
-		    return 1;
-		}else if (buf1[i] < buf2[i]){
-		    return -1;
-		}
-	    }
-=======
     		if(buf1[i] > buf2[i]){
     		    return 1;
     		}else if (buf1[i] < buf2[i]){
@@ -525,7 +502,6 @@ public class ServerUtils{
             return (((KeyChange)op1).counter > ((KeyChange)op2).counter) ? 1 : -1;
         }
 
->>>>>>> Adding the new files
 	    return 0;
 	}
     }

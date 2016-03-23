@@ -1,6 +1,5 @@
-<<<<<<< HEAD
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -30,12 +29,13 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
   POSSIBILITY OF SUCH DAMAGE.
-=======
+*/
+
 /** Sets various configuration parameters 
  * for a {@link ConiksClient}.
  *
- *@author Marcela Melara
->>>>>>> Adding the new files
+ *@author Marcela Melara (@masomel)
+ *@author Michael Rochlin (@marisbest2)
  */
 
 package org.coniks.coniks_test_client;
@@ -44,24 +44,13 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.io.FileInputStream;
 
-<<<<<<< HEAD
-/** Sets various configuration parameters 
- * for a {@link ConiksClient}.
- *
- *@author Marcela S. Melara (melara@cs.princeton.edu)
- */
-=======
->>>>>>> Adding the new files
 public class ClientConfig{
 
     private final int PORT_IDX = 0;
     private final int TRUSTSTORE_PATH_IDX = 1;
     private final int TRUSTSTORE_PWD_IDX = 2;
-<<<<<<< HEAD
-=======
     private final int PRIVATE_KEYSTORE_PATH_IDX = 3;
     private final int PRIVATE_KEYSTORE_PWD_IDX = 4;
->>>>>>> Adding the new files
 
     /** The port number on which the CONIKS server is listening
      */
@@ -75,28 +64,19 @@ public class ClientConfig{
      */
     public String TRUSTSTORE_PWD = "";
 
-<<<<<<< HEAD
-=======
     /** The path to the client's private DSA key */
     public String PRIVATE_KEYSTORE_PATH = "";
     public String PRIVATE_KEYSTORE_PWD = "";
 
-
->>>>>>> Adding the new files
     /** Set a {@link ConiksClient}'s configuration according to the following
      * default parameters.
      */
     public ClientConfig(){
         this.PORT = 40012;
-<<<<<<< HEAD
         this.TRUSTSTORE_PATH = "";
         this.TRUSTSTORE_PWD = "";
-=======
-        this.TRUSTSTORE_PATH = "/u/mrochlin/coniks/truststore";
-        this.TRUSTSTORE_PWD = "password";
-        this.PRIVATE_KEYSTORE_PATH = "/u/mrochlin/coniks/keystore";
-        this.PRIVATE_KEYSTORE_PWD = "password";
->>>>>>> Adding the new files
+        this.PRIVATE_KEYSTORE_PATH = "";
+        this.PRIVATE_KEYSTORE_PWD = "";
     }
 
     /** Set a {@link ConiksClient}'s configuration according to the parameters in
@@ -123,11 +103,8 @@ public class ClientConfig{
             this.PORT = Integer.parseInt(configs.get(PORT_IDX));
             this.TRUSTSTORE_PATH = configs.get(TRUSTSTORE_PATH_IDX);
             this.TRUSTSTORE_PWD = configs.get(TRUSTSTORE_PWD_IDX);
-<<<<<<< HEAD
-=======
             this.PRIVATE_KEYSTORE_PATH = configs.get(PRIVATE_KEYSTORE_PATH_IDX);
             this.PRIVATE_KEYSTORE_PWD = configs.get(PRIVATE_KEYSTORE_PWD_IDX);
->>>>>>> Adding the new files
             
         }
         catch (Exception e) {

@@ -1,22 +1,11 @@
 #CONIKS Server
 
-<<<<<<< HEAD
 Copyright (C) 2015-16 Princeton University.
 
 https://coniks.cs.princeton.edu
 
 ##Introduction
 This is a basic implementation of a server for the CONIKS key management service. It currently supports new key registrations, key lookups, and can generate consistency proofs and signed directory snapshots. It is designed to communicate with the [CONIKS test client](https://github.com/citp/coniks-ref-implementation/tree/master/coniks_test_client).
-=======
-Copyright (C) 2015 Princeton University.
-
-http://www.coniks.org
-
-##Introduction
-CONIKS is a key management service that provides consistency and privacy for end-user public keys. It protects users against malicious or coerced key servers which may want to impersonate these users to compromise their secure communications: CONIKS will quickly detect any spurious keys, or any versions of the key directory that are inconsistent between two or more users. Nonetheless, CONIKS users do not need to worry about or even see these protocols, or the encryption keys, as CONIKS seamlessly integrates into any existing secure messaging application.
-
-This is a basic implementation of a CONIKS server that currently only supports new key registrations and key lookups. It is designed to communicate with the CONIKS test client.
->>>>>>> Adding the new files
 
 ##Using the Server
 
@@ -81,9 +70,8 @@ For example, to start the server, use
 ```./coniks_server.sh start```
 Analogously to stop the server, and remove the logs.
 
+## Disclaimer
+Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/citp/coniks-ref-implementation/releases).
+
 ##Documentation
-<<<<<<< HEAD
 [Read the server's Java API (javadoc)](https://citp.github.io/coniks-ref-implementation/org/coniks/coniks_server/package-summary.html)
-=======
-[Read the server's Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation)
->>>>>>> Adding the new files

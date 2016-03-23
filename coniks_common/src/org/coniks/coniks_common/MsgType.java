@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,7 @@ package org.coniks.coniks_common;
  * of messages exchanged by CONIKS clients and servers.
  *
  *@author Marcela Melara
+ *@author Michael Rochlin
  */
 public final class MsgType {
 
@@ -46,10 +47,6 @@ public final class MsgType {
     private MsgType() {
     }
 
-<<<<<<< HEAD
-=======
-    
->>>>>>> Adding the new files
     /** A username-to-data binding registration message.
      */
     public static final int REGISTRATION = 0;
@@ -89,10 +86,8 @@ public final class MsgType {
      */
     public static final int OBSERVED_STR_PUSH = 7;
 
-<<<<<<< HEAD
-=======
+
     public static final int ULNCHANGE_REQ = 8;
     public static final int SIGNED_ULNCHANGE_REQ = 9;
 
->>>>>>> Adding the new files
 }

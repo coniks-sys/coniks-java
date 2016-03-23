@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -100,10 +100,5 @@ public class ServerLogger {
      */
     public static void error (String msg) {
         logger.severe(msg);
-<<<<<<< HEAD
     }
-    
-=======
-    }    
->>>>>>> Adding the new files
 }

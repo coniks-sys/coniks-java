@@ -22,3 +22,9 @@ script:
         - cd ..
         - cd coniks_test_client; ${MAKE}
         - cd ..
+
+notifications:
+  # Email notifications are disabled to not annoy anyb ody.
+  # See http://about.travis-ci.org/docs/user/build-configuration/ to learn more
+  # about configuring notification recipients and more.
+  email: false

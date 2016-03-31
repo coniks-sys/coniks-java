@@ -59,7 +59,7 @@ public class UserInfoChanges {
         if (!uln.allowsUnsignedKeyChange()) {
             byte[] hOldK = ServerUtils.hash(oldK);
             if (ServerUtils.compareByteBuffers(hk, hOldK)) {
-                if changeKey(uln, newKey, sig) {
+                if (changeKey(uln, newKey, sig)) {
                     self.setHashK(newHashK);
                     return true;
                 }

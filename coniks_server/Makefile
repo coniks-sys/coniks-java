@@ -3,7 +3,6 @@
 #
 
 #This can be a relative path
-CLASS_DEST = /path/to/classes
 # Do not modify SRC
 SRC = src
 # Do not modify COMMON

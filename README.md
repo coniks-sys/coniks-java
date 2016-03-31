@@ -1,4 +1,4 @@
-##Status: We've begun active CONIKS development again. As part of this effort, this repository has been migrated to the Princeton CITP organization on Github. Please join the [CONIKS discussion mailing list] (https://coniks.cs.princeton.edu/subscribe.html) for updates on CONIKS!
+[![Build Status](https://travis-ci.org/citp/coniks-ref-implementation.svg?branch=master)](https://travis-ci.org/citp/coniks-ref-implementation)
 
 #CONIKS
 

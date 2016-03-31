@@ -80,28 +80,37 @@ public final class UtilProtos {
   /**
    * Protobuf type {@code org.coniks.coniks_common.Hash}
    */
-  public  static final class Hash extends
+  public static final class Hash extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.Hash)
       HashOrBuilder {
     // Use Hash.newBuilder() to construct.
-    private Hash(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private Hash(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private Hash() {
-      len_ = 0;
-      hash_ = java.util.Collections.emptyList();
+    private Hash(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final Hash defaultInstance;
+    public static Hash getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public Hash getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private Hash(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -149,11 +158,10 @@ public final class UtilProtos {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
           hash_ = java.util.Collections.unmodifiableList(hash_);
@@ -174,22 +182,13 @@ public final class UtilProtos {
               org.coniks.coniks_common.UtilProtos.Hash.class, org.coniks.coniks_common.UtilProtos.Hash.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<Hash> PARSER =
+    public static com.google.protobuf.Parser<Hash> PARSER =
         new com.google.protobuf.AbstractParser<Hash>() {
       public Hash parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new Hash(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new Hash(input, extensionRegistry);
       }
     };
 
@@ -245,6 +244,10 @@ public final class UtilProtos {
     }
     private int hashMemoizedSerializedSize = -1;
 
+    private void initFields() {
+      len_ = 0;
+      hash_ = java.util.Collections.emptyList();
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -268,7 +271,7 @@ public final class UtilProtos {
       for (int i = 0; i < hash_.size(); i++) {
         output.writeFixed32NoTag(hash_.get(i));
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -292,12 +295,18 @@ public final class UtilProtos {
         }
         hashMemoizedSerializedSize = dataSize;
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.UtilProtos.Hash parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -351,17 +360,12 @@ public final class UtilProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.UtilProtos.Hash prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -402,6 +406,10 @@ public final class UtilProtos {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         len_ = 0;
@@ -409,6 +417,10 @@ public final class UtilProtos {
         hash_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -470,8 +482,7 @@ public final class UtilProtos {
           }
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -615,22 +626,12 @@ public final class UtilProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.Hash)
     }
 
+    static {
+      defaultInstance = new Hash(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.Hash)
-    private static final org.coniks.coniks_common.UtilProtos.Hash defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.UtilProtos.Hash();
-    }
-
-    public static org.coniks.coniks_common.UtilProtos.Hash getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.UtilProtos.Hash getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   public interface CommitmentOrBuilder extends
@@ -695,28 +696,37 @@ public final class UtilProtos {
   /**
    * Protobuf type {@code org.coniks.coniks_common.Commitment}
    */
-  public  static final class Commitment extends
+  public static final class Commitment extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.Commitment)
       CommitmentOrBuilder {
     // Use Commitment.newBuilder() to construct.
-    private Commitment(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private Commitment(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private Commitment() {
-      epoch_ = 0L;
-      signature_ = java.util.Collections.emptyList();
+    private Commitment(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final Commitment defaultInstance;
+    public static Commitment getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public Commitment getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private Commitment(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -777,11 +787,10 @@ public final class UtilProtos {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
           signature_ = java.util.Collections.unmodifiableList(signature_);
@@ -802,22 +811,13 @@ public final class UtilProtos {
               org.coniks.coniks_common.UtilProtos.Commitment.class, org.coniks.coniks_common.UtilProtos.Commitment.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<Commitment> PARSER =
+    public static com.google.protobuf.Parser<Commitment> PARSER =
         new com.google.protobuf.AbstractParser<Commitment>() {
       public Commitment parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new Commitment(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new Commitment(input, extensionRegistry);
       }
     };
 
@@ -870,7 +870,7 @@ public final class UtilProtos {
      * </pre>
      */
     public org.coniks.coniks_common.UtilProtos.Hash getRootHash() {
-      return rootHash_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : rootHash_;
+      return rootHash_;
     }
     /**
      * <code>optional .org.coniks.coniks_common.Hash root_hash = 2;</code>
@@ -880,7 +880,7 @@ public final class UtilProtos {
      * </pre>
      */
     public org.coniks.coniks_common.UtilProtos.HashOrBuilder getRootHashOrBuilder() {
-      return rootHash_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : rootHash_;
+      return rootHash_;
     }
 
     public static final int SIGNATURE_FIELD_NUMBER = 3;
@@ -905,6 +905,11 @@ public final class UtilProtos {
       return signature_.get(index);
     }
 
+    private void initFields() {
+      epoch_ = 0L;
+      rootHash_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
+      signature_ = java.util.Collections.emptyList();
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -917,16 +922,17 @@ public final class UtilProtos {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeUInt64(1, epoch_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, getRootHash());
+        output.writeMessage(2, rootHash_);
       }
       for (int i = 0; i < signature_.size(); i++) {
         output.writeFixed32(3, signature_.get(i));
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -941,7 +947,7 @@ public final class UtilProtos {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getRootHash());
+          .computeMessageSize(2, rootHash_);
       }
       {
         int dataSize = 0;
@@ -949,12 +955,18 @@ public final class UtilProtos {
         size += dataSize;
         size += 1 * getSignatureList().size();
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.UtilProtos.Commitment parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1008,17 +1020,12 @@ public final class UtilProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.UtilProtos.Commitment prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -1060,12 +1067,16 @@ public final class UtilProtos {
           getRootHashFieldBuilder();
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         epoch_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
         if (rootHashBuilder_ == null) {
-          rootHash_ = null;
+          rootHash_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
         } else {
           rootHashBuilder_.clear();
         }
@@ -1073,6 +1084,10 @@ public final class UtilProtos {
         signature_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -1145,8 +1160,7 @@ public final class UtilProtos {
           }
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -1221,7 +1235,7 @@ public final class UtilProtos {
         return this;
       }
 
-      private org.coniks.coniks_common.UtilProtos.Hash rootHash_ = null;
+      private org.coniks.coniks_common.UtilProtos.Hash rootHash_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.coniks.coniks_common.UtilProtos.Hash, org.coniks.coniks_common.UtilProtos.Hash.Builder, org.coniks.coniks_common.UtilProtos.HashOrBuilder> rootHashBuilder_;
       /**
@@ -1243,7 +1257,7 @@ public final class UtilProtos {
        */
       public org.coniks.coniks_common.UtilProtos.Hash getRootHash() {
         if (rootHashBuilder_ == null) {
-          return rootHash_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : rootHash_;
+          return rootHash_;
         } else {
           return rootHashBuilder_.getMessage();
         }
@@ -1296,7 +1310,6 @@ public final class UtilProtos {
       public Builder mergeRootHash(org.coniks.coniks_common.UtilProtos.Hash value) {
         if (rootHashBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002) &&
-              rootHash_ != null &&
               rootHash_ != org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance()) {
             rootHash_ =
               org.coniks.coniks_common.UtilProtos.Hash.newBuilder(rootHash_).mergeFrom(value).buildPartial();
@@ -1319,7 +1332,7 @@ public final class UtilProtos {
        */
       public Builder clearRootHash() {
         if (rootHashBuilder_ == null) {
-          rootHash_ = null;
+          rootHash_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
           onChanged();
         } else {
           rootHashBuilder_.clear();
@@ -1350,8 +1363,7 @@ public final class UtilProtos {
         if (rootHashBuilder_ != null) {
           return rootHashBuilder_.getMessageOrBuilder();
         } else {
-          return rootHash_ == null ?
-              org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : rootHash_;
+          return rootHash_;
         }
       }
       /**
@@ -1444,22 +1456,12 @@ public final class UtilProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.Commitment)
     }
 
+    static {
+      defaultInstance = new Commitment(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.Commitment)
-    private static final org.coniks.coniks_common.UtilProtos.Commitment defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.UtilProtos.Commitment();
-    }
-
-    public static org.coniks.coniks_common.UtilProtos.Commitment getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.UtilProtos.Commitment getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   public interface ServerRespOrBuilder extends
@@ -1478,27 +1480,37 @@ public final class UtilProtos {
   /**
    * Protobuf type {@code org.coniks.coniks_common.ServerResp}
    */
-  public  static final class ServerResp extends
+  public static final class ServerResp extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.ServerResp)
       ServerRespOrBuilder {
     // Use ServerResp.newBuilder() to construct.
-    private ServerResp(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private ServerResp(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private ServerResp() {
-      message_ = 0;
+    private ServerResp(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final ServerResp defaultInstance;
+    public static ServerResp getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public ServerResp getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private ServerResp(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -1524,18 +1536,17 @@ public final class UtilProtos {
                 unknownFields.mergeVarintField(1, rawValue);
               } else {
                 bitField0_ |= 0x00000001;
-                message_ = rawValue;
+                message_ = value;
               }
               break;
             }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -1553,22 +1564,13 @@ public final class UtilProtos {
               org.coniks.coniks_common.UtilProtos.ServerResp.class, org.coniks.coniks_common.UtilProtos.ServerResp.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<ServerResp> PARSER =
+    public static com.google.protobuf.Parser<ServerResp> PARSER =
         new com.google.protobuf.AbstractParser<ServerResp>() {
       public ServerResp parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new ServerResp(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new ServerResp(input, extensionRegistry);
       }
     };
 
@@ -1654,9 +1656,7 @@ public final class UtilProtos {
       public static final int VERIFICATION_ERR_VALUE = 7;
 
 
-      public final int getNumber() {
-        return value;
-      }
+      public final int getNumber() { return value; }
 
       public static Message valueOf(int value) {
         switch (value) {
@@ -1721,7 +1721,7 @@ public final class UtilProtos {
 
     private int bitField0_;
     public static final int MESSAGE_FIELD_NUMBER = 1;
-    private int message_;
+    private org.coniks.coniks_common.UtilProtos.ServerResp.Message message_;
     /**
      * <code>optional .org.coniks.coniks_common.ServerResp.Message message = 1;</code>
      */
@@ -1732,10 +1732,12 @@ public final class UtilProtos {
      * <code>optional .org.coniks.coniks_common.ServerResp.Message message = 1;</code>
      */
     public org.coniks.coniks_common.UtilProtos.ServerResp.Message getMessage() {
-      org.coniks.coniks_common.UtilProtos.ServerResp.Message result = org.coniks.coniks_common.UtilProtos.ServerResp.Message.valueOf(message_);
-      return result == null ? org.coniks.coniks_common.UtilProtos.ServerResp.Message.SUCCESS : result;
+      return message_;
     }
 
+    private void initFields() {
+      message_ = org.coniks.coniks_common.UtilProtos.ServerResp.Message.SUCCESS;
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1748,10 +1750,11 @@ public final class UtilProtos {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeEnum(1, message_);
+        output.writeEnum(1, message_.getNumber());
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -1762,14 +1765,20 @@ public final class UtilProtos {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, message_);
+          .computeEnumSize(1, message_.getNumber());
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.UtilProtos.ServerResp parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1823,17 +1832,12 @@ public final class UtilProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.UtilProtos.ServerResp prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -1874,11 +1878,19 @@ public final class UtilProtos {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
-        message_ = 0;
+        message_ = org.coniks.coniks_common.UtilProtos.ServerResp.Message.SUCCESS;
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -1925,8 +1937,7 @@ public final class UtilProtos {
         if (other.hasMessage()) {
           setMessage(other.getMessage());
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -1953,7 +1964,7 @@ public final class UtilProtos {
       }
       private int bitField0_;
 
-      private int message_ = 0;
+      private org.coniks.coniks_common.UtilProtos.ServerResp.Message message_ = org.coniks.coniks_common.UtilProtos.ServerResp.Message.SUCCESS;
       /**
        * <code>optional .org.coniks.coniks_common.ServerResp.Message message = 1;</code>
        */
@@ -1964,8 +1975,7 @@ public final class UtilProtos {
        * <code>optional .org.coniks.coniks_common.ServerResp.Message message = 1;</code>
        */
       public org.coniks.coniks_common.UtilProtos.ServerResp.Message getMessage() {
-        org.coniks.coniks_common.UtilProtos.ServerResp.Message result = org.coniks.coniks_common.UtilProtos.ServerResp.Message.valueOf(message_);
-        return result == null ? org.coniks.coniks_common.UtilProtos.ServerResp.Message.SUCCESS : result;
+        return message_;
       }
       /**
        * <code>optional .org.coniks.coniks_common.ServerResp.Message message = 1;</code>
@@ -1975,7 +1985,7 @@ public final class UtilProtos {
           throw new NullPointerException();
         }
         bitField0_ |= 0x00000001;
-        message_ = value.getNumber();
+        message_ = value;
         onChanged();
         return this;
       }
@@ -1984,7 +1994,7 @@ public final class UtilProtos {
        */
       public Builder clearMessage() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        message_ = 0;
+        message_ = org.coniks.coniks_common.UtilProtos.ServerResp.Message.SUCCESS;
         onChanged();
         return this;
       }
@@ -1992,22 +2002,12 @@ public final class UtilProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.ServerResp)
     }
 
+    static {
+      defaultInstance = new ServerResp(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.ServerResp)
-    private static final org.coniks.coniks_common.UtilProtos.ServerResp defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.UtilProtos.ServerResp();
-    }
-
-    public static org.coniks.coniks_common.UtilProtos.ServerResp getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.UtilProtos.ServerResp getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   public interface CompleteRootNodeOrBuilder extends
@@ -2065,27 +2065,37 @@ public final class UtilProtos {
   /**
    * Protobuf type {@code org.coniks.coniks_common.CompleteRootNode}
    */
-  public  static final class CompleteRootNode extends
+  public static final class CompleteRootNode extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.CompleteRootNode)
       CompleteRootNodeOrBuilder {
     // Use CompleteRootNode.newBuilder() to construct.
-    private CompleteRootNode(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private CompleteRootNode(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private CompleteRootNode() {
-      epoch_ = 0L;
+    private CompleteRootNode(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final CompleteRootNode defaultInstance;
+    public static CompleteRootNode getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public CompleteRootNode getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private CompleteRootNode(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -2151,11 +2161,10 @@ public final class UtilProtos {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -2173,22 +2182,13 @@ public final class UtilProtos {
               org.coniks.coniks_common.UtilProtos.CompleteRootNode.class, org.coniks.coniks_common.UtilProtos.CompleteRootNode.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<CompleteRootNode> PARSER =
+    public static com.google.protobuf.Parser<CompleteRootNode> PARSER =
         new com.google.protobuf.AbstractParser<CompleteRootNode>() {
       public CompleteRootNode parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new CompleteRootNode(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new CompleteRootNode(input, extensionRegistry);
       }
     };
 
@@ -2210,13 +2210,13 @@ public final class UtilProtos {
      * <code>optional .org.coniks.coniks_common.Hash left = 1;</code>
      */
     public org.coniks.coniks_common.UtilProtos.Hash getLeft() {
-      return left_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : left_;
+      return left_;
     }
     /**
      * <code>optional .org.coniks.coniks_common.Hash left = 1;</code>
      */
     public org.coniks.coniks_common.UtilProtos.HashOrBuilder getLeftOrBuilder() {
-      return left_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : left_;
+      return left_;
     }
 
     public static final int RIGHT_FIELD_NUMBER = 2;
@@ -2231,13 +2231,13 @@ public final class UtilProtos {
      * <code>optional .org.coniks.coniks_common.Hash right = 2;</code>
      */
     public org.coniks.coniks_common.UtilProtos.Hash getRight() {
-      return right_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : right_;
+      return right_;
     }
     /**
      * <code>optional .org.coniks.coniks_common.Hash right = 2;</code>
      */
     public org.coniks.coniks_common.UtilProtos.HashOrBuilder getRightOrBuilder() {
-      return right_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : right_;
+      return right_;
     }
 
     public static final int PREV_FIELD_NUMBER = 3;
@@ -2252,13 +2252,13 @@ public final class UtilProtos {
      * <code>optional .org.coniks.coniks_common.Hash prev = 3;</code>
      */
     public org.coniks.coniks_common.UtilProtos.Hash getPrev() {
-      return prev_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : prev_;
+      return prev_;
     }
     /**
      * <code>optional .org.coniks.coniks_common.Hash prev = 3;</code>
      */
     public org.coniks.coniks_common.UtilProtos.HashOrBuilder getPrevOrBuilder() {
-      return prev_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : prev_;
+      return prev_;
     }
 
     public static final int EPOCH_FIELD_NUMBER = 4;
@@ -2276,6 +2276,12 @@ public final class UtilProtos {
       return epoch_;
     }
 
+    private void initFields() {
+      left_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
+      right_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
+      prev_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
+      epoch_ = 0L;
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -2288,19 +2294,20 @@ public final class UtilProtos {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, getLeft());
+        output.writeMessage(1, left_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, getRight());
+        output.writeMessage(2, right_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(3, getPrev());
+        output.writeMessage(3, prev_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeUInt64(4, epoch_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -2311,26 +2318,32 @@ public final class UtilProtos {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getLeft());
+          .computeMessageSize(1, left_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getRight());
+          .computeMessageSize(2, right_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getPrev());
+          .computeMessageSize(3, prev_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt64Size(4, epoch_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.UtilProtos.CompleteRootNode parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -2384,17 +2397,12 @@ public final class UtilProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.UtilProtos.CompleteRootNode prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -2438,22 +2446,26 @@ public final class UtilProtos {
           getPrevFieldBuilder();
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         if (leftBuilder_ == null) {
-          left_ = null;
+          left_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
         } else {
           leftBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000001);
         if (rightBuilder_ == null) {
-          right_ = null;
+          right_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
         } else {
           rightBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
         if (prevBuilder_ == null) {
-          prev_ = null;
+          prev_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
         } else {
           prevBuilder_.clear();
         }
@@ -2461,6 +2473,10 @@ public final class UtilProtos {
         epoch_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -2540,8 +2556,7 @@ public final class UtilProtos {
         if (other.hasEpoch()) {
           setEpoch(other.getEpoch());
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -2568,7 +2583,7 @@ public final class UtilProtos {
       }
       private int bitField0_;
 
-      private org.coniks.coniks_common.UtilProtos.Hash left_ = null;
+      private org.coniks.coniks_common.UtilProtos.Hash left_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.coniks.coniks_common.UtilProtos.Hash, org.coniks.coniks_common.UtilProtos.Hash.Builder, org.coniks.coniks_common.UtilProtos.HashOrBuilder> leftBuilder_;
       /**
@@ -2582,7 +2597,7 @@ public final class UtilProtos {
        */
       public org.coniks.coniks_common.UtilProtos.Hash getLeft() {
         if (leftBuilder_ == null) {
-          return left_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : left_;
+          return left_;
         } else {
           return leftBuilder_.getMessage();
         }
@@ -2623,7 +2638,6 @@ public final class UtilProtos {
       public Builder mergeLeft(org.coniks.coniks_common.UtilProtos.Hash value) {
         if (leftBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
-              left_ != null &&
               left_ != org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance()) {
             left_ =
               org.coniks.coniks_common.UtilProtos.Hash.newBuilder(left_).mergeFrom(value).buildPartial();
@@ -2642,7 +2656,7 @@ public final class UtilProtos {
        */
       public Builder clearLeft() {
         if (leftBuilder_ == null) {
-          left_ = null;
+          left_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
           onChanged();
         } else {
           leftBuilder_.clear();
@@ -2665,8 +2679,7 @@ public final class UtilProtos {
         if (leftBuilder_ != null) {
           return leftBuilder_.getMessageOrBuilder();
         } else {
-          return left_ == null ?
-              org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : left_;
+          return left_;
         }
       }
       /**
@@ -2686,7 +2699,7 @@ public final class UtilProtos {
         return leftBuilder_;
       }
 
-      private org.coniks.coniks_common.UtilProtos.Hash right_ = null;
+      private org.coniks.coniks_common.UtilProtos.Hash right_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.coniks.coniks_common.UtilProtos.Hash, org.coniks.coniks_common.UtilProtos.Hash.Builder, org.coniks.coniks_common.UtilProtos.HashOrBuilder> rightBuilder_;
       /**
@@ -2700,7 +2713,7 @@ public final class UtilProtos {
        */
       public org.coniks.coniks_common.UtilProtos.Hash getRight() {
         if (rightBuilder_ == null) {
-          return right_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : right_;
+          return right_;
         } else {
           return rightBuilder_.getMessage();
         }
@@ -2741,7 +2754,6 @@ public final class UtilProtos {
       public Builder mergeRight(org.coniks.coniks_common.UtilProtos.Hash value) {
         if (rightBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002) &&
-              right_ != null &&
               right_ != org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance()) {
             right_ =
               org.coniks.coniks_common.UtilProtos.Hash.newBuilder(right_).mergeFrom(value).buildPartial();
@@ -2760,7 +2772,7 @@ public final class UtilProtos {
        */
       public Builder clearRight() {
         if (rightBuilder_ == null) {
-          right_ = null;
+          right_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
           onChanged();
         } else {
           rightBuilder_.clear();
@@ -2783,8 +2795,7 @@ public final class UtilProtos {
         if (rightBuilder_ != null) {
           return rightBuilder_.getMessageOrBuilder();
         } else {
-          return right_ == null ?
-              org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : right_;
+          return right_;
         }
       }
       /**
@@ -2804,7 +2815,7 @@ public final class UtilProtos {
         return rightBuilder_;
       }
 
-      private org.coniks.coniks_common.UtilProtos.Hash prev_ = null;
+      private org.coniks.coniks_common.UtilProtos.Hash prev_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.coniks.coniks_common.UtilProtos.Hash, org.coniks.coniks_common.UtilProtos.Hash.Builder, org.coniks.coniks_common.UtilProtos.HashOrBuilder> prevBuilder_;
       /**
@@ -2818,7 +2829,7 @@ public final class UtilProtos {
        */
       public org.coniks.coniks_common.UtilProtos.Hash getPrev() {
         if (prevBuilder_ == null) {
-          return prev_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : prev_;
+          return prev_;
         } else {
           return prevBuilder_.getMessage();
         }
@@ -2859,7 +2870,6 @@ public final class UtilProtos {
       public Builder mergePrev(org.coniks.coniks_common.UtilProtos.Hash value) {
         if (prevBuilder_ == null) {
           if (((bitField0_ & 0x00000004) == 0x00000004) &&
-              prev_ != null &&
               prev_ != org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance()) {
             prev_ =
               org.coniks.coniks_common.UtilProtos.Hash.newBuilder(prev_).mergeFrom(value).buildPartial();
@@ -2878,7 +2888,7 @@ public final class UtilProtos {
        */
       public Builder clearPrev() {
         if (prevBuilder_ == null) {
-          prev_ = null;
+          prev_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
           onChanged();
         } else {
           prevBuilder_.clear();
@@ -2901,8 +2911,7 @@ public final class UtilProtos {
         if (prevBuilder_ != null) {
           return prevBuilder_.getMessageOrBuilder();
         } else {
-          return prev_ == null ?
-              org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : prev_;
+          return prev_;
         }
       }
       /**
@@ -2957,22 +2966,12 @@ public final class UtilProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.CompleteRootNode)
     }
 
+    static {
+      defaultInstance = new CompleteRootNode(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.CompleteRootNode)
-    private static final org.coniks.coniks_common.UtilProtos.CompleteRootNode defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.UtilProtos.CompleteRootNode();
-    }
-
-    public static org.coniks.coniks_common.UtilProtos.CompleteRootNode getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.UtilProtos.CompleteRootNode getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   public interface WitnessedCommitmentOrBuilder extends
@@ -3026,27 +3025,37 @@ public final class UtilProtos {
    * this is the format of commitments that servers exchange
    * </pre>
    */
-  public  static final class WitnessedCommitment extends
+  public static final class WitnessedCommitment extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.WitnessedCommitment)
       WitnessedCommitmentOrBuilder {
     // Use WitnessedCommitment.newBuilder() to construct.
-    private WitnessedCommitment(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private WitnessedCommitment(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private WitnessedCommitment() {
-      provider_ = "";
+    private WitnessedCommitment(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final WitnessedCommitment defaultInstance;
+    public static WitnessedCommitment getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public WitnessedCommitment getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private WitnessedCommitment(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -3100,11 +3109,10 @@ public final class UtilProtos {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -3122,22 +3130,13 @@ public final class UtilProtos {
               org.coniks.coniks_common.UtilProtos.WitnessedCommitment.class, org.coniks.coniks_common.UtilProtos.WitnessedCommitment.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<WitnessedCommitment> PARSER =
+    public static com.google.protobuf.Parser<WitnessedCommitment> PARSER =
         new com.google.protobuf.AbstractParser<WitnessedCommitment>() {
       public WitnessedCommitment parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new WitnessedCommitment(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new WitnessedCommitment(input, extensionRegistry);
       }
     };
 
@@ -3201,13 +3200,13 @@ public final class UtilProtos {
      * <code>optional .org.coniks.coniks_common.Commitment comm = 2;</code>
      */
     public org.coniks.coniks_common.UtilProtos.Commitment getComm() {
-      return comm_ == null ? org.coniks.coniks_common.UtilProtos.Commitment.getDefaultInstance() : comm_;
+      return comm_;
     }
     /**
      * <code>optional .org.coniks.coniks_common.Commitment comm = 2;</code>
      */
     public org.coniks.coniks_common.UtilProtos.CommitmentOrBuilder getCommOrBuilder() {
-      return comm_ == null ? org.coniks.coniks_common.UtilProtos.Commitment.getDefaultInstance() : comm_;
+      return comm_;
     }
 
     public static final int ROOT_FIELD_NUMBER = 3;
@@ -3222,15 +3221,20 @@ public final class UtilProtos {
      * <code>optional .org.coniks.coniks_common.CompleteRootNode root = 3;</code>
      */
     public org.coniks.coniks_common.UtilProtos.CompleteRootNode getRoot() {
-      return root_ == null ? org.coniks.coniks_common.UtilProtos.CompleteRootNode.getDefaultInstance() : root_;
+      return root_;
     }
     /**
      * <code>optional .org.coniks.coniks_common.CompleteRootNode root = 3;</code>
      */
     public org.coniks.coniks_common.UtilProtos.CompleteRootNodeOrBuilder getRootOrBuilder() {
-      return root_ == null ? org.coniks.coniks_common.UtilProtos.CompleteRootNode.getDefaultInstance() : root_;
+      return root_;
     }
 
+    private void initFields() {
+      provider_ = "";
+      comm_ = org.coniks.coniks_common.UtilProtos.Commitment.getDefaultInstance();
+      root_ = org.coniks.coniks_common.UtilProtos.CompleteRootNode.getDefaultInstance();
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -3243,16 +3247,17 @@ public final class UtilProtos {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, getProviderBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, getComm());
+        output.writeMessage(2, comm_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(3, getRoot());
+        output.writeMessage(3, root_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -3267,18 +3272,24 @@ public final class UtilProtos {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getComm());
+          .computeMessageSize(2, comm_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getRoot());
+          .computeMessageSize(3, root_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.UtilProtos.WitnessedCommitment parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -3332,17 +3343,12 @@ public final class UtilProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.UtilProtos.WitnessedCommitment prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -3389,23 +3395,31 @@ public final class UtilProtos {
           getRootFieldBuilder();
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         provider_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
         if (commBuilder_ == null) {
-          comm_ = null;
+          comm_ = org.coniks.coniks_common.UtilProtos.Commitment.getDefaultInstance();
         } else {
           commBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
         if (rootBuilder_ == null) {
-          root_ = null;
+          root_ = org.coniks.coniks_common.UtilProtos.CompleteRootNode.getDefaultInstance();
         } else {
           rootBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -3476,8 +3490,7 @@ public final class UtilProtos {
         if (other.hasRoot()) {
           mergeRoot(other.getRoot());
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -3580,7 +3593,7 @@ public final class UtilProtos {
         return this;
       }
 
-      private org.coniks.coniks_common.UtilProtos.Commitment comm_ = null;
+      private org.coniks.coniks_common.UtilProtos.Commitment comm_ = org.coniks.coniks_common.UtilProtos.Commitment.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.coniks.coniks_common.UtilProtos.Commitment, org.coniks.coniks_common.UtilProtos.Commitment.Builder, org.coniks.coniks_common.UtilProtos.CommitmentOrBuilder> commBuilder_;
       /**
@@ -3594,7 +3607,7 @@ public final class UtilProtos {
        */
       public org.coniks.coniks_common.UtilProtos.Commitment getComm() {
         if (commBuilder_ == null) {
-          return comm_ == null ? org.coniks.coniks_common.UtilProtos.Commitment.getDefaultInstance() : comm_;
+          return comm_;
         } else {
           return commBuilder_.getMessage();
         }
@@ -3635,7 +3648,6 @@ public final class UtilProtos {
       public Builder mergeComm(org.coniks.coniks_common.UtilProtos.Commitment value) {
         if (commBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002) &&
-              comm_ != null &&
               comm_ != org.coniks.coniks_common.UtilProtos.Commitment.getDefaultInstance()) {
             comm_ =
               org.coniks.coniks_common.UtilProtos.Commitment.newBuilder(comm_).mergeFrom(value).buildPartial();
@@ -3654,7 +3666,7 @@ public final class UtilProtos {
        */
       public Builder clearComm() {
         if (commBuilder_ == null) {
-          comm_ = null;
+          comm_ = org.coniks.coniks_common.UtilProtos.Commitment.getDefaultInstance();
           onChanged();
         } else {
           commBuilder_.clear();
@@ -3677,8 +3689,7 @@ public final class UtilProtos {
         if (commBuilder_ != null) {
           return commBuilder_.getMessageOrBuilder();
         } else {
-          return comm_ == null ?
-              org.coniks.coniks_common.UtilProtos.Commitment.getDefaultInstance() : comm_;
+          return comm_;
         }
       }
       /**
@@ -3698,7 +3709,7 @@ public final class UtilProtos {
         return commBuilder_;
       }
 
-      private org.coniks.coniks_common.UtilProtos.CompleteRootNode root_ = null;
+      private org.coniks.coniks_common.UtilProtos.CompleteRootNode root_ = org.coniks.coniks_common.UtilProtos.CompleteRootNode.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.coniks.coniks_common.UtilProtos.CompleteRootNode, org.coniks.coniks_common.UtilProtos.CompleteRootNode.Builder, org.coniks.coniks_common.UtilProtos.CompleteRootNodeOrBuilder> rootBuilder_;
       /**
@@ -3712,7 +3723,7 @@ public final class UtilProtos {
        */
       public org.coniks.coniks_common.UtilProtos.CompleteRootNode getRoot() {
         if (rootBuilder_ == null) {
-          return root_ == null ? org.coniks.coniks_common.UtilProtos.CompleteRootNode.getDefaultInstance() : root_;
+          return root_;
         } else {
           return rootBuilder_.getMessage();
         }
@@ -3753,7 +3764,6 @@ public final class UtilProtos {
       public Builder mergeRoot(org.coniks.coniks_common.UtilProtos.CompleteRootNode value) {
         if (rootBuilder_ == null) {
           if (((bitField0_ & 0x00000004) == 0x00000004) &&
-              root_ != null &&
               root_ != org.coniks.coniks_common.UtilProtos.CompleteRootNode.getDefaultInstance()) {
             root_ =
               org.coniks.coniks_common.UtilProtos.CompleteRootNode.newBuilder(root_).mergeFrom(value).buildPartial();
@@ -3772,7 +3782,7 @@ public final class UtilProtos {
        */
       public Builder clearRoot() {
         if (rootBuilder_ == null) {
-          root_ = null;
+          root_ = org.coniks.coniks_common.UtilProtos.CompleteRootNode.getDefaultInstance();
           onChanged();
         } else {
           rootBuilder_.clear();
@@ -3795,8 +3805,7 @@ public final class UtilProtos {
         if (rootBuilder_ != null) {
           return rootBuilder_.getMessageOrBuilder();
         } else {
-          return root_ == null ?
-              org.coniks.coniks_common.UtilProtos.CompleteRootNode.getDefaultInstance() : root_;
+          return root_;
         }
       }
       /**
@@ -3819,22 +3828,12 @@ public final class UtilProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.WitnessedCommitment)
     }
 
+    static {
+      defaultInstance = new WitnessedCommitment(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.WitnessedCommitment)
-    private static final org.coniks.coniks_common.UtilProtos.WitnessedCommitment defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.UtilProtos.WitnessedCommitment();
-    }
-
-    public static org.coniks.coniks_common.UtilProtos.WitnessedCommitment getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.UtilProtos.WitnessedCommitment getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor

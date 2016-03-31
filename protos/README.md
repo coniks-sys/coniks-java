@@ -20,7 +20,10 @@ A few additional quick tips:
 - All .proto files for CONIKS should use **org.coniks.coniks_common** as their java_package, should use the same package, and reside within the same directory. This will make compilation a lot easier and avoid certain bugs.
 
 ### Compiling into Java
-Assuming you have protoc installed, run the following command from this directory for each .proto file you want to  compile into Java:
+-Prerequisites:
+You'll need to install protoc 2.6.1. Follow these [instructions](https://github.com/google/protobuf#protocol-compiler-installation) to install protoc. If you've cloned this repo, the protoc Java Runtime is already included in the *coniks_common* directory, so you don't need to install it again.
+-Compiling:
+Run the following command from this directory for each .proto file you want to  compile into Java:
 ```
 protoc --proto_path=. --java_out=../coniks_common/src <file>.proto
 ```

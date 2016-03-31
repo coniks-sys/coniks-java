@@ -118,30 +118,37 @@ public final class C2SProtos {
   /**
    * Protobuf type {@code org.coniks.coniks_common.DSAPublicKeyProto}
    */
-  public  static final class DSAPublicKeyProto extends
+  public static final class DSAPublicKeyProto extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.DSAPublicKeyProto)
       DSAPublicKeyProtoOrBuilder {
     // Use DSAPublicKeyProto.newBuilder() to construct.
-    private DSAPublicKeyProto(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private DSAPublicKeyProto(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private DSAPublicKeyProto() {
-      p_ = "";
-      q_ = "";
-      g_ = "";
-      y_ = "";
+    private DSAPublicKeyProto(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final DSAPublicKeyProto defaultInstance;
+    public static DSAPublicKeyProto getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public DSAPublicKeyProto getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private DSAPublicKeyProto(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -187,11 +194,10 @@ public final class C2SProtos {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -209,22 +215,13 @@ public final class C2SProtos {
               org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.class, org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<DSAPublicKeyProto> PARSER =
+    public static com.google.protobuf.Parser<DSAPublicKeyProto> PARSER =
         new com.google.protobuf.AbstractParser<DSAPublicKeyProto>() {
       public DSAPublicKeyProto parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new DSAPublicKeyProto(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new DSAPublicKeyProto(input, extensionRegistry);
       }
     };
 
@@ -414,6 +411,12 @@ public final class C2SProtos {
       }
     }
 
+    private void initFields() {
+      p_ = "";
+      q_ = "";
+      g_ = "";
+      y_ = "";
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -442,6 +445,7 @@ public final class C2SProtos {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, getPBytes());
       }
@@ -454,7 +458,7 @@ public final class C2SProtos {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeBytes(4, getYBytes());
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -479,12 +483,18 @@ public final class C2SProtos {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(4, getYBytes());
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -538,17 +548,12 @@ public final class C2SProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -589,6 +594,10 @@ public final class C2SProtos {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         p_ = "";
@@ -600,6 +609,10 @@ public final class C2SProtos {
         y_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -675,8 +688,7 @@ public final class C2SProtos {
           y_ = other.y_;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -1050,22 +1062,12 @@ public final class C2SProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.DSAPublicKeyProto)
     }
 
+    static {
+      defaultInstance = new DSAPublicKeyProto(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.DSAPublicKeyProto)
-    private static final org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto();
-    }
-
-    public static org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   public interface RegistrationOrBuilder extends
@@ -1158,30 +1160,37 @@ public final class C2SProtos {
   /**
    * Protobuf type {@code org.coniks.coniks_common.Registration}
    */
-  public  static final class Registration extends
+  public static final class Registration extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.Registration)
       RegistrationOrBuilder {
     // Use Registration.newBuilder() to construct.
-    private Registration(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private Registration(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private Registration() {
-      name_ = "";
-      blob_ = "";
-      allowsUnsignedKeychange_ = false;
-      allowsPublicLookup_ = false;
+    private Registration(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final Registration defaultInstance;
+    public static Registration getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public Registration getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private Registration(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -1238,11 +1247,10 @@ public final class C2SProtos {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -1260,22 +1268,13 @@ public final class C2SProtos {
               org.coniks.coniks_common.C2SProtos.Registration.class, org.coniks.coniks_common.C2SProtos.Registration.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<Registration> PARSER =
+    public static com.google.protobuf.Parser<Registration> PARSER =
         new com.google.protobuf.AbstractParser<Registration>() {
       public Registration parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new Registration(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new Registration(input, extensionRegistry);
       }
     };
 
@@ -1405,13 +1404,13 @@ public final class C2SProtos {
      * <code>optional .org.coniks.coniks_common.DSAPublicKeyProto changeKey = 3;</code>
      */
     public org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto getChangeKey() {
-      return changeKey_ == null ? org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance() : changeKey_;
+      return changeKey_;
     }
     /**
      * <code>optional .org.coniks.coniks_common.DSAPublicKeyProto changeKey = 3;</code>
      */
     public org.coniks.coniks_common.C2SProtos.DSAPublicKeyProtoOrBuilder getChangeKeyOrBuilder() {
-      return changeKey_ == null ? org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance() : changeKey_;
+      return changeKey_;
     }
 
     public static final int ALLOWS_UNSIGNED_KEYCHANGE_FIELD_NUMBER = 4;
@@ -1444,6 +1443,13 @@ public final class C2SProtos {
       return allowsPublicLookup_;
     }
 
+    private void initFields() {
+      name_ = "";
+      blob_ = "";
+      changeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
+      allowsUnsignedKeychange_ = false;
+      allowsPublicLookup_ = false;
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1462,6 +1468,7 @@ public final class C2SProtos {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, getNameBytes());
       }
@@ -1469,7 +1476,7 @@ public final class C2SProtos {
         output.writeBytes(2, getBlobBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(3, getChangeKey());
+        output.writeMessage(3, changeKey_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeBool(4, allowsUnsignedKeychange_);
@@ -1477,7 +1484,7 @@ public final class C2SProtos {
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeBool(5, allowsPublicLookup_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -1496,7 +1503,7 @@ public final class C2SProtos {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getChangeKey());
+          .computeMessageSize(3, changeKey_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1506,12 +1513,18 @@ public final class C2SProtos {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(5, allowsPublicLookup_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.C2SProtos.Registration parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1565,17 +1578,12 @@ public final class C2SProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.C2SProtos.Registration prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -1617,6 +1625,10 @@ public final class C2SProtos {
           getChangeKeyFieldBuilder();
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         name_ = "";
@@ -1624,7 +1636,7 @@ public final class C2SProtos {
         blob_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
         if (changeKeyBuilder_ == null) {
-          changeKey_ = null;
+          changeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
         } else {
           changeKeyBuilder_.clear();
         }
@@ -1634,6 +1646,10 @@ public final class C2SProtos {
         allowsPublicLookup_ = false;
         bitField0_ = (bitField0_ & ~0x00000010);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -1716,8 +1732,7 @@ public final class C2SProtos {
         if (other.hasAllowsPublicLookup()) {
           setAllowsPublicLookup(other.getAllowsPublicLookup());
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -1950,7 +1965,7 @@ public final class C2SProtos {
         return this;
       }
 
-      private org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto changeKey_ = null;
+      private org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto changeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto, org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.Builder, org.coniks.coniks_common.C2SProtos.DSAPublicKeyProtoOrBuilder> changeKeyBuilder_;
       /**
@@ -1964,7 +1979,7 @@ public final class C2SProtos {
        */
       public org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto getChangeKey() {
         if (changeKeyBuilder_ == null) {
-          return changeKey_ == null ? org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance() : changeKey_;
+          return changeKey_;
         } else {
           return changeKeyBuilder_.getMessage();
         }
@@ -2005,7 +2020,6 @@ public final class C2SProtos {
       public Builder mergeChangeKey(org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto value) {
         if (changeKeyBuilder_ == null) {
           if (((bitField0_ & 0x00000004) == 0x00000004) &&
-              changeKey_ != null &&
               changeKey_ != org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance()) {
             changeKey_ =
               org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.newBuilder(changeKey_).mergeFrom(value).buildPartial();
@@ -2024,7 +2038,7 @@ public final class C2SProtos {
        */
       public Builder clearChangeKey() {
         if (changeKeyBuilder_ == null) {
-          changeKey_ = null;
+          changeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
           onChanged();
         } else {
           changeKeyBuilder_.clear();
@@ -2047,8 +2061,7 @@ public final class C2SProtos {
         if (changeKeyBuilder_ != null) {
           return changeKeyBuilder_.getMessageOrBuilder();
         } else {
-          return changeKey_ == null ?
-              org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance() : changeKey_;
+          return changeKey_;
         }
       }
       /**
@@ -2135,22 +2148,12 @@ public final class C2SProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.Registration)
     }
 
+    static {
+      defaultInstance = new Registration(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.Registration)
-    private static final org.coniks.coniks_common.C2SProtos.Registration defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.C2SProtos.Registration();
-    }
-
-    public static org.coniks.coniks_common.C2SProtos.Registration getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.C2SProtos.Registration getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   public interface ULNChangeReqOrBuilder extends
@@ -2219,30 +2222,37 @@ public final class C2SProtos {
   /**
    * Protobuf type {@code org.coniks.coniks_common.ULNChangeReq}
    */
-  public  static final class ULNChangeReq extends
+  public static final class ULNChangeReq extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.ULNChangeReq)
       ULNChangeReqOrBuilder {
     // Use ULNChangeReq.newBuilder() to construct.
-    private ULNChangeReq(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private ULNChangeReq(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private ULNChangeReq() {
-      name_ = "";
-      newBlob_ = "";
-      allowsUnsignedKeychange_ = false;
-      allowsPublicLookup_ = false;
+    private ULNChangeReq(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final ULNChangeReq defaultInstance;
+    public static ULNChangeReq getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public ULNChangeReq getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private ULNChangeReq(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -2299,11 +2309,10 @@ public final class C2SProtos {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -2321,22 +2330,13 @@ public final class C2SProtos {
               org.coniks.coniks_common.C2SProtos.ULNChangeReq.class, org.coniks.coniks_common.C2SProtos.ULNChangeReq.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<ULNChangeReq> PARSER =
+    public static com.google.protobuf.Parser<ULNChangeReq> PARSER =
         new com.google.protobuf.AbstractParser<ULNChangeReq>() {
       public ULNChangeReq parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new ULNChangeReq(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new ULNChangeReq(input, extensionRegistry);
       }
     };
 
@@ -2442,13 +2442,13 @@ public final class C2SProtos {
      * <code>optional .org.coniks.coniks_common.DSAPublicKeyProto newChangeKey = 3;</code>
      */
     public org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto getNewChangeKey() {
-      return newChangeKey_ == null ? org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance() : newChangeKey_;
+      return newChangeKey_;
     }
     /**
      * <code>optional .org.coniks.coniks_common.DSAPublicKeyProto newChangeKey = 3;</code>
      */
     public org.coniks.coniks_common.C2SProtos.DSAPublicKeyProtoOrBuilder getNewChangeKeyOrBuilder() {
-      return newChangeKey_ == null ? org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance() : newChangeKey_;
+      return newChangeKey_;
     }
 
     public static final int ALLOWSUNSIGNEDKEYCHANGE_FIELD_NUMBER = 4;
@@ -2481,6 +2481,13 @@ public final class C2SProtos {
       return allowsPublicLookup_;
     }
 
+    private void initFields() {
+      name_ = "";
+      newBlob_ = "";
+      newChangeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
+      allowsUnsignedKeychange_ = false;
+      allowsPublicLookup_ = false;
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -2499,6 +2506,7 @@ public final class C2SProtos {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, getNameBytes());
       }
@@ -2506,7 +2514,7 @@ public final class C2SProtos {
         output.writeBytes(2, getNewBlobBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(3, getNewChangeKey());
+        output.writeMessage(3, newChangeKey_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeBool(4, allowsUnsignedKeychange_);
@@ -2514,7 +2522,7 @@ public final class C2SProtos {
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeBool(5, allowsPublicLookup_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -2533,7 +2541,7 @@ public final class C2SProtos {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getNewChangeKey());
+          .computeMessageSize(3, newChangeKey_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
@@ -2543,12 +2551,18 @@ public final class C2SProtos {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(5, allowsPublicLookup_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.C2SProtos.ULNChangeReq parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -2602,17 +2616,12 @@ public final class C2SProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.C2SProtos.ULNChangeReq prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -2654,6 +2663,10 @@ public final class C2SProtos {
           getNewChangeKeyFieldBuilder();
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         name_ = "";
@@ -2661,7 +2674,7 @@ public final class C2SProtos {
         newBlob_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
         if (newChangeKeyBuilder_ == null) {
-          newChangeKey_ = null;
+          newChangeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
         } else {
           newChangeKeyBuilder_.clear();
         }
@@ -2671,6 +2684,10 @@ public final class C2SProtos {
         allowsPublicLookup_ = false;
         bitField0_ = (bitField0_ & ~0x00000010);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -2753,8 +2770,7 @@ public final class C2SProtos {
         if (other.hasAllowsPublicLookup()) {
           setAllowsPublicLookup(other.getAllowsPublicLookup());
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -2939,7 +2955,7 @@ public final class C2SProtos {
         return this;
       }
 
-      private org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto newChangeKey_ = null;
+      private org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto newChangeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto, org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.Builder, org.coniks.coniks_common.C2SProtos.DSAPublicKeyProtoOrBuilder> newChangeKeyBuilder_;
       /**
@@ -2953,7 +2969,7 @@ public final class C2SProtos {
        */
       public org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto getNewChangeKey() {
         if (newChangeKeyBuilder_ == null) {
-          return newChangeKey_ == null ? org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance() : newChangeKey_;
+          return newChangeKey_;
         } else {
           return newChangeKeyBuilder_.getMessage();
         }
@@ -2994,7 +3010,6 @@ public final class C2SProtos {
       public Builder mergeNewChangeKey(org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto value) {
         if (newChangeKeyBuilder_ == null) {
           if (((bitField0_ & 0x00000004) == 0x00000004) &&
-              newChangeKey_ != null &&
               newChangeKey_ != org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance()) {
             newChangeKey_ =
               org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.newBuilder(newChangeKey_).mergeFrom(value).buildPartial();
@@ -3013,7 +3028,7 @@ public final class C2SProtos {
        */
       public Builder clearNewChangeKey() {
         if (newChangeKeyBuilder_ == null) {
-          newChangeKey_ = null;
+          newChangeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
           onChanged();
         } else {
           newChangeKeyBuilder_.clear();
@@ -3036,8 +3051,7 @@ public final class C2SProtos {
         if (newChangeKeyBuilder_ != null) {
           return newChangeKeyBuilder_.getMessageOrBuilder();
         } else {
-          return newChangeKey_ == null ?
-              org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance() : newChangeKey_;
+          return newChangeKey_;
         }
       }
       /**
@@ -3124,22 +3138,12 @@ public final class C2SProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.ULNChangeReq)
     }
 
+    static {
+      defaultInstance = new ULNChangeReq(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.ULNChangeReq)
-    private static final org.coniks.coniks_common.C2SProtos.ULNChangeReq defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.C2SProtos.ULNChangeReq();
-    }
-
-    public static org.coniks.coniks_common.C2SProtos.ULNChangeReq getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.C2SProtos.ULNChangeReq getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   public interface SignedULNChangeReqOrBuilder extends
@@ -3196,27 +3200,37 @@ public final class C2SProtos {
   /**
    * Protobuf type {@code org.coniks.coniks_common.SignedULNChangeReq}
    */
-  public  static final class SignedULNChangeReq extends
+  public static final class SignedULNChangeReq extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.SignedULNChangeReq)
       SignedULNChangeReqOrBuilder {
     // Use SignedULNChangeReq.newBuilder() to construct.
-    private SignedULNChangeReq(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private SignedULNChangeReq(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private SignedULNChangeReq() {
-      sig_ = java.util.Collections.emptyList();
+    private SignedULNChangeReq(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final SignedULNChangeReq defaultInstance;
+    public static SignedULNChangeReq getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public SignedULNChangeReq getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private SignedULNChangeReq(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -3272,11 +3286,10 @@ public final class C2SProtos {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
           sig_ = java.util.Collections.unmodifiableList(sig_);
@@ -3297,22 +3310,13 @@ public final class C2SProtos {
               org.coniks.coniks_common.C2SProtos.SignedULNChangeReq.class, org.coniks.coniks_common.C2SProtos.SignedULNChangeReq.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<SignedULNChangeReq> PARSER =
+    public static com.google.protobuf.Parser<SignedULNChangeReq> PARSER =
         new com.google.protobuf.AbstractParser<SignedULNChangeReq>() {
       public SignedULNChangeReq parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new SignedULNChangeReq(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new SignedULNChangeReq(input, extensionRegistry);
       }
     };
 
@@ -3348,7 +3352,7 @@ public final class C2SProtos {
      * </pre>
      */
     public org.coniks.coniks_common.C2SProtos.ULNChangeReq getReq() {
-      return req_ == null ? org.coniks.coniks_common.C2SProtos.ULNChangeReq.getDefaultInstance() : req_;
+      return req_;
     }
     /**
      * <code>optional .org.coniks.coniks_common.ULNChangeReq req = 1;</code>
@@ -3361,7 +3365,7 @@ public final class C2SProtos {
      * </pre>
      */
     public org.coniks.coniks_common.C2SProtos.ULNChangeReqOrBuilder getReqOrBuilder() {
-      return req_ == null ? org.coniks.coniks_common.C2SProtos.ULNChangeReq.getDefaultInstance() : req_;
+      return req_;
     }
 
     public static final int SIG_FIELD_NUMBER = 2;
@@ -3387,6 +3391,10 @@ public final class C2SProtos {
     }
     private int sigMemoizedSerializedSize = -1;
 
+    private void initFields() {
+      req_ = org.coniks.coniks_common.C2SProtos.ULNChangeReq.getDefaultInstance();
+      sig_ = java.util.Collections.emptyList();
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -3407,7 +3415,7 @@ public final class C2SProtos {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, getReq());
+        output.writeMessage(1, req_);
       }
       if (getSigList().size() > 0) {
         output.writeRawVarint32(18);
@@ -3416,7 +3424,7 @@ public final class C2SProtos {
       for (int i = 0; i < sig_.size(); i++) {
         output.writeFixed32NoTag(sig_.get(i));
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -3427,7 +3435,7 @@ public final class C2SProtos {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getReq());
+          .computeMessageSize(1, req_);
       }
       {
         int dataSize = 0;
@@ -3440,12 +3448,18 @@ public final class C2SProtos {
         }
         sigMemoizedSerializedSize = dataSize;
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.C2SProtos.SignedULNChangeReq parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -3499,17 +3513,12 @@ public final class C2SProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.C2SProtos.SignedULNChangeReq prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -3551,10 +3560,14 @@ public final class C2SProtos {
           getReqFieldBuilder();
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         if (reqBuilder_ == null) {
-          req_ = null;
+          req_ = org.coniks.coniks_common.C2SProtos.ULNChangeReq.getDefaultInstance();
         } else {
           reqBuilder_.clear();
         }
@@ -3562,6 +3575,10 @@ public final class C2SProtos {
         sig_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -3627,8 +3644,7 @@ public final class C2SProtos {
           }
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -3661,7 +3677,7 @@ public final class C2SProtos {
       }
       private int bitField0_;
 
-      private org.coniks.coniks_common.C2SProtos.ULNChangeReq req_ = null;
+      private org.coniks.coniks_common.C2SProtos.ULNChangeReq req_ = org.coniks.coniks_common.C2SProtos.ULNChangeReq.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.coniks.coniks_common.C2SProtos.ULNChangeReq, org.coniks.coniks_common.C2SProtos.ULNChangeReq.Builder, org.coniks.coniks_common.C2SProtos.ULNChangeReqOrBuilder> reqBuilder_;
       /**
@@ -3689,7 +3705,7 @@ public final class C2SProtos {
        */
       public org.coniks.coniks_common.C2SProtos.ULNChangeReq getReq() {
         if (reqBuilder_ == null) {
-          return req_ == null ? org.coniks.coniks_common.C2SProtos.ULNChangeReq.getDefaultInstance() : req_;
+          return req_;
         } else {
           return reqBuilder_.getMessage();
         }
@@ -3751,7 +3767,6 @@ public final class C2SProtos {
       public Builder mergeReq(org.coniks.coniks_common.C2SProtos.ULNChangeReq value) {
         if (reqBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
-              req_ != null &&
               req_ != org.coniks.coniks_common.C2SProtos.ULNChangeReq.getDefaultInstance()) {
             req_ =
               org.coniks.coniks_common.C2SProtos.ULNChangeReq.newBuilder(req_).mergeFrom(value).buildPartial();
@@ -3777,7 +3792,7 @@ public final class C2SProtos {
        */
       public Builder clearReq() {
         if (reqBuilder_ == null) {
-          req_ = null;
+          req_ = org.coniks.coniks_common.C2SProtos.ULNChangeReq.getDefaultInstance();
           onChanged();
         } else {
           reqBuilder_.clear();
@@ -3814,8 +3829,7 @@ public final class C2SProtos {
         if (reqBuilder_ != null) {
           return reqBuilder_.getMessageOrBuilder();
         } else {
-          return req_ == null ?
-              org.coniks.coniks_common.C2SProtos.ULNChangeReq.getDefaultInstance() : req_;
+          return req_;
         }
       }
       /**
@@ -3911,22 +3925,12 @@ public final class C2SProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.SignedULNChangeReq)
     }
 
+    static {
+      defaultInstance = new SignedULNChangeReq(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.SignedULNChangeReq)
-    private static final org.coniks.coniks_common.C2SProtos.SignedULNChangeReq defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.C2SProtos.SignedULNChangeReq();
-    }
-
-    public static org.coniks.coniks_common.C2SProtos.SignedULNChangeReq getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.C2SProtos.SignedULNChangeReq getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   public interface CommitmentReqOrBuilder extends
@@ -3996,29 +4000,37 @@ public final class C2SProtos {
   /**
    * Protobuf type {@code org.coniks.coniks_common.CommitmentReq}
    */
-  public  static final class CommitmentReq extends
+  public static final class CommitmentReq extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.CommitmentReq)
       CommitmentReqOrBuilder {
     // Use CommitmentReq.newBuilder() to construct.
-    private CommitmentReq(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private CommitmentReq(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private CommitmentReq() {
-      type_ = 0;
-      epoch_ = 0L;
-      provider_ = "";
+    private CommitmentReq(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final CommitmentReq defaultInstance;
+    public static CommitmentReq getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public CommitmentReq getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private CommitmentReq(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -4044,7 +4056,7 @@ public final class C2SProtos {
                 unknownFields.mergeVarintField(1, rawValue);
               } else {
                 bitField0_ |= 0x00000001;
-                type_ = rawValue;
+                type_ = value;
               }
               break;
             }
@@ -4062,11 +4074,10 @@ public final class C2SProtos {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -4084,22 +4095,13 @@ public final class C2SProtos {
               org.coniks.coniks_common.C2SProtos.CommitmentReq.class, org.coniks.coniks_common.C2SProtos.CommitmentReq.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<CommitmentReq> PARSER =
+    public static com.google.protobuf.Parser<CommitmentReq> PARSER =
         new com.google.protobuf.AbstractParser<CommitmentReq>() {
       public CommitmentReq parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new CommitmentReq(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new CommitmentReq(input, extensionRegistry);
       }
     };
 
@@ -4137,9 +4139,7 @@ public final class C2SProtos {
       public static final int WITNESS_VALUE = 1;
 
 
-      public final int getNumber() {
-        return value;
-      }
+      public final int getNumber() { return value; }
 
       public static CommitmentType valueOf(int value) {
         switch (value) {
@@ -4198,7 +4198,7 @@ public final class C2SProtos {
 
     private int bitField0_;
     public static final int TYPE_FIELD_NUMBER = 1;
-    private int type_;
+    private org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType type_;
     /**
      * <code>optional .org.coniks.coniks_common.CommitmentReq.CommitmentType type = 1;</code>
      *
@@ -4217,8 +4217,7 @@ public final class C2SProtos {
      * </pre>
      */
     public org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType getType() {
-      org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType result = org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType.valueOf(type_);
-      return result == null ? org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType.SELF : result;
+      return type_;
     }
 
     public static final int EPOCH_FIELD_NUMBER = 2;
@@ -4298,6 +4297,11 @@ public final class C2SProtos {
       }
     }
 
+    private void initFields() {
+      type_ = org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType.SELF;
+      epoch_ = 0L;
+      provider_ = "";
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -4310,8 +4314,9 @@ public final class C2SProtos {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeEnum(1, type_);
+        output.writeEnum(1, type_.getNumber());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeUInt64(2, epoch_);
@@ -4319,7 +4324,7 @@ public final class C2SProtos {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeBytes(3, getProviderBytes());
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -4330,7 +4335,7 @@ public final class C2SProtos {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, type_);
+          .computeEnumSize(1, type_.getNumber());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -4340,12 +4345,18 @@ public final class C2SProtos {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(3, getProviderBytes());
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.C2SProtos.CommitmentReq parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -4399,17 +4410,12 @@ public final class C2SProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.C2SProtos.CommitmentReq prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -4450,15 +4456,23 @@ public final class C2SProtos {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
-        type_ = 0;
+        type_ = org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType.SELF;
         bitField0_ = (bitField0_ & ~0x00000001);
         epoch_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000002);
         provider_ = "";
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -4521,8 +4535,7 @@ public final class C2SProtos {
           provider_ = other.provider_;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -4549,7 +4562,7 @@ public final class C2SProtos {
       }
       private int bitField0_;
 
-      private int type_ = 0;
+      private org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType type_ = org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType.SELF;
       /**
        * <code>optional .org.coniks.coniks_common.CommitmentReq.CommitmentType type = 1;</code>
        *
@@ -4568,8 +4581,7 @@ public final class C2SProtos {
        * </pre>
        */
       public org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType getType() {
-        org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType result = org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType.valueOf(type_);
-        return result == null ? org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType.SELF : result;
+        return type_;
       }
       /**
        * <code>optional .org.coniks.coniks_common.CommitmentReq.CommitmentType type = 1;</code>
@@ -4583,7 +4595,7 @@ public final class C2SProtos {
           throw new NullPointerException();
         }
         bitField0_ |= 0x00000001;
-        type_ = value.getNumber();
+        type_ = value;
         onChanged();
         return this;
       }
@@ -4596,7 +4608,7 @@ public final class C2SProtos {
        */
       public Builder clearType() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        type_ = 0;
+        type_ = org.coniks.coniks_common.C2SProtos.CommitmentReq.CommitmentType.SELF;
         onChanged();
         return this;
       }
@@ -4752,22 +4764,12 @@ public final class C2SProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.CommitmentReq)
     }
 
+    static {
+      defaultInstance = new CommitmentReq(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.CommitmentReq)
-    private static final org.coniks.coniks_common.C2SProtos.CommitmentReq defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.C2SProtos.CommitmentReq();
-    }
-
-    public static org.coniks.coniks_common.C2SProtos.CommitmentReq getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.C2SProtos.CommitmentReq getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   public interface KeyLookupOrBuilder extends
@@ -4812,28 +4814,37 @@ public final class C2SProtos {
   /**
    * Protobuf type {@code org.coniks.coniks_common.KeyLookup}
    */
-  public  static final class KeyLookup extends
+  public static final class KeyLookup extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.KeyLookup)
       KeyLookupOrBuilder {
     // Use KeyLookup.newBuilder() to construct.
-    private KeyLookup(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private KeyLookup(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private KeyLookup() {
-      name_ = "";
-      epoch_ = 0L;
+    private KeyLookup(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final KeyLookup defaultInstance;
+    public static KeyLookup getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public KeyLookup getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private KeyLookup(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -4866,11 +4877,10 @@ public final class C2SProtos {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -4888,22 +4898,13 @@ public final class C2SProtos {
               org.coniks.coniks_common.C2SProtos.KeyLookup.class, org.coniks.coniks_common.C2SProtos.KeyLookup.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<KeyLookup> PARSER =
+    public static com.google.protobuf.Parser<KeyLookup> PARSER =
         new com.google.protobuf.AbstractParser<KeyLookup>() {
       public KeyLookup parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new KeyLookup(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new KeyLookup(input, extensionRegistry);
       }
     };
 
@@ -4982,6 +4983,10 @@ public final class C2SProtos {
       return epoch_;
     }
 
+    private void initFields() {
+      name_ = "";
+      epoch_ = 0L;
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -4994,13 +4999,14 @@ public final class C2SProtos {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, getNameBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeUInt64(2, epoch_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -5017,12 +5023,18 @@ public final class C2SProtos {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt64Size(2, epoch_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.C2SProtos.KeyLookup parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -5076,17 +5088,12 @@ public final class C2SProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.C2SProtos.KeyLookup prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -5127,6 +5134,10 @@ public final class C2SProtos {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         name_ = "";
@@ -5134,6 +5145,10 @@ public final class C2SProtos {
         epoch_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -5189,8 +5204,7 @@ public final class C2SProtos {
         if (other.hasEpoch()) {
           setEpoch(other.getEpoch());
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -5352,22 +5366,12 @@ public final class C2SProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.KeyLookup)
     }
 
+    static {
+      defaultInstance = new KeyLookup(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.KeyLookup)
-    private static final org.coniks.coniks_common.C2SProtos.KeyLookup defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.C2SProtos.KeyLookup();
-    }
-
-    public static org.coniks.coniks_common.C2SProtos.KeyLookup getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.C2SProtos.KeyLookup getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   public interface RegistrationRespOrBuilder extends
@@ -5403,28 +5407,37 @@ public final class C2SProtos {
   /**
    * Protobuf type {@code org.coniks.coniks_common.RegistrationResp}
    */
-  public  static final class RegistrationResp extends
+  public static final class RegistrationResp extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.RegistrationResp)
       RegistrationRespOrBuilder {
     // Use RegistrationResp.newBuilder() to construct.
-    private RegistrationResp(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private RegistrationResp(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private RegistrationResp() {
-      initEpoch_ = 0L;
-      epochInterval_ = 0;
+    private RegistrationResp(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final RegistrationResp defaultInstance;
+    public static RegistrationResp getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public RegistrationResp getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private RegistrationResp(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -5456,11 +5469,10 @@ public final class C2SProtos {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -5478,22 +5490,13 @@ public final class C2SProtos {
               org.coniks.coniks_common.C2SProtos.RegistrationResp.class, org.coniks.coniks_common.C2SProtos.RegistrationResp.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<RegistrationResp> PARSER =
+    public static com.google.protobuf.Parser<RegistrationResp> PARSER =
         new com.google.protobuf.AbstractParser<RegistrationResp>() {
       public RegistrationResp parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new RegistrationResp(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new RegistrationResp(input, extensionRegistry);
       }
     };
 
@@ -5541,6 +5544,10 @@ public final class C2SProtos {
       return epochInterval_;
     }
 
+    private void initFields() {
+      initEpoch_ = 0L;
+      epochInterval_ = 0;
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -5553,13 +5560,14 @@ public final class C2SProtos {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeUInt64(1, initEpoch_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeUInt32(2, epochInterval_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -5576,12 +5584,18 @@ public final class C2SProtos {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(2, epochInterval_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.C2SProtos.RegistrationResp parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -5635,17 +5649,12 @@ public final class C2SProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.C2SProtos.RegistrationResp prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -5686,6 +5695,10 @@ public final class C2SProtos {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         initEpoch_ = 0L;
@@ -5693,6 +5706,10 @@ public final class C2SProtos {
         epochInterval_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -5746,8 +5763,7 @@ public final class C2SProtos {
         if (other.hasEpochInterval()) {
           setEpochInterval(other.getEpochInterval());
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -5857,22 +5873,12 @@ public final class C2SProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.RegistrationResp)
     }
 
+    static {
+      defaultInstance = new RegistrationResp(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.RegistrationResp)
-    private static final org.coniks.coniks_common.C2SProtos.RegistrationResp defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.C2SProtos.RegistrationResp();
-    }
-
-    public static org.coniks.coniks_common.C2SProtos.RegistrationResp getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.C2SProtos.RegistrationResp getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   public interface AuthPathOrBuilder extends
@@ -5944,27 +5950,37 @@ public final class C2SProtos {
   /**
    * Protobuf type {@code org.coniks.coniks_common.AuthPath}
    */
-  public  static final class AuthPath extends
+  public static final class AuthPath extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.AuthPath)
       AuthPathOrBuilder {
     // Use AuthPath.newBuilder() to construct.
-    private AuthPath(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private AuthPath(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private AuthPath() {
-      interior_ = java.util.Collections.emptyList();
+    private AuthPath(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final AuthPath defaultInstance;
+    public static AuthPath getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public AuthPath getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private AuthPath(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-      this();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -6020,11 +6036,10 @@ public final class C2SProtos {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw new RuntimeException(e.setUnfinishedMessage(this));
+        throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new RuntimeException(
-            new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this));
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
           interior_ = java.util.Collections.unmodifiableList(interior_);
@@ -6045,22 +6060,13 @@ public final class C2SProtos {
               org.coniks.coniks_common.C2SProtos.AuthPath.class, org.coniks.coniks_common.C2SProtos.AuthPath.Builder.class);
     }
 
-    public static final com.google.protobuf.Parser<AuthPath> PARSER =
+    public static com.google.protobuf.Parser<AuthPath> PARSER =
         new com.google.protobuf.AbstractParser<AuthPath>() {
       public AuthPath parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        try {
-          return new AuthPath(input, extensionRegistry);
-        } catch (RuntimeException e) {
-          if (e.getCause() instanceof
-              com.google.protobuf.InvalidProtocolBufferException) {
-            throw (com.google.protobuf.InvalidProtocolBufferException)
-                e.getCause();
-          }
-          throw e;
-        }
+        return new AuthPath(input, extensionRegistry);
       }
     };
 
@@ -6098,9 +6104,7 @@ public final class C2SProtos {
       public static final int RIGHT_VALUE = 1;
 
 
-      public final int getNumber() {
-        return value;
-      }
+      public final int getNumber() { return value; }
 
       public static PrunedChild valueOf(int value) {
         switch (value) {
@@ -6313,36 +6317,37 @@ public final class C2SProtos {
      * auth path consists of user leaf node, possibly interior nodes, and root node
      * </pre>
      */
-    public  static final class UserLeafNode extends
+    public static final class UserLeafNode extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.AuthPath.UserLeafNode)
         UserLeafNodeOrBuilder {
       // Use UserLeafNode.newBuilder() to construct.
-      private UserLeafNode(com.google.protobuf.GeneratedMessage.Builder builder) {
+      private UserLeafNode(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
+        this.unknownFields = builder.getUnknownFields();
       }
-      private UserLeafNode() {
-        name_ = "";
-        publickey_ = "";
-        epochAdded_ = 0L;
-        epochChanged_ = 0L;
-        allowsUnsignedKeychange_ = false;
-        allowsPublicLookup_ = false;
-        lookupIndex_ = java.util.Collections.emptyList();
-        intlevels_ = 0;
-        signature_ = java.util.Collections.emptyList();
-        lastMsg_ = java.util.Collections.emptyList();
+      private UserLeafNode(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+      private static final UserLeafNode defaultInstance;
+      public static UserLeafNode getDefaultInstance() {
+        return defaultInstance;
       }
 
+      public UserLeafNode getDefaultInstanceForType() {
+        return defaultInstance;
+      }
+
+      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+          getUnknownFields() {
         return this.unknownFields;
       }
       private UserLeafNode(
           com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-        this();
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        initFields();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -6477,11 +6482,10 @@ public final class C2SProtos {
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw new RuntimeException(e.setUnfinishedMessage(this));
+          throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
-          throw new RuntimeException(
-              new com.google.protobuf.InvalidProtocolBufferException(
-                  e.getMessage()).setUnfinishedMessage(this));
+          throw new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this);
         } finally {
           if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
             lookupIndex_ = java.util.Collections.unmodifiableList(lookupIndex_);
@@ -6508,22 +6512,13 @@ public final class C2SProtos {
                 org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.class, org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.Builder.class);
       }
 
-      public static final com.google.protobuf.Parser<UserLeafNode> PARSER =
+      public static com.google.protobuf.Parser<UserLeafNode> PARSER =
           new com.google.protobuf.AbstractParser<UserLeafNode>() {
         public UserLeafNode parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-          try {
-            return new UserLeafNode(input, extensionRegistry);
-          } catch (RuntimeException e) {
-            if (e.getCause() instanceof
-                com.google.protobuf.InvalidProtocolBufferException) {
-              throw (com.google.protobuf.InvalidProtocolBufferException)
-                  e.getCause();
-            }
-            throw e;
-          }
+          return new UserLeafNode(input, extensionRegistry);
         }
       };
 
@@ -6770,13 +6765,13 @@ public final class C2SProtos {
        * <code>optional .org.coniks.coniks_common.DSAPublicKeyProto changeKey = 10;</code>
        */
       public org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto getChangeKey() {
-        return changeKey_ == null ? org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance() : changeKey_;
+        return changeKey_;
       }
       /**
        * <code>optional .org.coniks.coniks_common.DSAPublicKeyProto changeKey = 10;</code>
        */
       public org.coniks.coniks_common.C2SProtos.DSAPublicKeyProtoOrBuilder getChangeKeyOrBuilder() {
-        return changeKey_ == null ? org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance() : changeKey_;
+        return changeKey_;
       }
 
       public static final int LASTMSG_FIELD_NUMBER = 11;
@@ -6802,6 +6797,19 @@ public final class C2SProtos {
       }
       private int lastMsgMemoizedSerializedSize = -1;
 
+      private void initFields() {
+        name_ = "";
+        publickey_ = "";
+        epochAdded_ = 0L;
+        epochChanged_ = 0L;
+        allowsUnsignedKeychange_ = false;
+        allowsPublicLookup_ = false;
+        lookupIndex_ = java.util.Collections.emptyList();
+        intlevels_ = 0;
+        signature_ = java.util.Collections.emptyList();
+        changeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
+        lastMsg_ = java.util.Collections.emptyList();
+      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -6857,7 +6865,7 @@ public final class C2SProtos {
           output.writeFixed32NoTag(signature_.get(i));
         }
         if (((bitField0_ & 0x00000080) == 0x00000080)) {
-          output.writeMessage(10, getChangeKey());
+          output.writeMessage(10, changeKey_);
         }
         if (getLastMsgList().size() > 0) {
           output.writeRawVarint32(90);
@@ -6866,7 +6874,7 @@ public final class C2SProtos {
         for (int i = 0; i < lastMsg_.size(); i++) {
           output.writeFixed32NoTag(lastMsg_.get(i));
         }
-        unknownFields.writeTo(output);
+        getUnknownFields().writeTo(output);
       }
 
       private int memoizedSerializedSize = -1;
@@ -6927,7 +6935,7 @@ public final class C2SProtos {
         }
         if (((bitField0_ & 0x00000080) == 0x00000080)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(10, getChangeKey());
+            .computeMessageSize(10, changeKey_);
         }
         {
           int dataSize = 0;
@@ -6940,12 +6948,18 @@ public final class C2SProtos {
           }
           lastMsgMemoizedSerializedSize = dataSize;
         }
-        size += unknownFields.getSerializedSize();
+        size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
+      @java.lang.Override
+      protected java.lang.Object writeReplace()
+          throws java.io.ObjectStreamException {
+        return super.writeReplace();
+      }
+
       public static org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode parseFrom(
           com.google.protobuf.ByteString data)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -6999,17 +7013,12 @@ public final class C2SProtos {
         return PARSER.parseFrom(input, extensionRegistry);
       }
 
+      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder() {
-        return defaultInstance.toBuilder();
-      }
       public static Builder newBuilder(org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode prototype) {
-        return defaultInstance.toBuilder().mergeFrom(prototype);
+        return newBuilder().mergeFrom(prototype);
       }
-      public Builder toBuilder() {
-        return this == defaultInstance
-            ? new Builder() : new Builder().mergeFrom(this);
-      }
+      public Builder toBuilder() { return newBuilder(this); }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -7055,6 +7064,10 @@ public final class C2SProtos {
             getChangeKeyFieldBuilder();
           }
         }
+        private static Builder create() {
+          return new Builder();
+        }
+
         public Builder clear() {
           super.clear();
           name_ = "";
@@ -7076,7 +7089,7 @@ public final class C2SProtos {
           signature_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000100);
           if (changeKeyBuilder_ == null) {
-            changeKey_ = null;
+            changeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
           } else {
             changeKeyBuilder_.clear();
           }
@@ -7084,6 +7097,10 @@ public final class C2SProtos {
           lastMsg_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000400);
           return this;
+        }
+
+        public Builder clone() {
+          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -7232,8 +7249,7 @@ public final class C2SProtos {
             }
             onChanged();
           }
-          this.mergeUnknownFields(other.unknownFields);
-          onChanged();
+          this.mergeUnknownFields(other.getUnknownFields());
           return this;
         }
 
@@ -7750,7 +7766,7 @@ public final class C2SProtos {
           return this;
         }
 
-        private org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto changeKey_ = null;
+        private org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto changeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
         private com.google.protobuf.SingleFieldBuilder<
             org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto, org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.Builder, org.coniks.coniks_common.C2SProtos.DSAPublicKeyProtoOrBuilder> changeKeyBuilder_;
         /**
@@ -7764,7 +7780,7 @@ public final class C2SProtos {
          */
         public org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto getChangeKey() {
           if (changeKeyBuilder_ == null) {
-            return changeKey_ == null ? org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance() : changeKey_;
+            return changeKey_;
           } else {
             return changeKeyBuilder_.getMessage();
           }
@@ -7805,7 +7821,6 @@ public final class C2SProtos {
         public Builder mergeChangeKey(org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto value) {
           if (changeKeyBuilder_ == null) {
             if (((bitField0_ & 0x00000200) == 0x00000200) &&
-                changeKey_ != null &&
                 changeKey_ != org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance()) {
               changeKey_ =
                 org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.newBuilder(changeKey_).mergeFrom(value).buildPartial();
@@ -7824,7 +7839,7 @@ public final class C2SProtos {
          */
         public Builder clearChangeKey() {
           if (changeKeyBuilder_ == null) {
-            changeKey_ = null;
+            changeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
             onChanged();
           } else {
             changeKeyBuilder_.clear();
@@ -7847,8 +7862,7 @@ public final class C2SProtos {
           if (changeKeyBuilder_ != null) {
             return changeKeyBuilder_.getMessageOrBuilder();
           } else {
-            return changeKey_ == null ?
-                org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance() : changeKey_;
+            return changeKey_;
           }
         }
         /**
@@ -7937,22 +7951,12 @@ public final class C2SProtos {
         // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.AuthPath.UserLeafNode)
       }
 
+      static {
+        defaultInstance = new UserLeafNode(true);
+        defaultInstance.initFields();
+      }
+
       // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.AuthPath.UserLeafNode)
-      private static final org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode defaultInstance;
-      static {
-        defaultInstance = new org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode();
-      }
-
-      public static org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode getDefaultInstance() {
-        return defaultInstance;
-      }
-
-      public org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode getDefaultInstanceForType() {
-        return defaultInstance;
-      }
-
-      static {
-      }
     }
 
     public interface InteriorNodeOrBuilder extends
@@ -7992,27 +7996,37 @@ public final class C2SProtos {
     /**
      * Protobuf type {@code org.coniks.coniks_common.AuthPath.InteriorNode}
      */
-    public  static final class InteriorNode extends
+    public static final class InteriorNode extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.AuthPath.InteriorNode)
         InteriorNodeOrBuilder {
       // Use InteriorNode.newBuilder() to construct.
-      private InteriorNode(com.google.protobuf.GeneratedMessage.Builder builder) {
+      private InteriorNode(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
+        this.unknownFields = builder.getUnknownFields();
       }
-      private InteriorNode() {
-        prunedchild_ = 0;
+      private InteriorNode(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+      private static final InteriorNode defaultInstance;
+      public static InteriorNode getDefaultInstance() {
+        return defaultInstance;
       }
 
+      public InteriorNode getDefaultInstanceForType() {
+        return defaultInstance;
+      }
+
+      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+          getUnknownFields() {
         return this.unknownFields;
       }
       private InteriorNode(
           com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-        this();
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        initFields();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -8038,7 +8052,7 @@ public final class C2SProtos {
                   unknownFields.mergeVarintField(1, rawValue);
                 } else {
                   bitField0_ |= 0x00000001;
-                  prunedchild_ = rawValue;
+                  prunedchild_ = value;
                 }
                 break;
               }
@@ -8058,11 +8072,10 @@ public final class C2SProtos {
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw new RuntimeException(e.setUnfinishedMessage(this));
+          throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
-          throw new RuntimeException(
-              new com.google.protobuf.InvalidProtocolBufferException(
-                  e.getMessage()).setUnfinishedMessage(this));
+          throw new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -8080,22 +8093,13 @@ public final class C2SProtos {
                 org.coniks.coniks_common.C2SProtos.AuthPath.InteriorNode.class, org.coniks.coniks_common.C2SProtos.AuthPath.InteriorNode.Builder.class);
       }
 
-      public static final com.google.protobuf.Parser<InteriorNode> PARSER =
+      public static com.google.protobuf.Parser<InteriorNode> PARSER =
           new com.google.protobuf.AbstractParser<InteriorNode>() {
         public InteriorNode parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-          try {
-            return new InteriorNode(input, extensionRegistry);
-          } catch (RuntimeException e) {
-            if (e.getCause() instanceof
-                com.google.protobuf.InvalidProtocolBufferException) {
-              throw (com.google.protobuf.InvalidProtocolBufferException)
-                  e.getCause();
-            }
-            throw e;
-          }
+          return new InteriorNode(input, extensionRegistry);
         }
       };
 
@@ -8106,7 +8110,7 @@ public final class C2SProtos {
 
       private int bitField0_;
       public static final int PRUNEDCHILD_FIELD_NUMBER = 1;
-      private int prunedchild_;
+      private org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild prunedchild_;
       /**
        * <code>optional .org.coniks.coniks_common.AuthPath.PrunedChild prunedchild = 1;</code>
        *
@@ -8125,8 +8129,7 @@ public final class C2SProtos {
        * </pre>
        */
       public org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild getPrunedchild() {
-        org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild result = org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.valueOf(prunedchild_);
-        return result == null ? org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.LEFT : result;
+        return prunedchild_;
       }
 
       public static final int SUBTREE_FIELD_NUMBER = 2;
@@ -8141,15 +8144,19 @@ public final class C2SProtos {
        * <code>optional .org.coniks.coniks_common.Hash subtree = 2;</code>
        */
       public org.coniks.coniks_common.UtilProtos.Hash getSubtree() {
-        return subtree_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : subtree_;
+        return subtree_;
       }
       /**
        * <code>optional .org.coniks.coniks_common.Hash subtree = 2;</code>
        */
       public org.coniks.coniks_common.UtilProtos.HashOrBuilder getSubtreeOrBuilder() {
-        return subtree_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : subtree_;
+        return subtree_;
       }
 
+      private void initFields() {
+        prunedchild_ = org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.LEFT;
+        subtree_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
+      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -8162,13 +8169,14 @@ public final class C2SProtos {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
+        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          output.writeEnum(1, prunedchild_);
+          output.writeEnum(1, prunedchild_.getNumber());
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          output.writeMessage(2, getSubtree());
+          output.writeMessage(2, subtree_);
         }
-        unknownFields.writeTo(output);
+        getUnknownFields().writeTo(output);
       }
 
       private int memoizedSerializedSize = -1;
@@ -8179,18 +8187,24 @@ public final class C2SProtos {
         size = 0;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeEnumSize(1, prunedchild_);
+            .computeEnumSize(1, prunedchild_.getNumber());
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(2, getSubtree());
+            .computeMessageSize(2, subtree_);
         }
-        size += unknownFields.getSerializedSize();
+        size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
+      @java.lang.Override
+      protected java.lang.Object writeReplace()
+          throws java.io.ObjectStreamException {
+        return super.writeReplace();
+      }
+
       public static org.coniks.coniks_common.C2SProtos.AuthPath.InteriorNode parseFrom(
           com.google.protobuf.ByteString data)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -8244,17 +8258,12 @@ public final class C2SProtos {
         return PARSER.parseFrom(input, extensionRegistry);
       }
 
+      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder() {
-        return defaultInstance.toBuilder();
-      }
       public static Builder newBuilder(org.coniks.coniks_common.C2SProtos.AuthPath.InteriorNode prototype) {
-        return defaultInstance.toBuilder().mergeFrom(prototype);
+        return newBuilder().mergeFrom(prototype);
       }
-      public Builder toBuilder() {
-        return this == defaultInstance
-            ? new Builder() : new Builder().mergeFrom(this);
-      }
+      public Builder toBuilder() { return newBuilder(this); }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -8296,17 +8305,25 @@ public final class C2SProtos {
             getSubtreeFieldBuilder();
           }
         }
+        private static Builder create() {
+          return new Builder();
+        }
+
         public Builder clear() {
           super.clear();
-          prunedchild_ = 0;
+          prunedchild_ = org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.LEFT;
           bitField0_ = (bitField0_ & ~0x00000001);
           if (subtreeBuilder_ == null) {
-            subtree_ = null;
+            subtree_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
           } else {
             subtreeBuilder_.clear();
           }
           bitField0_ = (bitField0_ & ~0x00000002);
           return this;
+        }
+
+        public Builder clone() {
+          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -8364,8 +8381,7 @@ public final class C2SProtos {
           if (other.hasSubtree()) {
             mergeSubtree(other.getSubtree());
           }
-          this.mergeUnknownFields(other.unknownFields);
-          onChanged();
+          this.mergeUnknownFields(other.getUnknownFields());
           return this;
         }
 
@@ -8392,7 +8408,7 @@ public final class C2SProtos {
         }
         private int bitField0_;
 
-        private int prunedchild_ = 0;
+        private org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild prunedchild_ = org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.LEFT;
         /**
          * <code>optional .org.coniks.coniks_common.AuthPath.PrunedChild prunedchild = 1;</code>
          *
@@ -8411,8 +8427,7 @@ public final class C2SProtos {
          * </pre>
          */
         public org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild getPrunedchild() {
-          org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild result = org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.valueOf(prunedchild_);
-          return result == null ? org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.LEFT : result;
+          return prunedchild_;
         }
         /**
          * <code>optional .org.coniks.coniks_common.AuthPath.PrunedChild prunedchild = 1;</code>
@@ -8426,7 +8441,7 @@ public final class C2SProtos {
             throw new NullPointerException();
           }
           bitField0_ |= 0x00000001;
-          prunedchild_ = value.getNumber();
+          prunedchild_ = value;
           onChanged();
           return this;
         }
@@ -8439,12 +8454,12 @@ public final class C2SProtos {
          */
         public Builder clearPrunedchild() {
           bitField0_ = (bitField0_ & ~0x00000001);
-          prunedchild_ = 0;
+          prunedchild_ = org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.LEFT;
           onChanged();
           return this;
         }
 
-        private org.coniks.coniks_common.UtilProtos.Hash subtree_ = null;
+        private org.coniks.coniks_common.UtilProtos.Hash subtree_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
         private com.google.protobuf.SingleFieldBuilder<
             org.coniks.coniks_common.UtilProtos.Hash, org.coniks.coniks_common.UtilProtos.Hash.Builder, org.coniks.coniks_common.UtilProtos.HashOrBuilder> subtreeBuilder_;
         /**
@@ -8458,7 +8473,7 @@ public final class C2SProtos {
          */
         public org.coniks.coniks_common.UtilProtos.Hash getSubtree() {
           if (subtreeBuilder_ == null) {
-            return subtree_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : subtree_;
+            return subtree_;
           } else {
             return subtreeBuilder_.getMessage();
           }
@@ -8499,7 +8514,6 @@ public final class C2SProtos {
         public Builder mergeSubtree(org.coniks.coniks_common.UtilProtos.Hash value) {
           if (subtreeBuilder_ == null) {
             if (((bitField0_ & 0x00000002) == 0x00000002) &&
-                subtree_ != null &&
                 subtree_ != org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance()) {
               subtree_ =
                 org.coniks.coniks_common.UtilProtos.Hash.newBuilder(subtree_).mergeFrom(value).buildPartial();
@@ -8518,7 +8532,7 @@ public final class C2SProtos {
          */
         public Builder clearSubtree() {
           if (subtreeBuilder_ == null) {
-            subtree_ = null;
+            subtree_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
             onChanged();
           } else {
             subtreeBuilder_.clear();
@@ -8541,8 +8555,7 @@ public final class C2SProtos {
           if (subtreeBuilder_ != null) {
             return subtreeBuilder_.getMessageOrBuilder();
           } else {
-            return subtree_ == null ?
-                org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : subtree_;
+            return subtree_;
           }
         }
         /**
@@ -8565,22 +8578,12 @@ public final class C2SProtos {
         // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.AuthPath.InteriorNode)
       }
 
+      static {
+        defaultInstance = new InteriorNode(true);
+        defaultInstance.initFields();
+      }
+
       // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.AuthPath.InteriorNode)
-      private static final org.coniks.coniks_common.C2SProtos.AuthPath.InteriorNode defaultInstance;
-      static {
-        defaultInstance = new org.coniks.coniks_common.C2SProtos.AuthPath.InteriorNode();
-      }
-
-      public static org.coniks.coniks_common.C2SProtos.AuthPath.InteriorNode getDefaultInstance() {
-        return defaultInstance;
-      }
-
-      public org.coniks.coniks_common.C2SProtos.AuthPath.InteriorNode getDefaultInstanceForType() {
-        return defaultInstance;
-      }
-
-      static {
-      }
     }
 
     public interface RootNodeOrBuilder extends
@@ -8642,28 +8645,37 @@ public final class C2SProtos {
     /**
      * Protobuf type {@code org.coniks.coniks_common.AuthPath.RootNode}
      */
-    public  static final class RootNode extends
+    public static final class RootNode extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:org.coniks.coniks_common.AuthPath.RootNode)
         RootNodeOrBuilder {
       // Use RootNode.newBuilder() to construct.
-      private RootNode(com.google.protobuf.GeneratedMessage.Builder builder) {
+      private RootNode(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
         super(builder);
+        this.unknownFields = builder.getUnknownFields();
       }
-      private RootNode() {
-        prunedchild_ = 0;
-        epoch_ = 0L;
+      private RootNode(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+      private static final RootNode defaultInstance;
+      public static RootNode getDefaultInstance() {
+        return defaultInstance;
       }
 
+      public RootNode getDefaultInstanceForType() {
+        return defaultInstance;
+      }
+
+      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-      getUnknownFields() {
+          getUnknownFields() {
         return this.unknownFields;
       }
       private RootNode(
           com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
-        this();
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        initFields();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -8689,7 +8701,7 @@ public final class C2SProtos {
                   unknownFields.mergeVarintField(1, rawValue);
                 } else {
                   bitField0_ |= 0x00000001;
-                  prunedchild_ = rawValue;
+                  prunedchild_ = value;
                 }
                 break;
               }
@@ -8727,11 +8739,10 @@ public final class C2SProtos {
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw new RuntimeException(e.setUnfinishedMessage(this));
+          throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
-          throw new RuntimeException(
-              new com.google.protobuf.InvalidProtocolBufferException(
-                  e.getMessage()).setUnfinishedMessage(this));
+          throw new com.google.protobuf.InvalidProtocolBufferException(
+              e.getMessage()).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -8749,22 +8760,13 @@ public final class C2SProtos {
                 org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.class, org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.Builder.class);
       }
 
-      public static final com.google.protobuf.Parser<RootNode> PARSER =
+      public static com.google.protobuf.Parser<RootNode> PARSER =
           new com.google.protobuf.AbstractParser<RootNode>() {
         public RootNode parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-          try {
-            return new RootNode(input, extensionRegistry);
-          } catch (RuntimeException e) {
-            if (e.getCause() instanceof
-                com.google.protobuf.InvalidProtocolBufferException) {
-              throw (com.google.protobuf.InvalidProtocolBufferException)
-                  e.getCause();
-            }
-            throw e;
-          }
+          return new RootNode(input, extensionRegistry);
         }
       };
 
@@ -8775,7 +8777,7 @@ public final class C2SProtos {
 
       private int bitField0_;
       public static final int PRUNEDCHILD_FIELD_NUMBER = 1;
-      private int prunedchild_;
+      private org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild prunedchild_;
       /**
        * <code>optional .org.coniks.coniks_common.AuthPath.PrunedChild prunedchild = 1;</code>
        *
@@ -8794,8 +8796,7 @@ public final class C2SProtos {
        * </pre>
        */
       public org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild getPrunedchild() {
-        org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild result = org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.valueOf(prunedchild_);
-        return result == null ? org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.LEFT : result;
+        return prunedchild_;
       }
 
       public static final int SUBTREE_FIELD_NUMBER = 2;
@@ -8810,13 +8811,13 @@ public final class C2SProtos {
        * <code>optional .org.coniks.coniks_common.Hash subtree = 2;</code>
        */
       public org.coniks.coniks_common.UtilProtos.Hash getSubtree() {
-        return subtree_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : subtree_;
+        return subtree_;
       }
       /**
        * <code>optional .org.coniks.coniks_common.Hash subtree = 2;</code>
        */
       public org.coniks.coniks_common.UtilProtos.HashOrBuilder getSubtreeOrBuilder() {
-        return subtree_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : subtree_;
+        return subtree_;
       }
 
       public static final int PREV_FIELD_NUMBER = 3;
@@ -8831,13 +8832,13 @@ public final class C2SProtos {
        * <code>optional .org.coniks.coniks_common.Hash prev = 3;</code>
        */
       public org.coniks.coniks_common.UtilProtos.Hash getPrev() {
-        return prev_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : prev_;
+        return prev_;
       }
       /**
        * <code>optional .org.coniks.coniks_common.Hash prev = 3;</code>
        */
       public org.coniks.coniks_common.UtilProtos.HashOrBuilder getPrevOrBuilder() {
-        return prev_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : prev_;
+        return prev_;
       }
 
       public static final int EPOCH_FIELD_NUMBER = 4;
@@ -8855,6 +8856,12 @@ public final class C2SProtos {
         return epoch_;
       }
 
+      private void initFields() {
+        prunedchild_ = org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.LEFT;
+        subtree_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
+        prev_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
+        epoch_ = 0L;
+      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -8867,19 +8874,20 @@ public final class C2SProtos {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
+        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          output.writeEnum(1, prunedchild_);
+          output.writeEnum(1, prunedchild_.getNumber());
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          output.writeMessage(2, getSubtree());
+          output.writeMessage(2, subtree_);
         }
         if (((bitField0_ & 0x00000004) == 0x00000004)) {
-          output.writeMessage(3, getPrev());
+          output.writeMessage(3, prev_);
         }
         if (((bitField0_ & 0x00000008) == 0x00000008)) {
           output.writeUInt64(4, epoch_);
         }
-        unknownFields.writeTo(output);
+        getUnknownFields().writeTo(output);
       }
 
       private int memoizedSerializedSize = -1;
@@ -8890,26 +8898,32 @@ public final class C2SProtos {
         size = 0;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeEnumSize(1, prunedchild_);
+            .computeEnumSize(1, prunedchild_.getNumber());
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(2, getSubtree());
+            .computeMessageSize(2, subtree_);
         }
         if (((bitField0_ & 0x00000004) == 0x00000004)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(3, getPrev());
+            .computeMessageSize(3, prev_);
         }
         if (((bitField0_ & 0x00000008) == 0x00000008)) {
           size += com.google.protobuf.CodedOutputStream
             .computeUInt64Size(4, epoch_);
         }
-        size += unknownFields.getSerializedSize();
+        size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
+      @java.lang.Override
+      protected java.lang.Object writeReplace()
+          throws java.io.ObjectStreamException {
+        return super.writeReplace();
+      }
+
       public static org.coniks.coniks_common.C2SProtos.AuthPath.RootNode parseFrom(
           com.google.protobuf.ByteString data)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -8963,17 +8977,12 @@ public final class C2SProtos {
         return PARSER.parseFrom(input, extensionRegistry);
       }
 
+      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder() {
-        return defaultInstance.toBuilder();
-      }
       public static Builder newBuilder(org.coniks.coniks_common.C2SProtos.AuthPath.RootNode prototype) {
-        return defaultInstance.toBuilder().mergeFrom(prototype);
+        return newBuilder().mergeFrom(prototype);
       }
-      public Builder toBuilder() {
-        return this == defaultInstance
-            ? new Builder() : new Builder().mergeFrom(this);
-      }
+      public Builder toBuilder() { return newBuilder(this); }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -9016,18 +9025,22 @@ public final class C2SProtos {
             getPrevFieldBuilder();
           }
         }
+        private static Builder create() {
+          return new Builder();
+        }
+
         public Builder clear() {
           super.clear();
-          prunedchild_ = 0;
+          prunedchild_ = org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.LEFT;
           bitField0_ = (bitField0_ & ~0x00000001);
           if (subtreeBuilder_ == null) {
-            subtree_ = null;
+            subtree_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
           } else {
             subtreeBuilder_.clear();
           }
           bitField0_ = (bitField0_ & ~0x00000002);
           if (prevBuilder_ == null) {
-            prev_ = null;
+            prev_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
           } else {
             prevBuilder_.clear();
           }
@@ -9035,6 +9048,10 @@ public final class C2SProtos {
           epoch_ = 0L;
           bitField0_ = (bitField0_ & ~0x00000008);
           return this;
+        }
+
+        public Builder clone() {
+          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -9110,8 +9127,7 @@ public final class C2SProtos {
           if (other.hasEpoch()) {
             setEpoch(other.getEpoch());
           }
-          this.mergeUnknownFields(other.unknownFields);
-          onChanged();
+          this.mergeUnknownFields(other.getUnknownFields());
           return this;
         }
 
@@ -9138,7 +9154,7 @@ public final class C2SProtos {
         }
         private int bitField0_;
 
-        private int prunedchild_ = 0;
+        private org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild prunedchild_ = org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.LEFT;
         /**
          * <code>optional .org.coniks.coniks_common.AuthPath.PrunedChild prunedchild = 1;</code>
          *
@@ -9157,8 +9173,7 @@ public final class C2SProtos {
          * </pre>
          */
         public org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild getPrunedchild() {
-          org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild result = org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.valueOf(prunedchild_);
-          return result == null ? org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.LEFT : result;
+          return prunedchild_;
         }
         /**
          * <code>optional .org.coniks.coniks_common.AuthPath.PrunedChild prunedchild = 1;</code>
@@ -9172,7 +9187,7 @@ public final class C2SProtos {
             throw new NullPointerException();
           }
           bitField0_ |= 0x00000001;
-          prunedchild_ = value.getNumber();
+          prunedchild_ = value;
           onChanged();
           return this;
         }
@@ -9185,12 +9200,12 @@ public final class C2SProtos {
          */
         public Builder clearPrunedchild() {
           bitField0_ = (bitField0_ & ~0x00000001);
-          prunedchild_ = 0;
+          prunedchild_ = org.coniks.coniks_common.C2SProtos.AuthPath.PrunedChild.LEFT;
           onChanged();
           return this;
         }
 
-        private org.coniks.coniks_common.UtilProtos.Hash subtree_ = null;
+        private org.coniks.coniks_common.UtilProtos.Hash subtree_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
         private com.google.protobuf.SingleFieldBuilder<
             org.coniks.coniks_common.UtilProtos.Hash, org.coniks.coniks_common.UtilProtos.Hash.Builder, org.coniks.coniks_common.UtilProtos.HashOrBuilder> subtreeBuilder_;
         /**
@@ -9204,7 +9219,7 @@ public final class C2SProtos {
          */
         public org.coniks.coniks_common.UtilProtos.Hash getSubtree() {
           if (subtreeBuilder_ == null) {
-            return subtree_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : subtree_;
+            return subtree_;
           } else {
             return subtreeBuilder_.getMessage();
           }
@@ -9245,7 +9260,6 @@ public final class C2SProtos {
         public Builder mergeSubtree(org.coniks.coniks_common.UtilProtos.Hash value) {
           if (subtreeBuilder_ == null) {
             if (((bitField0_ & 0x00000002) == 0x00000002) &&
-                subtree_ != null &&
                 subtree_ != org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance()) {
               subtree_ =
                 org.coniks.coniks_common.UtilProtos.Hash.newBuilder(subtree_).mergeFrom(value).buildPartial();
@@ -9264,7 +9278,7 @@ public final class C2SProtos {
          */
         public Builder clearSubtree() {
           if (subtreeBuilder_ == null) {
-            subtree_ = null;
+            subtree_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
             onChanged();
           } else {
             subtreeBuilder_.clear();
@@ -9287,8 +9301,7 @@ public final class C2SProtos {
           if (subtreeBuilder_ != null) {
             return subtreeBuilder_.getMessageOrBuilder();
           } else {
-            return subtree_ == null ?
-                org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : subtree_;
+            return subtree_;
           }
         }
         /**
@@ -9308,7 +9321,7 @@ public final class C2SProtos {
           return subtreeBuilder_;
         }
 
-        private org.coniks.coniks_common.UtilProtos.Hash prev_ = null;
+        private org.coniks.coniks_common.UtilProtos.Hash prev_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
         private com.google.protobuf.SingleFieldBuilder<
             org.coniks.coniks_common.UtilProtos.Hash, org.coniks.coniks_common.UtilProtos.Hash.Builder, org.coniks.coniks_common.UtilProtos.HashOrBuilder> prevBuilder_;
         /**
@@ -9322,7 +9335,7 @@ public final class C2SProtos {
          */
         public org.coniks.coniks_common.UtilProtos.Hash getPrev() {
           if (prevBuilder_ == null) {
-            return prev_ == null ? org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : prev_;
+            return prev_;
           } else {
             return prevBuilder_.getMessage();
           }
@@ -9363,7 +9376,6 @@ public final class C2SProtos {
         public Builder mergePrev(org.coniks.coniks_common.UtilProtos.Hash value) {
           if (prevBuilder_ == null) {
             if (((bitField0_ & 0x00000004) == 0x00000004) &&
-                prev_ != null &&
                 prev_ != org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance()) {
               prev_ =
                 org.coniks.coniks_common.UtilProtos.Hash.newBuilder(prev_).mergeFrom(value).buildPartial();
@@ -9382,7 +9394,7 @@ public final class C2SProtos {
          */
         public Builder clearPrev() {
           if (prevBuilder_ == null) {
-            prev_ = null;
+            prev_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
             onChanged();
           } else {
             prevBuilder_.clear();
@@ -9405,8 +9417,7 @@ public final class C2SProtos {
           if (prevBuilder_ != null) {
             return prevBuilder_.getMessageOrBuilder();
           } else {
-            return prev_ == null ?
-                org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance() : prev_;
+            return prev_;
           }
         }
         /**
@@ -9461,22 +9472,12 @@ public final class C2SProtos {
         // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.AuthPath.RootNode)
       }
 
+      static {
+        defaultInstance = new RootNode(true);
+        defaultInstance.initFields();
+      }
+
       // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.AuthPath.RootNode)
-      private static final org.coniks.coniks_common.C2SProtos.AuthPath.RootNode defaultInstance;
-      static {
-        defaultInstance = new org.coniks.coniks_common.C2SProtos.AuthPath.RootNode();
-      }
-
-      public static org.coniks.coniks_common.C2SProtos.AuthPath.RootNode getDefaultInstance() {
-        return defaultInstance;
-      }
-
-      public org.coniks.coniks_common.C2SProtos.AuthPath.RootNode getDefaultInstanceForType() {
-        return defaultInstance;
-      }
-
-      static {
-      }
     }
 
     private int bitField0_;
@@ -9500,7 +9501,7 @@ public final class C2SProtos {
      * </pre>
      */
     public org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode getLeaf() {
-      return leaf_ == null ? org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.getDefaultInstance() : leaf_;
+      return leaf_;
     }
     /**
      * <code>optional .org.coniks.coniks_common.AuthPath.UserLeafNode leaf = 1;</code>
@@ -9510,7 +9511,7 @@ public final class C2SProtos {
      * </pre>
      */
     public org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNodeOrBuilder getLeafOrBuilder() {
-      return leaf_ == null ? org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.getDefaultInstance() : leaf_;
+      return leaf_;
     }
 
     public static final int INTERIOR_FIELD_NUMBER = 2;
@@ -9560,15 +9561,20 @@ public final class C2SProtos {
      * <code>optional .org.coniks.coniks_common.AuthPath.RootNode root = 3;</code>
      */
     public org.coniks.coniks_common.C2SProtos.AuthPath.RootNode getRoot() {
-      return root_ == null ? org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.getDefaultInstance() : root_;
+      return root_;
     }
     /**
      * <code>optional .org.coniks.coniks_common.AuthPath.RootNode root = 3;</code>
      */
     public org.coniks.coniks_common.C2SProtos.AuthPath.RootNodeOrBuilder getRootOrBuilder() {
-      return root_ == null ? org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.getDefaultInstance() : root_;
+      return root_;
     }
 
+    private void initFields() {
+      leaf_ = org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.getDefaultInstance();
+      interior_ = java.util.Collections.emptyList();
+      root_ = org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.getDefaultInstance();
+    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -9587,16 +9593,17 @@ public final class C2SProtos {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, getLeaf());
+        output.writeMessage(1, leaf_);
       }
       for (int i = 0; i < interior_.size(); i++) {
         output.writeMessage(2, interior_.get(i));
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(3, getRoot());
+        output.writeMessage(3, root_);
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -9607,7 +9614,7 @@ public final class C2SProtos {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getLeaf());
+          .computeMessageSize(1, leaf_);
       }
       for (int i = 0; i < interior_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
@@ -9615,14 +9622,20 @@ public final class C2SProtos {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getRoot());
+          .computeMessageSize(3, root_);
       }
-      size += unknownFields.getSerializedSize();
+      size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
     public static org.coniks.coniks_common.C2SProtos.AuthPath parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -9676,17 +9689,12 @@ public final class C2SProtos {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return defaultInstance.toBuilder();
-    }
     public static Builder newBuilder(org.coniks.coniks_common.C2SProtos.AuthPath prototype) {
-      return defaultInstance.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() {
-      return this == defaultInstance
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -9730,10 +9738,14 @@ public final class C2SProtos {
           getRootFieldBuilder();
         }
       }
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         if (leafBuilder_ == null) {
-          leaf_ = null;
+          leaf_ = org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.getDefaultInstance();
         } else {
           leafBuilder_.clear();
         }
@@ -9745,12 +9757,16 @@ public final class C2SProtos {
           interiorBuilder_.clear();
         }
         if (rootBuilder_ == null) {
-          root_ = null;
+          root_ = org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.getDefaultInstance();
         } else {
           rootBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -9847,8 +9863,7 @@ public final class C2SProtos {
         if (other.hasRoot()) {
           mergeRoot(other.getRoot());
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
@@ -9881,7 +9896,7 @@ public final class C2SProtos {
       }
       private int bitField0_;
 
-      private org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode leaf_ = null;
+      private org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode leaf_ = org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode, org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.Builder, org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNodeOrBuilder> leafBuilder_;
       /**
@@ -9903,7 +9918,7 @@ public final class C2SProtos {
        */
       public org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode getLeaf() {
         if (leafBuilder_ == null) {
-          return leaf_ == null ? org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.getDefaultInstance() : leaf_;
+          return leaf_;
         } else {
           return leafBuilder_.getMessage();
         }
@@ -9956,7 +9971,6 @@ public final class C2SProtos {
       public Builder mergeLeaf(org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode value) {
         if (leafBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
-              leaf_ != null &&
               leaf_ != org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.getDefaultInstance()) {
             leaf_ =
               org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.newBuilder(leaf_).mergeFrom(value).buildPartial();
@@ -9979,7 +9993,7 @@ public final class C2SProtos {
        */
       public Builder clearLeaf() {
         if (leafBuilder_ == null) {
-          leaf_ = null;
+          leaf_ = org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.getDefaultInstance();
           onChanged();
         } else {
           leafBuilder_.clear();
@@ -10010,8 +10024,7 @@ public final class C2SProtos {
         if (leafBuilder_ != null) {
           return leafBuilder_.getMessageOrBuilder();
         } else {
-          return leaf_ == null ?
-              org.coniks.coniks_common.C2SProtos.AuthPath.UserLeafNode.getDefaultInstance() : leaf_;
+          return leaf_;
         }
       }
       /**
@@ -10275,7 +10288,7 @@ public final class C2SProtos {
         return interiorBuilder_;
       }
 
-      private org.coniks.coniks_common.C2SProtos.AuthPath.RootNode root_ = null;
+      private org.coniks.coniks_common.C2SProtos.AuthPath.RootNode root_ = org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.coniks.coniks_common.C2SProtos.AuthPath.RootNode, org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.Builder, org.coniks.coniks_common.C2SProtos.AuthPath.RootNodeOrBuilder> rootBuilder_;
       /**
@@ -10289,7 +10302,7 @@ public final class C2SProtos {
        */
       public org.coniks.coniks_common.C2SProtos.AuthPath.RootNode getRoot() {
         if (rootBuilder_ == null) {
-          return root_ == null ? org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.getDefaultInstance() : root_;
+          return root_;
         } else {
           return rootBuilder_.getMessage();
         }
@@ -10330,7 +10343,6 @@ public final class C2SProtos {
       public Builder mergeRoot(org.coniks.coniks_common.C2SProtos.AuthPath.RootNode value) {
         if (rootBuilder_ == null) {
           if (((bitField0_ & 0x00000004) == 0x00000004) &&
-              root_ != null &&
               root_ != org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.getDefaultInstance()) {
             root_ =
               org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.newBuilder(root_).mergeFrom(value).buildPartial();
@@ -10349,7 +10361,7 @@ public final class C2SProtos {
        */
       public Builder clearRoot() {
         if (rootBuilder_ == null) {
-          root_ = null;
+          root_ = org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.getDefaultInstance();
           onChanged();
         } else {
           rootBuilder_.clear();
@@ -10372,8 +10384,7 @@ public final class C2SProtos {
         if (rootBuilder_ != null) {
           return rootBuilder_.getMessageOrBuilder();
         } else {
-          return root_ == null ?
-              org.coniks.coniks_common.C2SProtos.AuthPath.RootNode.getDefaultInstance() : root_;
+          return root_;
         }
       }
       /**
@@ -10396,22 +10407,12 @@ public final class C2SProtos {
       // @@protoc_insertion_point(builder_scope:org.coniks.coniks_common.AuthPath)
     }
 
+    static {
+      defaultInstance = new AuthPath(true);
+      defaultInstance.initFields();
+    }
+
     // @@protoc_insertion_point(class_scope:org.coniks.coniks_common.AuthPath)
-    private static final org.coniks.coniks_common.C2SProtos.AuthPath defaultInstance;
-    static {
-      defaultInstance = new org.coniks.coniks_common.C2SProtos.AuthPath();
-    }
-
-    public static org.coniks.coniks_common.C2SProtos.AuthPath getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public org.coniks.coniks_common.C2SProtos.AuthPath getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    static {
-    }
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor

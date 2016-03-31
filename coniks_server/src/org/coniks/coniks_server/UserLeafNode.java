@@ -193,21 +193,6 @@ public class UserLeafNode extends LeafNode implements Serializable {
     public void setAllowsPublicLookup(boolean b) {
         this.allowPublicLookup = b;
     }
-                    
-    /** Clones (i.e. duplicates) this user leaf node from the current
-     * epoch {@code ep0} for the next epoch {@code ep1} with the
-     * given {@code parent} tree node.
-     *<p>
-     * This function is called as part of the CONIKS Merkle tree
-     * rebuilding process at the beginning of every epoch.
-     *@return The cloned user leaf node.
-     */
-    public UserLeafNode clone(TreeNode parent, long ep0, long ep1){        
-        UserLeafNode cloneN = new UserLeafNode(this);
-    	cloneN.parent = (parent);
-    	
-    	return cloneN;
-    }
     
     public DSAPublicKey getChangeKey() {
         return this.changeKey;
@@ -259,7 +244,7 @@ public class UserLeafNode extends LeafNode implements Serializable {
 	
 	UserLeafNode cloneN = new UserLeafNode(this.username, this.pubKey,
 					       this.epochAdded, this.level, this.index);
-	cloneN.parent = (parent);
+	cloneN.parent = parent;
 	
 	return cloneN;
     }

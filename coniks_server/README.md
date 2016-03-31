@@ -40,6 +40,8 @@ Set the path to the configuration file in the **CONFIG_FILE** field if used, and
 
 ###Building
 We understand that people may not necessarily want to build and run the server on the same machine. 
+- Prerequisites:
+You'll need Java 7 or greater and need to ensure that the protobufs have been compiled with the most recent version of protoc.
 - Compiling:
 Specify where you would like the .class files to be placed, and run make:
 ```

@@ -67,10 +67,20 @@ import java.util.Arrays;
  */
 public class ConiksClient {
 
-    public static final ClientConfig CONFIG = new ClientConfig();
+    // Config settings now set in main in TestClient
+    public static ClientConfig CONFIG;
+    private static boolean isFullOp = true;
 
     private static DataOutputStream dout;
     private static DataInputStream din;
+
+    /** Sets the operating mode of the client: either full or testing.
+     *
+     *@param isFullOp indicates if the client is in full operating mode or not.
+     */
+    public static void setOpMode (boolean isFullOpMode) {
+        isFullOp = isFullOpMode;
+    }
 
     /** Sets the default truststore according to the {@link ClientConfig}.
      * This is needed to set up SSL connections with a CONIKS server.
@@ -450,12 +460,18 @@ public class ConiksClient {
     private static void connect (String server) 
         throws IOException {
 
-        SSLSocketFactory sslFact =
-            (SSLSocketFactory)SSLSocketFactory.getDefault();
+        Socket sock;
 
-        SSLSocket sslSock = (SSLSocket)sslFact.createSocket(server, CONFIG.PORT);
-        dout = new DataOutputStream(sslSock.getOutputStream());
-        din = new DataInputStream(sslSock.getInputStream());
+        if (isFullOp) {
+            SSLSocketFactory sslFact =
+                (SSLSocketFactory)SSLSocketFactory.getDefault();
+            sock = (SSLSocket)sslFact.createSocket(server, CONFIG.PORT);
+        }
+        else {
+            sock = new Socket(server, CONFIG.PORT);
+        }
+        dout = new DataOutputStream(sock.getOutputStream());
+        din = new DataInputStream(sock.getInputStream());
         
     }
 

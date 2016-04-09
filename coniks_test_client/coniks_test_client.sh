@@ -34,30 +34,24 @@
 ## Runs or a CONIKS test client instance
 
 # Set all the configs here
-CLASSPATH="-cp ."
+CLASSPATH="-cp $CLASS_DEST"
 CLIENT_BIN="org.coniks.coniks_test_client.TestClient"
-RUN_CONIKS="java $CLASSPATH $CLIENT_BIN"
+CONIKS_CLIENTCONFIG="config"
+RUN_CONIKS="java $CLASSPATH $CLIENT_BIN $CONIKS_CLIENTCONFIG"
 
-if [ "$#" -lt 2 ]; then
-    echo "Usage: $0 <server> <REGISTER | LOOKUP | VERIFY> [iters = 1] [offset = 0] [verbosity = 0]"
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 <server> [test]"
     exit
 fi
 
 SERVER=$1
-CMD=$2
 
-if [ "$#" = 2 ]; then
-    $RUN_CONIKS $SERVER $CMD
+if [ "$#" = 1 ]; then
+    $RUN_CONIKS $SERVER "full"
 
-elif [ "$#" = 3 ]; then
-    $RUN_CONIKS $SERVER $CMD $3
-
-elif [ "$#" = 4 ]; then
-    $RUN_CONIKS $SERVER $CMD $3 $4
-
-elif [ "$#" = 5 ]; then
-    $RUN_CONIKS $SERVER $CMD $3 $4 $5
+elif [ "$#" = 2 ]; then
+    $RUN_CONIKS $SERVER $2
 
 else
-    echo echo "Usage: $0 <server> <REGISTER | LOOKUP | VERIFY> [iters = 1] [offset = 0] [verbosity = 0]"
+    echo "Usage: $0 <server> [test]"
 fi

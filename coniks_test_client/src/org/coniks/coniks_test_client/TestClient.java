@@ -39,6 +39,10 @@ import java.security.interfaces.*;
 import javax.crypto.*;
 import java.util.Random;
 import java.math.BigInteger;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.lang.NumberFormatException;
 
 /** Implementation of a simple CONIKS test client
  * that simply displays how each component of the
@@ -51,6 +55,12 @@ import java.math.BigInteger;
  *@author Michael Rochlin
  */
 public class TestClient {
+
+    // Must be passed in as args to the client
+    private static String configFileName;
+    private static String server;
+    private static boolean isFullOp;
+    private static final int NUM_ARGS = 3; // ha, don't forget to set this to the right number
 
     // since we're only creating dummy users, use this 
     // DSA-looking string as the test public key
@@ -184,98 +194,216 @@ public class TestClient {
     /** Prints the usage of the TestClient.
      */
     private static void usage() {
-        System.out.println("TestClient <server> <command> [iterations = 1] [offset = 0] [verbosity = 0]");
-        System.out.println("command := (REGISTER LOOKUP VERIFY SIGNED UNSIGNED CHANGES MIXED)");
+        System.out.println("valid operations: REGISTER, LOOKUP, VERIFY, SIGNED, UNSIGNED, CHANGES, MIXED");
     }
 
-    /** Usage:
-     * {@code TestClient [-h] <server> <command> [iterations = 1] [offset = 0] [verbosity = 1]}
-     * <p>
-     * command := ({@code REGISTER LOOKUP VERIFY})
+    /** Checks whether the given operation is valid.
+     *
+     *@param op the operation to be checked.
+     *@return {@code true} if it's valid, {@code false} otherwise.
      */
-    public static void main(String[] args){
-        if (args.length < 2 || args[0].equals("-h")){
-            usage();
-            return;
-        }
-        String server = args[0];
-        String command = args[1];
-        int iters = 1;
-        int verbosity = 0;
-        int offset = 0;
-        try {
-            if (args.length >= 3)
-                iters = Integer.parseInt(args[2]);
-            if (args.length >= 4)
-                offset = Integer.parseInt(args[3]);
-            if (args.length >= 5)
-                verbosity = Integer.parseInt(args[4]);
-        }
-        catch (NumberFormatException e) {
-            System.out.println("iterations, offset and verbosity must be positive integers.");
-            return;
-        }
+    private static boolean isValidOperation (String op) {
+         if (op.equalsIgnoreCase("LOOKUP") || 
+            op.equalsIgnoreCase("REGISTER") || 
+            op.equalsIgnoreCase("VERIFY") ||
+            op.equalsIgnoreCase("SIGNED") || 
+            op.equalsIgnoreCase("UNSIGNED") ||
+            op.equalsIgnoreCase("CHANGES") ||
+            op.equalsIgnoreCase("MIXED")) {
+             return true;
+         }
+         else {
+             return false;
+         }
+    }
 
-        // this is needed to enable the client to communicate using SSL
-        ConiksClient.setDefaultTruststore();
-
-        for (int i = 0; i < iters; i++){
-            if (i % (1 + (iters / 10)) == 0)
+    /** Performs the given operation {@code numUsers} times, starting
+     * at user number {@code offset}.
+     *
+     *@param op the operation to perform
+     *@param numUsers the number of users for which to do the operation
+     *@param offset the user number at which to start
+     */
+    private static void doOperation (String op, int numUsers, int offset) {
+        for (int i = 0; i < numUsers; i++){
+            if (i % (1 + (numUsers / 10)) == 0)
                 System.err.print(".");
 
             String uname = "test-"+(offset+i);
             
-            if(command.equalsIgnoreCase("LOOKUP")){
+            if(op.equalsIgnoreCase("LOOKUP")){
 
                 if (!keyLookup(uname, server))
                     System.out.println ("An error occurred.");
                 
             }
-            else if (command.equalsIgnoreCase("REGISTER")){
+            else if (op.equalsIgnoreCase("REGISTER")){
                 if (!register(uname, server))
                     System.out.println ("An error occurred.");
 
             }
-            else if (command.equalsIgnoreCase("VERIFY")){
-                if (verbosity == 1) {
-                    System.out.println("checking: "+uname);
-                }
-                
+            else if (op.equalsIgnoreCase("VERIFY")){                
                 if (!doLookupVerification(uname, server)) 
                     System.out.println("An error occurred.");
 
             }
-            else if (command.equalsIgnoreCase("SIGNED")) {
+            else if (op.equalsIgnoreCase("SIGNED")) {
                 if (!doSignedKeyChange(uname, server)) {
                     System.out.println("An error occured");
                 }
             }
-            else if (command.equalsIgnoreCase("UNSIGNED")) {
+            else if (op.equalsIgnoreCase("UNSIGNED")) {
                 if (!doUnsignedKeyChange(uname, server)) {
                     System.out.println("An error occured");
                 }
 
             }
-            else if (command.equalsIgnoreCase("CHANGES")) {
+            else if (op.equalsIgnoreCase("CHANGES")) {
                 if (!doChangeToAllowsUnsigned(uname, server)) {
                     System.out.println("An error occured");
                 }
 
             }
-            else if (command.equalsIgnoreCase("MIXED")) {
+            else if (op.equalsIgnoreCase("MIXED")) {
                 if (!doSignedKeyChange(uname, server)) {
                     System.out.println("An error occured");
                 }
-            }
-            else {
-                System.out.println("Unknown command: "+command);
-                usage();
-                break;
             }
             
         }
         System.out.println(" done!");
     }
 
+    /** Prompts the user to perform a CONIKS operation for one or more users.
+     */
+    public static void main(String[] args){
+
+        if (args.length != NUM_ARGS) {
+            System.out.println("Need "+(NUM_ARGS-1)+" arguments: CONIKS_CLIENTCONFIG and SERVER");
+            System.out.println("Check run script for more info.");
+            System.exit(-1);
+        }
+
+        File configFile = null;
+        try {
+            configFileName = args[0];
+            configFile = new File(configFileName);
+
+            if (!configFile.exists()) {
+                throw new FileNotFoundException();
+            }
+
+            server = args[1];
+
+            String opMode = args[2];
+            if (opMode.equalsIgnoreCase("full")) {
+                isFullOp = true;
+            }
+            else if (opMode.equalsIgnoreCase("test")) {
+                isFullOp = false;
+            }
+            else {
+                System.out.println("Unknown operation mode: "+opMode);
+                System.exit(-1);
+            }
+        }
+        catch (FileNotFoundException e) {
+            System.out.println("The path you entered for CONIKS_CLIENTCONFIG doesn't exist.");
+            System.exit(-1);
+        }
+
+        // read in the client config
+        ConiksClient.CONFIG = new ClientConfig();
+
+        // false indictaes an error, so exit
+        if (!ConiksClient.CONFIG.readClientConfig(configFile, isFullOp)) {
+            System.exit(-1);
+        }
+
+        // set the client's operating mode
+        ConiksClient.setOpMode(isFullOp);
+
+        String cont = "y";
+
+        Scanner scanner = new Scanner(System.in);
+
+        if (isFullOp) {
+            // this is needed to enable the client to communicate using SSL
+            ConiksClient.setDefaultTruststore();
+        }
+
+        // this loops prompts the users to enter the command, the number of users to run it for
+        // and the offset
+        while (!cont.equalsIgnoreCase("n")) {
+
+            //  prompt for the user's name
+            System.out.print("Enter the next operation (or h for help): ");
+            
+            // get their input as a String
+            String op = scanner.next();
+
+            if (op.equalsIgnoreCase("h")) {
+                usage();
+            }
+            else if (isValidOperation(op)) {
+                System.out.print("Enter the number of users for this operation: ");
+
+                int numUsers = 1;
+
+                try {
+                    numUsers = Integer.parseInt(scanner.next());
+
+                    while (numUsers < 1) {
+                        System.out.println("the number of users must be a positive integer.");
+                        System.out.print("Enter the number of users for this operation: ");
+                        numUsers = Integer.parseInt(scanner.next());
+                    }
+                }
+                catch (NumberFormatException e) {
+                    System.out.println("malformed number.");
+                    break;
+                }
+
+                System.out.print("Enter the first user number for this operation: ");
+
+                int offset = 0;
+
+                try {
+                    offset = Integer.parseInt(scanner.next());
+
+                    while (offset < 0) {
+                        System.out.println("the user number can't be a negative number.");
+                        System.out.print("Enter the first user number for this operation: ");
+                        offset = Integer.parseInt(scanner.next());
+                    }
+                }
+                catch (NumberFormatException e) {
+                    System.out.println("malformed number.");
+                    break;
+                }
+
+                // do the operation
+                doOperation(op, numUsers, offset);
+
+                System.out.print("Would you like to perform another operation? [y/n]: ");
+                
+                cont = scanner.next();
+
+                while (!cont.equalsIgnoreCase("y")  && !cont.equalsIgnoreCase("n")) {
+                    System.out.print("Please enter y or n: ");                
+                    cont = scanner.next();
+                }
+            }
+            else {
+                System.out.println("Unknown operation: "+op);
+                usage();
+                break;
+            }
+            
+        }
+
+        System.out.println("Goodbye.");
+
+    }
 
 }

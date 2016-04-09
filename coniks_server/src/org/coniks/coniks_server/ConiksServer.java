@@ -59,6 +59,8 @@ import java.util.TimerTask;
 import java.util.Date;
 import java.util.Scanner;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.lang.NumberFormatException;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ScheduledExecutorService;
@@ -82,14 +84,19 @@ import java.util.Arrays;
  */
 public class ConiksServer{
 
-    /** Set these two fields before running the server */
-    private static final int SIZE = 10;
-    private static final String CONFIG_FILE = "/path/to/config/file.txt";
+    // Must be passed in as args to the server!
+    private static String configFileName;
+    private static String logPath;
+    private static int initNumUsers;
+    private static boolean isFullOp;
+    private static final int NUM_ARGS = 4; // ha, don't forget to set this to the right number
 
-    // This is where the server operator must decide how to configure the server
-    private static ServerConfig CONFIG = new ServerConfig();
-    private static long curEpoch = CONFIG.STARTUP_TIME;
-    private static ServerUtils.Record curRecord = null; //points to the head of the history list (newest record first)
+    // These configuration settings are now set in main
+    private static ServerConfig CONFIG; 
+    private static long curEpoch;
+
+    //points to the head of the history list (newest record first)
+    private static ServerUtils.Record curRecord = null; 
     private static int providerID; // meant to be SP ID to identify different SP's quickly
     private static Timer epochTimer = new Timer("epoch timer", false); // may wish to run as daemon later
 
@@ -223,7 +230,7 @@ public class ConiksServer{
         initEpoch = curEpoch;
 	
         long handled = 0;
-        long size = SIZE;
+        long size = initNumUsers;
         long batchSize = size/10; // unused right now, but it's here for future versions
         UserTreeBuilder utb = ServerOps.startBuildInitTree(ServerUtils.hash(new byte[10]), 
                                                            initEpoch);
@@ -231,7 +238,7 @@ public class ConiksServer{
         RootNode initRoot = null;    
         // add <size> dummy users
         for (int i = 0 ; i < size; i++){
-            String userId = String.format("test-%8d", i);
+            String userId = String.format("test-%d", i);
             String pubKey = "(dsa  (p #test-10000007712ECAF91762ED4E46076D846624D2A71C67A991D1FEA059593163C2B19690B1A5CA3C603F52A62D73BB91D521BA55682D38E3543CC34E384420AA32CFF440A90D28A6F54C586BB856460969C658B20ABF65A767063FE94A5DDBC2D0D5D1FD154116AE7039CC4E482DCF1245A9E4987EB6C91B32834B49052284027#) (q #00B84E385FA6263B26E9F46BF90E78684C245D5B35#) (g #77F6AA02740EF115FDA233646AAF479367B34090AEC0D62BA3E37F793D5CB995418E4F3F57F31612561A4BEA41FAC3EE05679D90D2F79A581905E432B85F4C109164EB7846DC9C3669B013D67063747ABCC4B07EAA4AC44D9DE9FC2A349859994DB683DFC7784D0F1DF1DA25014A40D8617E3EC94D8DB8FBBBC37A5C5AAEE5DC#) (y #4B41A8AA7B6F23F740DEF994D1A6582E00E4B821F65AC30BDC6710CD6111FA24DE70EACE6F4A92A84038D4B928D79F6A0DF35F729B861A6713BECC934309DE0822B8C9D2A6D3C0A4F0D0FB28A77B0393D72568D72EE60C73B2C5F6E4E1A1347EDC20AC449EFF250AC1C251E16403A610DB9EB90791E63207601714A78679283))";
             long epochAdded = initEpoch;
             byte[] index = ServerUtils.unameToIndex(userId);
@@ -307,47 +314,109 @@ public class ConiksServer{
      * incoming connections from CONIKS clients.
      *<p>
      * Usage:
-     * {@code ./coniks.sh <start | stop | clean>}
+     * {@code ./coniks_server.sh <start | test | stop | clean>}
      */
     public static void main(String[] args){
+        
+        if (args.length != NUM_ARGS) {
+            System.out.println("Need "+(NUM_ARGS-1)+" arguments: CONIKS_SERVERCONFIG, CONIKS_SERVERLOGS, and CONIKS_INIT_SIZE");
+            System.out.println("The run script may expect these to be passed as env vars, make sure to export these before running the run script again.");
+            System.exit(-1);
+        }
+
+        initNumUsers = 0;
+        File configFile = null;
+        try {
+            configFileName = args[0];
+            configFile = new File(configFileName);
+
+            logPath = args[1];
+            File logDir = new File(logPath);
+
+            if (!configFile.exists() || !logDir.isDirectory()) {
+                throw new FileNotFoundException();
+            }
+            
+            initNumUsers = Integer.parseInt(args[2]);
+
+            String opMode = args[3];
+            if (opMode.equalsIgnoreCase("full")) {
+                isFullOp = true;
+            }
+            else if (opMode.equalsIgnoreCase("test")) {
+                isFullOp = false;
+            }
+            else {
+                System.out.println("Unknown operation mode: "+opMode);
+                System.exit(-1);
+            }
+        }
+        catch (NumberFormatException e) {
+            System.out.println("CONIKS_INIT_SIZE must be an integer.");
+            System.exit(-1);
+        }
+        catch (FileNotFoundException e) {
+            System.out.println("The path you entered for CONIKS_SERVERCONFIG or CONIKS_SERVERLOGS doesn't exist.");
+            System.exit(-1);
+        }
+
+        // read in the server config
+        CONFIG = new ServerConfig();
+        
+        // false indictaes an error, so exit
+        if (!CONFIG.readServerConfig(configFile, isFullOp)) {
+            System.exit(-1);
+        }
+        
         // set some more configs
-        msgLog = MsgHandlerLogger.getInstance(CONFIG.MSGHAND_LOG_PATH);
-        timerLog = TimerLogger.getInstance(CONFIG.TIMER_LOG_PATH);
-        serverLog = ServerLogger.getInstance(CONFIG.SERVER_LOG_PATH);
+        curEpoch = CONFIG.STARTUP_TIME;
+        msgLog = MsgHandlerLogger.getInstance(logPath+"/msg-handler-%g");
+        timerLog = TimerLogger.getInstance(logPath+"/epoch-timer-%g");
+        serverLog = ServerLogger.getInstance(logPath+"/server-%g");
 
         pendingQueue = new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>( 
 	    16384, new ServerUtils.PrefixComparator());
 
-        // this is needed to set up the SSL connection
         System.setProperty("javax.net.ssl.keyStore", CONFIG.KEYSTORE_PATH);
         System.setProperty("javax.net.ssl.keyStorePassword", CONFIG.KEYSTORE_PWD);
-        System.setProperty("javax.net.ssl.trustStore", CONFIG.TRUSTSTORE_PATH);
-        System.setProperty("javax.net.ssl.trustStorePassword", CONFIG.TRUSTSTORE_PWD);
+
+        // this is needed to set up the SSL connection
+        if (isFullOp) {
+            System.setProperty("javax.net.ssl.trustStore", CONFIG.TRUSTSTORE_PATH);
+            System.setProperty("javax.net.ssl.trustStorePassword", CONFIG.TRUSTSTORE_PWD);
+        }
 
         SignatureOps.initSignatureOps(CONFIG);
         initNamespace(); // initializes the namespace with latest stored snapshot and all registered users
         
         EpochTimerTask epochSnapshotTaker = new EpochTimerTask();
         
-    	ScheduledExecutorService scheduler =
-    	    Executors.newScheduledThreadPool(1);
-            scheduler.scheduleWithFixedDelay(epochSnapshotTaker, 
+    	ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleWithFixedDelay(epochSnapshotTaker, 
     					 CONFIG.EPOCH_INTERVAL, 
     					 CONFIG.EPOCH_INTERVAL,
     					 TimeUnit.MILLISECONDS);
-        
-        SSLServerSocket s;
+
+        ServerSocket s;
         
         try{
-            SSLServerSocketFactory sslSrvFact = 
+
+            if (isFullOp) {
+                SSLServerSocketFactory sslSrvFact = 
                 (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
-            s =(SSLServerSocket)sslSrvFact.createServerSocket(CONFIG.PORT);
-            
+                s =(SSLServerSocket)sslSrvFact.createServerSocket(CONFIG.PORT);
+            }
+            else {
+                s = new ServerSocket(CONFIG.PORT);
+
+                System.out.println("Listening for connections on port "+CONFIG.PORT+"...");
+            }            
+
             serverLog.log("Listening for connections on port "+CONFIG.PORT+"...");
             
             // loop to listen for requests
             while(true){
-                SSLSocket c = (SSLSocket)s.accept(); // closing done by thread
+                Socket c = s.accept(); // closing done by thread
                 
                 serverLog.log("Server accepted new connection.");
                 
@@ -368,7 +437,6 @@ public class ConiksServer{
      */
     private static class EpochTimerTask implements Runnable {
 
-        private SSLSocket outSocket;
         private DataOutputStream dout;
 
         public void run() {
@@ -394,7 +462,7 @@ public class ConiksServer{
      */
     private static class ServerThread extends Thread{
         
-        private SSLSocket clientSocket;
+        private Socket clientSocket;
         private DataInputStream din;
         private DataOutputStream dout;
         private long regEpoch;
@@ -404,8 +472,14 @@ public class ConiksServer{
          *
          * @param s the client socket
          */
-        public ServerThread(SSLSocket c){
-            this.clientSocket = c;
+        public ServerThread(Socket c){
+            
+            if (isFullOp) {
+                this.clientSocket = (SSLSocket)c;
+            }
+            else {
+                this.clientSocket = c;
+            }
         }
         
         /** Runs the ServerThread: calls the handle connection method
@@ -539,15 +613,11 @@ public class ConiksServer{
 
             if(!reg.hasBlob()){
                 msgLog.log("Malformed registration message");
-                // result = ServerUtils.RespType.MALFORMED_ERR;
-                // return result;
+                sendSimpleResponse(ServerUtils.RespType.MALFORMED_ERR);
+                return;
             }
-            //OTR has bug: adds slash to end of account name if not immediately 
-            // registered with server so remove this slash
+           
             String name =reg.getName();
-            if(name.charAt(name.length()-1) == '/' ){
-                name = name.substring(0,name.length()-1);
-            }
 
             // want to check first whether the name already 
             // exists in the database before we register, if it does, reply with error

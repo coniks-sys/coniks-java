@@ -34,9 +34,12 @@
 ## Runs or stops a CONIKS server instance
 
 # Set all the configs here
+CLASS_DEST="bin" #change this if you built the server somewhere else
 CLASSPATH="-cp $CLASS_DEST"
 SERVER_BIN="org.coniks.coniks_server.ConiksServer"
-CONIKS_SERVERCONFIG="config"
+CONIKS_SERVERCONFIG="config" #change this if using a different config file
+CONIKS_SERVERLOGS="logs" #change this if storing the logs somewhere else
+CONIKS_INIT_SIZE=10 #change this to initialize the server with a different number of dummy users
 RUN_CONIKS="java $CLASSPATH $SERVER_BIN $CONIKS_SERVERCONFIG $CONIKS_SERVERLOGS $CONIKS_INIT_SIZE"
 
 if [ -z "$1" ]; then
@@ -61,7 +64,7 @@ if [ "$CMD" = "start" ]; then
     fi
 
     echo "Starting up the CONIKS server in full mode."
-    echo "All logs are in $CONIKS_SERVERLOGS."
+    echo "All logs are in the $CONIKS_SERVERLOGS directory."
 
     # redirecting stderr to stdout to capture error messages in console log
     nohup sh -c "exec $RUN_CONIKS full >> $CONIKS_SERVERLOGS/console 2>&1" >>/dev/null &

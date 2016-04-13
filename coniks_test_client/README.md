@@ -5,77 +5,85 @@ Copyright (C) 2015-16 Princeton University.
 https://coniks.cs.princeton.edu
 
 ##Introduction
-This is a simple test client for the CONIKS key management service. It supports new key registrations, key lookups and key consistency checks. It is designed to communicate with the basic implementation of a [CONIKS server](https://github.com/citp/coniks-ref-implementation/tree/master/coniks_server).
+This is a simple test client for the CONIKS key management system. It supports new key registrations, key lookups and key consistency checks. It is designed to communicate with the basic implementation of a [CONIKS server](https://github.com/citp/coniks-ref-implementation/tree/master/coniks_server).
+
+##Building the Test Client
+- Prerequisites:
+You'll need Java JDK7 or greater and need to ensure that the Google protobufs have been compiled with the most recent version of protoc. If you've already compiled the protobufs for the server, you don't need to
+repeat this step for the client.
+You'll also need to install the automake and build-essential packages.
+- Compiling:
+The default classpath is *bin*. If you'd like to change this, you'll need to change the ```CLASS_DEST``` 
+variable in the Makefile. To build, run:
+```
+make 
+```
 
 ##Using the Test Client
 
-###Preparing SSL
-CONIKS clients communicate via SSL/TLS connections with any CONIKS server.
-Here are instructions for creating the trusted certificate store for your client. You will have to manually import each server certificate the client will communicate with beforehand.
+The CONIKS test client has two operating modes: Test Mode and Full Operation. 
+Running the client in test mode allows you to still test all CONIKS protocols and operations,
+but requires less setup as you can simply use the default configuration in the included *config* file.
+**Note:** You must be running the server in the same operating mode.
+
+### Setup
+- Full operation mode only: Import the server certificate(s) for SSL/TLS communication.
 Repeat the following steps for each server certificate:
 ```
 keytool -import -alias <alias> -file <certificate file> -keystore <truststore name>
 ```
-You will be asked to enter a password for the truststore. Make sure you remember this password.
-
-###Client Configuration
-In *ClientConfig.java*: Set the port number, the absolute path to your trusted certificate store, and the truststore password in the ```ClientConfig()``` constructor.
-
-###Building
-We understand that people may not necessarily want to build and run the client on the same machine. 
-- Prerequisites:
-- Prerequisites:
-You'll need Java 7 or greater and need to ensure that the protobufs have been compiled with the most recent version of protoc.
-- Compiling:
-Specify where you would like the .class files to be placed, and run make:
+The alias must match the alias used when generating the cert for the server. You will be asked to
+enter a password for each truststore. Make sure to remember this password.
+- Set all of the configurations in the config file:
+Defaults are already set, except for the absolute path to the keystore generated in the 
+previous step along with its password. You'll have to set these using the format
+described below.
+You may write your own config file, but it must follow the following format:
 ```
-export CLASS_DEST=/path/to/classes
-make
+<port number> (must be the same in the CONIKS server config)
 ```
-- Pushing the compiled code to a remote machine:
-In the *Makefile*, set the **PUBUSER**, **PUBHOST**, and **PUBPATH** variables to the appropriate values. Then run:
+- Set all of the configs in the run script *coniks_test_client.sh*:
+Defaults are already set, but you may change the following variables:
+```CLASS_DEST``` if you used a different classpath when building the client.
+```CONIKS_CLIENTCONFIG``` if you're using a different config file
+
+###Running
+We provide a run script for the CONIKS test client *coniks_test_client.sh*, which allows you to run
+the test client in full operation mode and test mode.
+- Run in full operation mode:
+```./coniks_test_client.sh <server hostname>```
+- Run in test mode:
+```./coniks_test_client.sh <server hostname> test```
+
+Once running, the client prompts you to enter an operation, the number of users for which to
+perform the operation and the first dummy user for which to run the operation. Dummy users are
+identified by numbers, so user "5" is the 5th dummy user.
+The test client will prompt you until you no longer want to continue.
+
+Supported operations: 
+- ```REGISTER```: register a new name-to-public key mapping with the CONIKS server.
+- ```LOOKUP```: look up a public key, and obtaining a cryptographic proof is the user exists.
+- ```VERIFY```: verify a cryptographic proof for a key mapping.
+
+Some examples:
+- REGISTER 10 10: registers 10 new users, identified as dummy users 10 through 19.
+- LOOKUP 1 18: looks up the key for dummy user 18.
+- VERIFY 4 7: verifies the consistency proof obtained from looking up the key for dummy users 7 through 10.
+
+## Test Client Installation on a Remote Machine
+You may want to install the test client on a remote machine.
+Set the ```PUBUSER```, ```PUBHOST``` and ```PUBPATH``` variables in the Makefile.
+```PUBUSER``` will need ssh access to the remote machine.
+You'll then have to run the setup steps on the remote machine or send the appropriate files.
+Assuming you've built the test client locally, run:
 ```
 make pubbin
 ```
-This step assumes the **PUBUSER** has ssh access to the remote machine **PUBHOST**.
-- Pushing the run script to a remote machine:
+Next, install the run script on the remote machine:
 ```
 make pubscr
 ```
-This step also assumes the **PUBUSER** has ssh access to the remote machine **PUBHOST**, and may require you to change the permissions of the script on the remote host.
-
-###Running
-We provide a run script for the CONIKS test client *coniks_test_client.sh*, which accepts 
-multiple commands to test the various operations done by the client.
-
-The test client supports three commands: 
-- ```REGISTER```: register a new name-to-public key binding.
-- ```LOOKUP```: looki up a public key, and obtaining the proof of the binding's validity.
-- ```VERIFY```: verify a consistency proof for a key binding. 
-
-In addition to specifying your CONIKS key server's hostname, you may specify the number of times to perform the operation; for the i-th  iteration, the command will be performed for a test username of the form "*test-i*". Since you may want to perform operations on a subset of users or add more to the existing ones in the key server's directory, you may also specify an offset to the iteration counter. Lastly, for the ```VERIFY``` command, the client also accepts a fourth argument, verbose (set to 1 to turn on this flag).
-
-In general, the client is run as follows:
-```
-./coniks_test_client.sh <hostname> <cmd> [<num-iters>] [<offset>] [<verbose>]
-```
-
-Some examples for running the client:
-
-The example will register 10 new users at an offset of 10 (e.g. assuming that you have previously added 10 users to the key directory):
-```
-./coniks_test_client.sh <hostname> REGISTER 10 10
-```
-
-This example will lookup user *test-18*'s public key:
-```
-./coniks_test_client.sh <hostname> LOOKUP 1 18
-```
-
-This example will verify the consistency proof obtained from looking up user *test-7*'s through user *test-10*'s keys, with verbose output:
-```
-./coniks_test_client.sh <hostname> VERIFY 4 7 1
-```
+You may need to change the permissions on the script to be able to execute it on the remote machine.
 
 ## Disclaimer
 Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/citp/coniks-ref-implementation/releases).

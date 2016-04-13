@@ -34,6 +34,7 @@
 ## Runs or a CONIKS test client instance
 
 # Set all the configs here
+CLASS_DEST="bin" #change this if you built the server somewhere else
 CLASSPATH="-cp $CLASS_DEST"
 CLIENT_BIN="org.coniks.coniks_test_client.TestClient"
 CONIKS_CLIENTCONFIG="config"

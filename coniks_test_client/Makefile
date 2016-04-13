@@ -2,20 +2,21 @@
 # define compiler and compiler flag variables
 #
 
-#This can be a relative path
+# change this if building the test client somewhere else
+CLASS_DEST=bin
 # Do not modify SRC
-SRC = src
+SRC=src
 # Do not modify COMMON
-COMMON = ../coniks_common/src
+COMMON=../coniks_common/src
 # This is needed so the appropriate common files are included in the compilation
-JFLAGS = -d $(CLASS_DEST) -cp $(CLASS_DEST) -sourcepath $(SRC) -g
-JC = javac
-SCP = rsync
-SCPFLAGS = -rz
-PUBUSER = user
-PUBHOST = remote.host
+JFLAGS=-d $(CLASS_DEST) -cp $(CLASS_DEST) -sourcepath $(SRC) -g
+JC=javac
+SCP=rsync
+SCPFLAGS=-rz
+PUBUSER=user
+PUBHOST=remote.host
 #This should be an absolute path
-PUBPATH = /path/to/client/on/remote
+PUBPATH=/path/to/client/on/remote
 
 #
 # Clear any default targets for building .class files from .java files; we 
@@ -72,12 +73,10 @@ default: common client
 #
 
 common:
-	mkdir -p $(CLASS_DEST)/com/google/protobuf
-	mkdir -p $(CLASS_DEST)/org/javatuples/valueintf
+	mkdir -p $(CLASS_DEST)
 	$(JC) -d $(CLASS_DEST) -cp $(COMMON) $(COMMON)/org/coniks/coniks_common/*.java
-	cp $(COMMON)/com/google/protobuf/*.class $(CLASS_DEST)/com/google/protobuf
-	cp $(COMMON)/org/javatuples/*.class $(CLASS_DEST)/org/javatuples
-	cp $(COMMON)/org/javatuples/valueintf/*.class $(CLASS_DEST)/org/javatuples/valueintf
+	cp -r $(COMMON)/com $(CLASS_DEST)
+	cp -r $(COMMON)/org/javatuples $(CLASS_DEST)/org
 
 client: $(CLASSES:.java=.class)
 

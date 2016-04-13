@@ -109,8 +109,8 @@ public class ClientConfig{
             in.close();
             
             this.PORT = Integer.parseInt(configs.get(PORT_IDX));
-            this.PRIVATE_KEYSTORE_PATH = configs.get(PRIVATE_KEYSTORE_PATH_IDX);
-            this.PRIVATE_KEYSTORE_PWD = configs.get(PRIVATE_KEYSTORE_PWD_IDX);
+            //this.PRIVATE_KEYSTORE_PATH = configs.get(PRIVATE_KEYSTORE_PATH_IDX);
+            //this.PRIVATE_KEYSTORE_PWD = configs.get(PRIVATE_KEYSTORE_PWD_IDX);
 
             // skip these if we're testing the client
             if (isFullOp) {

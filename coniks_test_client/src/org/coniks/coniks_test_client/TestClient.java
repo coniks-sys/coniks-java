@@ -78,7 +78,7 @@ public class TestClient {
     /** Perfoms the CONIKS registration protocol with {@code server}
      * for the dummy user {@code username}.
      *
-     *@return Whether the registration succeeded.
+     *@return whether the registration succeeded or not.
      */
     public static boolean register (String username, String server) {
         String pk = createPkFor(username);
@@ -88,14 +88,14 @@ public class TestClient {
         if (ConiksClient.receiveRegistrationRespProto() == null) {
             return false;
         }
-        
+
         return true;
     }
 
     /** Perfoms the CONIKS public key lookup protocol with {@code server}
      * for the dummy user {@code username}.
      *
-     *@return Whether the lookup succeeded.
+     *@return whether the lookup succeeded or not.
      */
     // TODO: eventually, I'm going to want to remove this function
     public static boolean keyLookup (String username, String server) {
@@ -106,7 +106,7 @@ public class TestClient {
         if (ConiksClient.receiveAuthPathProto() == null) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -114,7 +114,7 @@ public class TestClient {
      * verify a dummy user {@code username}'s public key after 
      * lookup at {@code server}.
      *
-     *@return Whether the verification succeeded.
+     *@return whether the verification succeeded or not.
      */
     public static boolean doLookupVerification (String username, String server) {
         long epoch = System.currentTimeMillis();
@@ -124,14 +124,16 @@ public class TestClient {
         int result = ConsistencyChecks.verifyDataBindingProto(
                                                               ConiksClient.receiveAuthPathProto(), null);
 
-        if (result == ConsistencyErr.NO_ERR) {
-            return true;
+        if (result != ConsistencyErr.NO_ERR) {
+            System.out.println("\nError: consistency error "+result);
+            return false;
         }
         
-        return false;
+        return true;
+
     }
 
-        /** Performs a key change by randomly changing the user's data-blob
+    /** Performs a key change by randomly changing the user's data-blob
         and signing and sending a new changekey 
     */
     public static boolean doSignedKeyChange(String username, String server) {
@@ -225,27 +227,40 @@ public class TestClient {
      *@param offset the user number at which to start
      */
     private static void doOperation (String op, int numUsers, int offset) {
+        // print the status
+        if (numUsers == 1) {
+            System.out.print("Performing "+op+" for user test-"+offset);
+        }
+        else if (numUsers > 1) {
+            System.out.print("Performing "+op+" for users test-"+offset+" thru test-"+(offset+numUsers-1));
+        }
+
+
         for (int i = 0; i < numUsers; i++){
-            if (i % (1 + (numUsers / 10)) == 0)
-                System.err.print(".");
+            // this is just a nicety to give the user some sense of progress
+            if (numUsers <= 5 && i == 0) {
+                System.out.print("...");
+            }
+            else if (numUsers >= 6  && numUsers <= 49 && i % (1+ (numUsers / 6)) == 0) {
+                System.out.print(".");
+            }
+            if (numUsers >= 50  && numUsers <= 99 && i % (1 + (numUsers / 25)) == 0) {
+                System.out.print(".");
+            }
+            else if (numUsers >= 100 && i % (1+ (numUsers / 50)) == 0) {
+                System.out.print(".");
+            }
 
             String uname = "test-"+(offset+i);
             
             if(op.equalsIgnoreCase("LOOKUP")){
-
-                if (!keyLookup(uname, server))
-                    System.out.println ("An error occurred.");
-                
+                keyLookup(uname, server);
             }
             else if (op.equalsIgnoreCase("REGISTER")){
-                if (!register(uname, server))
-                    System.out.println ("An error occurred.");
-
+                register(uname, server);
             }
             else if (op.equalsIgnoreCase("VERIFY")){                
-                if (!doLookupVerification(uname, server)) 
-                    System.out.println("An error occurred.");
-
+                doLookupVerification(uname, server);
             }
             else if (op.equalsIgnoreCase("SIGNED")) {
                 if (!doSignedKeyChange(uname, server)) {

@@ -94,6 +94,14 @@ public class ConiksClient {
         System.setProperty("javax.net.ssl.keyStorePassword", CONFIG.PRIVATE_KEYSTORE_PWD);
     }
 
+    /** Prints out an error message.
+     *
+     *@param msg the error message to print out.
+     */
+    private static void printErr (String msg) {
+        System.out.println("\nError: "+msg);
+    }
+
     /* Functions for sending CONIKS messages to the server */
 
     /** Sends a Registration protobuf message with the given
@@ -174,7 +182,7 @@ public class ConiksClient {
             dout.flush();
         }
         catch (IOException e) {
-            System.out.println("Something went wrong while trying to send message: "+
+            printErr("Something went wrong while trying to send message: "+
                                msg.toString());
             System.out.println("Error: "+e.getMessage());
         }
@@ -253,11 +261,11 @@ public class ConiksClient {
         // implement signing
         try {
             byte[] sig = SignatureOps.sign(changeReq.toByteArray(), prk);
-            System.out.println("Signed ULNChange. Sig: " + Arrays.toString(sig));
+            printErr("Signed ULNChange. Sig: " + Arrays.toString(sig));
             ulnChangeBuilder.addAllSig(ClientUtils.byteArrToIntList(sig));
         }
         catch (InvalidKeyException e) {
-            System.out.println("Bad key");
+            printErr("Bad key");
             return null;
         }
         return ulnChangeBuilder.build();
@@ -279,7 +287,7 @@ public class ConiksClient {
 
         if (serverMsg == null || 
             !((serverMsg instanceof RegistrationResp) || (serverMsg instanceof ServerResp))) {
-            System.out.println("Unexpected server response");
+            printErr("Unexpected server response");
         }
         else if (serverMsg instanceof ServerResp) {
             printServerRespMsgProto((ServerResp)serverMsg);
@@ -306,7 +314,7 @@ public class ConiksClient {
 
         if (serverMsg == null || 
             !((serverMsg instanceof AuthPath) || (serverMsg instanceof ServerResp))) {
-            System.out.println("Unexpected server response");
+            printErr("Unexpected server response");
         }
         else if (serverMsg instanceof ServerResp) {
             printServerRespMsgProto((ServerResp)serverMsg);
@@ -333,7 +341,7 @@ public class ConiksClient {
 
         if (serverMsg == null || 
             !((serverMsg instanceof Commitment) || (serverMsg instanceof ServerResp))) {
-            System.out.println("Unexpected server response");
+            printErr("Unexpected server response");
         }
         else if (serverMsg instanceof ServerResp) {
             printServerRespMsgProto((ServerResp)serverMsg);
@@ -367,7 +375,7 @@ public class ConiksClient {
                 RegistrationResp regResp = RegistrationResp.parseDelimitedFrom(din);
                 
                 if(!regResp.hasInitEpoch() || !regResp.hasEpochInterval()){
-                    System.out.println("Malformed registration response");
+                    printErr("Malformed registration response");
                 }
                 else {
                     return regResp;
@@ -377,7 +385,7 @@ public class ConiksClient {
                 AuthPath authPath = AuthPath.parseDelimitedFrom(din);
                 
                 if (!authPath.hasLeaf() || !authPath.hasRoot()) {
-                    System.out.println("Malformed auth path");
+                    printErr("Malformed auth path");
                 }
                 else {
                     return authPath;
@@ -387,7 +395,7 @@ public class ConiksClient {
                 Commitment comm = Commitment.parseDelimitedFrom(din);
                 
                 if (!comm.hasEpoch() || !comm.hasRootHash()) {
-                    System.out.println("Malformed commitment");
+                    printErr("Malformed commitment");
                 }
                 else {
                     return comm;
@@ -399,7 +407,7 @@ public class ConiksClient {
                 ServerResp resp = ServerResp.parseDelimitedFrom(din);
                 
                 if (!resp.hasMessage()) {
-                    System.out.println("Malformed simple server response");
+                    printErr("Malformed simple server response");
                 }
                 else {
                     return resp;
@@ -407,10 +415,10 @@ public class ConiksClient {
             }
         }
         catch (InvalidProtocolBufferException e) {
-            System.out.println("An error occurred while parsing a protobuf message");
+            printErr("An error occurred while parsing a protobuf message");
         }
         catch (IOException e) {
-            System.out.println("An error occurred while receiving data from the server");
+            printErr("An error occurred while receiving data from the server");
         }
         
         close();
@@ -430,22 +438,22 @@ public class ConiksClient {
 
         switch(respType) {
         case SUCCESS:
-            System.out.println("Server successful.");
+            printErr("Server successful.");
             break;
         case NAME_EXISTS_ERR:
-            System.out.println("The name you tried to register already exists.");
+            printErr("The name you tried to register already exists.");
             break;
         case NAME_NOT_FOUND_ERR:
-            System.out.println("The name you tried to look up could not be found.");
+            printErr("The name you tried to look up could not be found.");
             break;
         case MALFORMED_ERR:
-            System.out.println("The message received by the server was malformed.");
+            printErr("The message received by the server was malformed.");
             break;
         case VERIFICATION_ERR:
-            System.out.println("There was a VERIFICATION_ERR");
+            printErr("There was a verification error");
             break;
         default:
-            System.out.println("Some server error occurred.");
+            printErr("Some server error occurred.");
             break;                
         }
 
@@ -483,7 +491,7 @@ public class ConiksClient {
             dout.close();
         }
         catch (IOException e) {
-            System.out.println("An error occurred while closing the connection");
+            printErr("An error occurred while closing the connection");
         }
     }
 }

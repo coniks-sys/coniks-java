@@ -165,8 +165,7 @@ public class ServerConfig{
             return true;
         }
         catch (Exception e) {
-            // the config returned may still have some default values!
-            System.out.println("Error in ServerConfig: "+e.getMessage());
+            ConiksServer.serverLog.error("ServerConfig: "+e.getMessage());
         }
 
         return false;

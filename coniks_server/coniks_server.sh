@@ -102,7 +102,7 @@ elif [ "$CMD" = "stop" ]; then
 
      echo "Stopping the CONIKS server."
      
-     kill -9 `cat $CONIKS_SERVERLOGS/pid` >/dev/null
+     kill `cat $CONIKS_SERVERLOGS/pid` >/dev/null
      rm -f $CONIKS_SERVERLOGS/pid
 
 # remove all logs in the LOG_PATH
@@ -114,7 +114,7 @@ elif [ "$CMD" = "clean" ]; then
      if [ `ps ax | grep -c $SERVER_BIN` -gt 1 ]; then
          echo "Stopping the CONIKS server."
      
-         kill -9 `cat $CONIKS_SERVERLOGS/pid` >/dev/null
+         kill `cat $CONIKS_SERVERLOGS/pid` >/dev/null
          rm -f $CONIKS_SERVERLOGS/pid
     fi
 

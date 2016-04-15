@@ -135,7 +135,7 @@ public class ServerOps{
             byte[] prunedChildHash = new byte[ServerUtils.HASH_SIZE_BYTES];
 
 	    if (runner == null){
-		System.out.println("Null runner" + curOffset);
+		ConiksServer.serverLog.error("Null runner" + curOffset);
 	    }
 
             if (runner instanceof RootNode) {
@@ -158,7 +158,7 @@ public class ServerOps{
                 Hash.Builder subtree = Hash.newBuilder();
                 ArrayList<Integer> subTreeHashList = ServerUtils.byteArrToIntList(prunedChildHash);
                 if(subTreeHashList.size() != ServerUtils.HASH_SIZE_BYTES){
-                    System.out.println("Bad length of pruned child hash: "+subTreeHashList.size());
+                    ConiksServer.serverLog.error("Bad length of pruned child hash: "+subTreeHashList.size());
                     return null;
                 }
                 subtree.setLen(subTreeHashList.size());
@@ -169,7 +169,7 @@ public class ServerOps{
                 Hash.Builder prevHash = Hash.newBuilder();
                 ArrayList<Integer> prevHashList = ServerUtils.byteArrToIntList(prev);
                 if(prevHashList.size() != ServerUtils.HASH_SIZE_BYTES){
-                    System.out.println("Bad length of prev pointer hash: "+prevHashList.size());
+                    ConiksServer.serverLog.error("Bad length of prev pointer hash: "+prevHashList.size());
                     return null;
                 }
                 prevHash.setLen(prevHashList.size());
@@ -200,7 +200,7 @@ public class ServerOps{
                 Hash.Builder subtree = Hash.newBuilder();
                 ArrayList<Integer> subTreeHashList = ServerUtils.byteArrToIntList(prunedChildHash);
                 if(subTreeHashList.size() != ServerUtils.HASH_SIZE_BYTES){
-                    System.out.println("Bad length of pruned child hash: "+subTreeHashList.size());
+                    ConiksServer.serverLog.error("Bad length of pruned child hash: "+subTreeHashList.size());
                     return null;
                 }
                 subtree.setLen(subTreeHashList.size());
@@ -209,7 +209,7 @@ public class ServerOps{
                 interiorList.add(0, inBuilder.build());
 		
 		if (runner == null){
-		    System.out.println("such sadness...");
+		    ConiksServer.serverLog.error("such sadness...");
 		}
 
                 curOffset++;
@@ -233,7 +233,7 @@ public class ServerOps{
          ArrayList<Integer> hashList = ServerUtils.byteArrToIntList(hashBytes);
          
          if(hashList.size() != ServerUtils.HASH_SIZE_BYTES){
-            System.out.println("Bad length of "+name+": "+hashList.size());
+            ConiksServer.serverLog.error("Bad length of "+name+": "+hashList.size());
             return null;
         }
 

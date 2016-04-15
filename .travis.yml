@@ -5,7 +5,6 @@ language: java
 env:
         global:
         - MAKE=make
-        - CLASS_DEST=${TRAVIS_BUILD_DIR}
 
 branches:
         only:
@@ -24,7 +23,7 @@ script:
         - cd ..
 
 notifications:
-  # Email notifications are disabled to not annoy anyb ody.
+  # Email notifications are disabled to not annoy anybody.
   # See http://about.travis-ci.org/docs/user/build-configuration/ to learn more
   # about configuring notification recipients and more.
   email: false

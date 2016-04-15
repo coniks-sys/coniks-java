@@ -67,10 +67,23 @@ import java.util.Arrays;
  */
 public class ConiksClient {
 
-    public static final ClientConfig CONFIG = new ClientConfig();
+    // Config settings now set in main in TestClient
+    public static ClientConfig CONFIG;
+    private static boolean isFullOp = true;
 
     private static DataOutputStream dout;
     private static DataInputStream din;
+
+    // logs are useful
+    public static ClientLogger clientLog = null;
+
+    /** Sets the operating mode of the client: either full or testing.
+     *
+     *@param isFullOp indicates if the client is in full operating mode or not.
+     */
+    public static void setOpMode (boolean isFullOpMode) {
+        isFullOp = isFullOpMode;
+    }
 
     /** Sets the default truststore according to the {@link ClientConfig}.
      * This is needed to set up SSL connections with a CONIKS server.
@@ -82,6 +95,14 @@ public class ConiksClient {
                            CONFIG.TRUSTSTORE_PWD);
         System.setProperty("javax.net.ssl.keyStore", CONFIG.PRIVATE_KEYSTORE_PATH);
         System.setProperty("javax.net.ssl.keyStorePassword", CONFIG.PRIVATE_KEYSTORE_PWD);
+    }
+
+    /** Sets up the logging for the client.
+     *
+     *@param logPath the path where the logs are to be written
+     */
+    public static void  setupLogging(String logPath) {
+        clientLog = ClientLogger.getInstance(logPath+"/client-%g");
     }
 
     /* Functions for sending CONIKS messages to the server */
@@ -164,9 +185,8 @@ public class ConiksClient {
             dout.flush();
         }
         catch (IOException e) {
-            System.out.println("Something went wrong while trying to send message: "+
-                               msg.toString());
-            System.out.println("Error: "+e.getMessage());
+            clientLog.error("Sending msg proto "+msg.toString());
+            clientLog.error("Error: "+e.getMessage());
         }
 
     }
@@ -243,11 +263,11 @@ public class ConiksClient {
         // implement signing
         try {
             byte[] sig = SignatureOps.sign(changeReq.toByteArray(), prk);
-            System.out.println("Signed ULNChange. Sig: " + Arrays.toString(sig));
+            clientLog.log("Signed ULNChange. Sig: " + Arrays.toString(sig));
             ulnChangeBuilder.addAllSig(ClientUtils.byteArrToIntList(sig));
         }
         catch (InvalidKeyException e) {
-            System.out.println("Bad key");
+            clientLog.error("signed ULN change - Bad key");
             return null;
         }
         return ulnChangeBuilder.build();
@@ -258,23 +278,20 @@ public class ConiksClient {
     /** Receives and parses a RegistrationResp protobuf message
      * from the server.
      *
-     *@return The RegistrationResp message upon success. {@code null} otherwise.
+     *@return The AbstractMessage (either of type ServerResp or RegistrationResp) 
+     *upon success. {@code null} otherwise.
      */
-    public static RegistrationResp receiveRegistrationRespProto() {
+    public static AbstractMessage receiveRegistrationRespProto() {
         
         // first receive the generic message from the server
         AbstractMessage serverMsg = receiveMsgProto();
 
-        RegistrationResp regResp = null;
+        AbstractMessage regResp = null;
 
-        if (serverMsg == null || 
-            !((serverMsg instanceof RegistrationResp) || (serverMsg instanceof ServerResp))) {
-            System.out.println("Unexpected server response");
+        if (serverMsg != null && serverMsg instanceof ServerResp) {
+            regResp = (ServerResp)serverMsg;
         }
-        else if (serverMsg instanceof ServerResp) {
-            printServerRespMsgProto((ServerResp)serverMsg);
-        }
-        else {
+        else if (serverMsg != null && serverMsg instanceof RegistrationResp) {
             regResp = (RegistrationResp)serverMsg;
         }
         
@@ -285,23 +302,20 @@ public class ConiksClient {
      /** Receives and parses an AuthPath protobuf message
      * from the server.
      *
-     *@return The AuthPath message upon success. {@code null} otherwise.
+     *@return The AbstractMessage (either of type ServerResp or AuthPath) 
+     *upon success. {@code null} otherwise.
      */
-    public static AuthPath receiveAuthPathProto() {
+    public static AbstractMessage receiveAuthPathProto() {
         
         // first receive the generic message from the server
         AbstractMessage serverMsg = receiveMsgProto();
 
-        AuthPath authPath = null;
+        AbstractMessage authPath = null;
 
-        if (serverMsg == null || 
-            !((serverMsg instanceof AuthPath) || (serverMsg instanceof ServerResp))) {
-            System.out.println("Unexpected server response");
+        if (serverMsg != null && serverMsg instanceof ServerResp) {
+            authPath = (ServerResp)serverMsg;
         }
-        else if (serverMsg instanceof ServerResp) {
-            printServerRespMsgProto((ServerResp)serverMsg);
-        }
-        else {
+        else if (serverMsg != null && serverMsg instanceof AuthPath) {
             authPath = (AuthPath)serverMsg;
         }
         
@@ -312,23 +326,20 @@ public class ConiksClient {
      /** Receives and parses a Commitment protobuf message
      * from the server 
      *
-     *@return The Commitment message upon success. {@code null} otherwise.
+     *@return The AbstractMessage (either of type ServerResp or Commitment) 
+     *upon success. {@code null} otherwise.
      */
-    public static Commitment receiveCommitmentProto() {
+    public static AbstractMessage receiveCommitmentProto() {
         
         // first receive the generic message from the server
         AbstractMessage serverMsg = receiveMsgProto();
 
-        Commitment comm = null;
+        AbstractMessage comm = null;
 
-        if (serverMsg == null || 
-            !((serverMsg instanceof Commitment) || (serverMsg instanceof ServerResp))) {
-            System.out.println("Unexpected server response");
+        if (serverMsg != null && serverMsg instanceof ServerResp) {
+            comm = (ServerResp)serverMsg;
         }
-        else if (serverMsg instanceof ServerResp) {
-            printServerRespMsgProto((ServerResp)serverMsg);
-        }
-        else {
+        else if (serverMsg != null && serverMsg instanceof Commitment) {
             comm = (Commitment)serverMsg;
         }
         
@@ -357,7 +368,7 @@ public class ConiksClient {
                 RegistrationResp regResp = RegistrationResp.parseDelimitedFrom(din);
                 
                 if(!regResp.hasInitEpoch() || !regResp.hasEpochInterval()){
-                    System.out.println("Malformed registration response");
+                    clientLog.error("Malformed registration response");
                 }
                 else {
                     return regResp;
@@ -367,7 +378,7 @@ public class ConiksClient {
                 AuthPath authPath = AuthPath.parseDelimitedFrom(din);
                 
                 if (!authPath.hasLeaf() || !authPath.hasRoot()) {
-                    System.out.println("Malformed auth path");
+                    clientLog.error("Malformed auth path");
                 }
                 else {
                     return authPath;
@@ -377,7 +388,7 @@ public class ConiksClient {
                 Commitment comm = Commitment.parseDelimitedFrom(din);
                 
                 if (!comm.hasEpoch() || !comm.hasRootHash()) {
-                    System.out.println("Malformed commitment");
+                    clientLog.error("Malformed commitment");
                 }
                 else {
                     return comm;
@@ -389,7 +400,7 @@ public class ConiksClient {
                 ServerResp resp = ServerResp.parseDelimitedFrom(din);
                 
                 if (!resp.hasMessage()) {
-                    System.out.println("Malformed simple server response");
+                    clientLog.error("Malformed simple server response");
                 }
                 else {
                     return resp;
@@ -397,47 +408,16 @@ public class ConiksClient {
             }
         }
         catch (InvalidProtocolBufferException e) {
-            System.out.println("An error occurred while parsing a protobuf message");
+            clientLog.error("parsing proto msg: "+e.getMessage());
         }
         catch (IOException e) {
-            System.out.println("An error occurred while receiving data from the server");
+            clientLog.error("receiving data from the server: "+e.getMessage());
         }
         
         close();
 
         // unexpected message type from the server
         return null;
-
-    }
-
-    /** Retrieves the simple server response message from 
-        {@code serverResp}
-     * and prints out an appropriate message to stdout.
-     */
-    private static void printServerRespMsgProto(ServerResp serverResp) {
-
-        ServerResp.Message respType = serverResp.getMessage();
-
-        switch(respType) {
-        case SUCCESS:
-            System.out.println("Server successful.");
-            break;
-        case NAME_EXISTS_ERR:
-            System.out.println("The name you tried to register already exists.");
-            break;
-        case NAME_NOT_FOUND_ERR:
-            System.out.println("The name you tried to look up could not be found.");
-            break;
-        case MALFORMED_ERR:
-            System.out.println("The message received by the server was malformed.");
-            break;
-        case VERIFICATION_ERR:
-            System.out.println("There was a VERIFICATION_ERR");
-            break;
-        default:
-            System.out.println("Some server error occurred.");
-            break;                
-        }
 
     }
 
@@ -450,12 +430,18 @@ public class ConiksClient {
     private static void connect (String server) 
         throws IOException {
 
-        SSLSocketFactory sslFact =
-            (SSLSocketFactory)SSLSocketFactory.getDefault();
+        Socket sock;
 
-        SSLSocket sslSock = (SSLSocket)sslFact.createSocket(server, CONFIG.PORT);
-        dout = new DataOutputStream(sslSock.getOutputStream());
-        din = new DataInputStream(sslSock.getInputStream());
+        if (isFullOp) {
+            SSLSocketFactory sslFact =
+                (SSLSocketFactory)SSLSocketFactory.getDefault();
+            sock = (SSLSocket)sslFact.createSocket(server, CONFIG.PORT);
+        }
+        else {
+            sock = new Socket(server, CONFIG.PORT);
+        }
+        dout = new DataOutputStream(sock.getOutputStream());
+        din = new DataInputStream(sock.getInputStream());
         
     }
 
@@ -467,7 +453,7 @@ public class ConiksClient {
             dout.close();
         }
         catch (IOException e) {
-            System.out.println("An error occurred while closing the connection");
+            clientLog.error("closing the connection to the server: "+e.getMessage());
         }
     }
 }

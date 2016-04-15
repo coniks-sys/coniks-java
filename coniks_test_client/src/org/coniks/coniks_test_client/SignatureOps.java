@@ -97,7 +97,7 @@ public class SignatureOps{
         if (CONFIG == null) initSignatureOps(new ClientConfig());
         String pubPath = CONFIG.PRIVATE_KEYSTORE_PATH + "_" + username + "_pub";
         String prPath = CONFIG.PRIVATE_KEYSTORE_PATH + "_" + username + "_pr";
-        System.out.println("Saving to: " + pubPath + " " + prPath);
+        ConiksClient.clientLog.log("Saving to: " + pubPath + " " + prPath);
         return unsafeSavePublicKeyToFile((DSAPublicKey) kp.getPublic(), pubPath) 
                 && unsafeSavePrivateKeyToFile((DSAPrivateKey) kp.getPrivate(), prPath);
     }
@@ -253,13 +253,13 @@ public class SignatureOps{
             return keyFactory.generatePublic(publicKeySpec);
         }
         catch(InvalidParameterException e) {
-            System.out.println("The given key is invalid.");
+            ConiksClient.clientLog.error("The given key is invalid.");
         }
         catch (InvalidKeySpecException e) {
-            System.out.println("The given key params are invalid.");
+            ConiksClient.clientLog.error("The given key params are invalid.");
         }
         catch(NoSuchAlgorithmException e){
-            System.out.println("DSA is invalid for some reason.");
+            ConiksClient.clientLog.error("DSA is invalid for some reason.");
         }
         return null;
     }
@@ -271,19 +271,19 @@ public class SignatureOps{
             verifyalg.initVerify(pk);
             verifyalg.update(msg);
             if (!verifyalg.verify(sig)) {
-                System.out.println("Failed to validate signature");
+                ConiksClient.clientLog.error("Failed to validate signature");
                 return false;
             }
             return true;
         }
         catch(NoSuchAlgorithmException e){
-            System.out.println("DSA is invalid for some reason.");
+            ConiksClient.clientLog.error("DSA is invalid for some reason.");
         }
         catch(InvalidKeyException e){
-            System.out.println("The given key is invalid.");
+            ConiksClient.clientLog.error("The given key is invalid.");
         }
         catch(SignatureException e){
-            System.out.println("The format of the input is invalid: "+e.getMessage());
+            ConiksClient.clientLog.error("The format of the input is invalid: "+e.getMessage());
         }
         return false;
     }
@@ -293,7 +293,7 @@ public class SignatureOps{
         Throws @code{InvalidKeyException} if @code{prk} is null */
     public static byte[] sign(byte[] msg, DSAPrivateKey prk) throws InvalidKeyException {
         if (prk == null) {
-            System.out.println("The given key is invalid.");
+            ConiksClient.clientLog.error("The given key is invalid.");
             throw new InvalidKeyException();
         }
         try {
@@ -303,13 +303,13 @@ public class SignatureOps{
             return sigProcess.sign();
         }
         catch(NoSuchAlgorithmException e){
-            System.out.println("DSA is invalid for some reason.");
+            ConiksClient.clientLog.error("DSA is invalid for some reason.");
         }
         catch(InvalidKeyException e){
-            System.out.println("The given key is invalid.");
+            ConiksClient.clientLog.error("The given key is invalid.");
         }
         catch(SignatureException e){
-            System.out.println("The format of the input is invalid: "+e.getMessage());
+            ConiksClient.clientLog.error("The format of the input is invalid: "+e.getMessage());
         }
         return null;
     }

@@ -75,6 +75,19 @@ public class ClientUtils{
      */
     public static final int SIG_SIZE_BYTES = 256;
 
+     /** The maximum number of bytes logged per log file.
+     */
+    public static final int MAX_BYTES_LOGGED_PER_FILE = (1 << 15);
+
+    /** The maximum number of log files per log.
+     */
+    public static final int MAX_NUM_LOG_FILES = 5;
+
+    /** Indicates a generic internal client error.
+     */
+    // TODO: is this where it makes most sense to put this?
+    public static final int INTERNAL_CLIENT_ERR = 1;
+
     private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     /** Generates the cryptographic hash of {@code input}.
@@ -93,7 +106,7 @@ public class ClientUtils{
 
 	}
 	catch(NoSuchAlgorithmException e){
-	    System.out.println("SHA-256 is not a valid algorithm for some reason");
+	    ConiksClient.clientLog.error("SHA-256 is not a valid algorithm for some reason");
 	}
 
 	return null; // should never get here
@@ -124,7 +137,7 @@ public class ClientUtils{
 
 	}
 	catch(NoSuchAlgorithmException e){
-	    System.out.println("SHA-256 is not a valid algorithm for some reason");
+	    ConiksClient.clientLog.error("SHA-256 is not a valid algorithm for some reason");
 	}
 
 	return null; // should never get here
@@ -373,7 +386,7 @@ public class ClientUtils{
             AuthPath.InteriorNode in = inList.get(i);
             
             if(!in.hasPrunedchild() && !in.hasSubtree()){
-                System.out.println("No pruned child at level: "+i);
+                ConiksClient.clientLog.error("No pruned child at level: "+i);
                 return null;
             }
             
@@ -382,7 +395,7 @@ public class ClientUtils{
             ArrayList<Integer> pcHashList = new ArrayList<Integer>(pcHash.getHashList());
 
             if(pcHashList.size() != ClientUtils.HASH_SIZE_BYTES){
-                System.out.println("Bad hash length");
+                ConiksClient.clientLog.error("Bad hash length");
                 return null;
             }
 
@@ -416,7 +429,7 @@ public class ClientUtils{
         ArrayList<Integer> pcHashList = new ArrayList<Integer>(pcHash.getHashList());
         
         if(pcHashList.size() != ClientUtils.HASH_SIZE_BYTES){
-            System.out.println("Bad hash length");
+            ConiksClient.clientLog.error("Bad hash length");
             return null;
         }
         
@@ -430,7 +443,7 @@ public class ClientUtils{
                                                                  prevHashProto.getHashList());
 
          if(prevHashList.size() != ClientUtils.HASH_SIZE_BYTES){
-            System.out.println("Bad prev hash length");
+            ConiksClient.clientLog.error("Bad prev hash length");
             return null;
         }
         

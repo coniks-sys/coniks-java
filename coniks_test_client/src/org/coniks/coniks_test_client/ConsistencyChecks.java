@@ -77,7 +77,7 @@ public class ConsistencyChecks {
             new ArrayList<AuthPath.InteriorNode>(authPath.getInteriorList());
 
         if(inList.size() != numInteriors){
-            System.out.println("Bad length of auth path");
+            ConiksClient.clientLog.error("Bad length of auth path");
             return null;
         }
 
@@ -90,7 +90,7 @@ public class ConsistencyChecks {
         AuthPath.RootNode root = authPath.getRoot();
 
         if(!root.hasPrunedchild() || !root.hasPrev() || !root.hasSubtree() || !root.hasEpoch()){
-            System.out.println("Root malformed");
+            ConiksClient.clientLog.error("Root malformed");
             return null;
         }
         
@@ -107,15 +107,16 @@ public class ConsistencyChecks {
     public static int verifyDataBindingProto (AuthPath authPath, 
                                                              Commitment comm){
 
+        // this really shouldn't be null at this point, but we'll check jic
         if (authPath == null /*|| comm == null*/) {
-            return ConsistencyErr.MSG_ERR;
+            return ServerErr.MALFORMED_SERVER_MSG_ERR;
         }
         
         // first recompute the root node from the authentication path
         byte[] recomputedRoot = recomputeAuthPathRootProto(authPath);
        
         if (recomputedRoot == null) {
-            return ConsistencyErr.INTERNAL_ERR;
+            return ServerErr.MALFORMED_SERVER_MSG_ERR;
         }
 
         // verify the signature on the commitment
@@ -128,7 +129,7 @@ public class ConsistencyChecks {
         // the two byte buffers
         // TODO: implement this
 
-        return ConsistencyErr.NO_ERR;
+        return ConsistencyErr.CHECK_PASSED;
 
     }
 

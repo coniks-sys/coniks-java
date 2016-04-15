@@ -42,52 +42,60 @@ package org.coniks.coniks_test_client;
 
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.io.File;
 import java.io.FileInputStream;
 
 public class ClientConfig{
 
     private final int PORT_IDX = 0;
-    private final int TRUSTSTORE_PATH_IDX = 1;
-    private final int TRUSTSTORE_PWD_IDX = 2;
-    private final int PRIVATE_KEYSTORE_PATH_IDX = 3;
-    private final int PRIVATE_KEYSTORE_PWD_IDX = 4;
+    private final int PRIVATE_KEYSTORE_PATH_IDX = 1;
+    private final int PRIVATE_KEYSTORE_PWD_IDX = 2;
+    private final int TRUSTSTORE_PATH_IDX = 3;
+    private final int TRUSTSTORE_PWD_IDX = 4;
 
     /** The port number on which the CONIKS server is listening
      */
-    public int PORT = -1;
-    
+    public int PORT;
+
+    /** The path to the client's private DSA key */
+    public String PRIVATE_KEYSTORE_PATH;
+
+    /** The password to the client's private DSA key */
+    public String PRIVATE_KEYSTORE_PWD;
+
     /** The path to the client's trusted certificate store
      */
-    public String TRUSTSTORE_PATH = "";
+    public String TRUSTSTORE_PATH;
     
     /** The password to the client's trusted certificate store
      */
-    public String TRUSTSTORE_PWD = "";
+    public String TRUSTSTORE_PWD;
 
-    /** The path to the client's private DSA key */
-    public String PRIVATE_KEYSTORE_PATH = "";
-    public String PRIVATE_KEYSTORE_PWD = "";
-
-    /** Set a {@link ConiksClient}'s configuration according to the following
-     * default parameters.
+    /** Initializes a {@link ConiksClient}'s configuration with empty values.
+     * The client must invoke {@link readClientConfig}, otherwise errors may occur.
      */
     public ClientConfig(){
-        this.PORT = 40012;
+        this.PORT = -1;
         this.TRUSTSTORE_PATH = "";
         this.TRUSTSTORE_PWD = "";
         this.PRIVATE_KEYSTORE_PATH = "";
         this.PRIVATE_KEYSTORE_PWD = "";
     }
 
-    /** Set a {@link ConiksClient}'s configuration according to the parameters in
+     /** Set a {@link ConiksClient}'s configuration according to the parameters in
      * {@code configFile}.
-     * To avoid problems in case of an Exception, this constructor will first
-     * set the configuration to the specified default values from the first constructor.
+     *
+     * The client has already checked that {@code configFile} exists, but the
+     * parameters in the File may still be malformed. If the client is being tested, 
+     * this will skip the truststore parameters.
+     *
+     *@param configFile the client configuration file
+     *@param isFullOp indicates whether the client is being run in full operation mode or testing mode
+     *
+     *@return {@code true} if the config file can be read in successfully, {@code false}
+     * if an exception occurs, which will cause the client to halt.
      */
-    public ClientConfig(String configFile) {
-
-        // this is just in case we fail below
-        this();
+    public boolean readClientConfig(File configFile, boolean isFullOp) {
         
         try {
             Scanner in = new Scanner (new FileInputStream(configFile));
@@ -101,16 +109,23 @@ public class ClientConfig{
             in.close();
             
             this.PORT = Integer.parseInt(configs.get(PORT_IDX));
-            this.TRUSTSTORE_PATH = configs.get(TRUSTSTORE_PATH_IDX);
-            this.TRUSTSTORE_PWD = configs.get(TRUSTSTORE_PWD_IDX);
-            this.PRIVATE_KEYSTORE_PATH = configs.get(PRIVATE_KEYSTORE_PATH_IDX);
-            this.PRIVATE_KEYSTORE_PWD = configs.get(PRIVATE_KEYSTORE_PWD_IDX);
+            //this.PRIVATE_KEYSTORE_PATH = configs.get(PRIVATE_KEYSTORE_PATH_IDX);
+            //this.PRIVATE_KEYSTORE_PWD = configs.get(PRIVATE_KEYSTORE_PWD_IDX);
+
+            // skip these if we're testing the client
+            if (isFullOp) {
+                this.TRUSTSTORE_PATH = configs.get(TRUSTSTORE_PATH_IDX);
+                this.TRUSTSTORE_PWD = configs.get(TRUSTSTORE_PWD_IDX);
+            }
             
+            return true;
         }
         catch (Exception e) {
             // caution the configuration may still have default values at this point
             System.out.println("Error in ClientConfig: "+e.getMessage());
         }
+
+        return false;
     }
 
 }

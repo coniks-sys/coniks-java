@@ -34,19 +34,22 @@
 ## Runs or stops a CONIKS server instance
 
 # Set all the configs here
-CLASSPATH="-cp ."
+CLASS_DEST="bin" #change this if you built the server somewhere else
+CLASSPATH="-cp $CLASS_DEST"
 SERVER_BIN="org.coniks.coniks_server.ConiksServer"
-RUN_CONIKS="java $CLASSPATH $SERVER_BIN"
-LOG_PATH="/path/to/logs"
+CONIKS_SERVERCONFIG="config" #change this if using a different config file
+CONIKS_SERVERLOGS="logs" #change this if storing the logs somewhere else
+CONIKS_INIT_SIZE=10 #change this to initialize the server with a different number of dummy users
+RUN_CONIKS="java $CLASSPATH $SERVER_BIN $CONIKS_SERVERCONFIG $CONIKS_SERVERLOGS $CONIKS_INIT_SIZE"
 
 if [ -z "$1" ]; then
-    echo "Usage: $0 <start | stop | clean>"
+    echo "Usage: $0 <start | test | stop | clean>"
     exit
 fi
 
 CMD=$1
 
-# start up the server if no other instances are running.
+# start up the server in full mode if no other instances are running.
 if [ "$CMD" = "start" ]; then
     # need to check for 1 since the grep command 
     # itself is included in the count    
@@ -56,17 +59,38 @@ if [ "$CMD" = "start" ]; then
         exit
     fi
     
-    if [ ! -d "$LOG_PATH" ]; then
-        mkdir "$LOG_PATH"
+    if [ ! -d "$CONIKS_SERVERLOGS" ]; then
+        mkdir "$CONIKS_SERVERLOGS"
     fi
 
-    echo "Starting up the CONIKS server."
-    echo "All logs are in $LOG_PATH."
+    echo "Starting up the CONIKS server in full mode."
+    echo "All logs are in the $CONIKS_SERVERLOGS directory."
 
     # redirecting stderr to stdout to capture error messages in console log
-    nohup sh -c "exec $RUN_CONIKS >> $LOG_PATH/console 2>&1" >>/dev/null &
+    nohup sh -c "exec $RUN_CONIKS full >> $CONIKS_SERVERLOGS/console 2>&1" >>/dev/null &
     # need to store PID in file so we can stop the program later
-    echo $! > $LOG_PATH/pid
+    echo $! > $CONIKS_SERVERLOGS/pid
+
+# start up the server in testing mode if no other instances are running.
+elif [ "$CMD" = "test" ]; then
+    # need to check for 1 since the grep command 
+    # itself is included in the count    
+    if [ `ps ax | grep -c $SERVER_BIN` -gt 1 ]; then
+        echo "An instance of $SERVER_BIN is already running."
+        echo "Exiting."
+        exit
+    fi
+    
+    if [ ! -d "$CONIKS_SERVERLOGS" ]; then
+        mkdir "$CONIKS_SERVERLOGS"
+    fi
+
+    echo "Starting up the CONIKS server in testing mode."
+    echo "All logs are in $CONIKS_SERVERLOGS."
+
+    $RUN_CONIKS test
+    # need to store PID in file so we can stop the program later
+    echo $! > $CONIKS_SERVERLOGS/pid
 
 # stop a running server
 elif [ "$CMD" = "stop" ]; then
@@ -78,24 +102,24 @@ elif [ "$CMD" = "stop" ]; then
 
      echo "Stopping the CONIKS server."
      
-     kill -9 `cat $LOG_PATH/pid` >/dev/null
-     rm -f $LOG_PATH/pid
+     kill `cat $CONIKS_SERVERLOGS/pid` >/dev/null
+     rm -f $CONIKS_SERVERLOGS/pid
 
 # remove all logs in the LOG_PATH
 elif [ "$CMD" = "clean" ]; then
-    echo "Removing all logs in $LOG_PATH."
+    echo "Removing all logs in $CONIKS_SERVERLOGS."
 
     # if we don't stop the server before, it will crash when trying to
     # write to one of the logs
      if [ `ps ax | grep -c $SERVER_BIN` -gt 1 ]; then
          echo "Stopping the CONIKS server."
      
-         kill -9 `cat $LOG_PATH/pid` >/dev/null
-         rm -f $LOG_PATH/pid
+         kill `cat $CONIKS_SERVERLOGS/pid` >/dev/null
+         rm -f $CONIKS_SERVERLOGS/pid
     fi
 
-    rm -rf "$LOG_PATH/"*;
+    rm -rf "$CONIKS_SERVERLOGS/"*;
 
 else
-    echo "Usage: $0 <start | stop | clean>"
+    echo "Usage: $0 <start | test | stop | clean>"
 fi

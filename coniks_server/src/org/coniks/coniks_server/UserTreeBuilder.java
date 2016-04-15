@@ -292,10 +292,6 @@ public class UserTreeBuilder{
         
         int toInsert = pendingQ.size();
         
-        if (prevEpoch == -1) {
-            System.out.println("Inserting " + toInsert);
-        }
-        
         Triplet<byte[], UserLeafNode, Operation> p = pendingQ.poll();
         while(p != null){
             // while we're handing the same prefix,

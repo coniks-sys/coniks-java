@@ -60,11 +60,11 @@ public class KeyOps{
             kg.initialize(1024, new SecureRandom());
         }
         catch(NoSuchAlgorithmException e){
-            System.out.println("DSA is not valid for some reason.");
+            ConiksClient.clientLog.error("DSA is not valid for some reason.");
             return null;
         }
         catch(InvalidParameterException e){
-            System.out.println("DSA is not valid for some reason.");
+            ConiksClient.clientLog.error("DSA is not valid for some reason.");
             return null;
         }
 

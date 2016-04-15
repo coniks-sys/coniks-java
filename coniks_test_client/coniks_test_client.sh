@@ -34,30 +34,36 @@
 ## Runs or a CONIKS test client instance
 
 # Set all the configs here
-CLASSPATH="-cp ."
+CLASS_DEST="bin" #change this if you built the server somewhere else
+CLASSPATH="-cp $CLASS_DEST"
 CLIENT_BIN="org.coniks.coniks_test_client.TestClient"
-RUN_CONIKS="java $CLASSPATH $CLIENT_BIN"
+CONIKS_CLIENTCONFIG="config"
+CONIKS_CLIENTLOGS="logs"
+RUN_CONIKS="java $CLASSPATH $CLIENT_BIN $CONIKS_CLIENTCONFIG $CONIKS_CLIENTLOGS"
 
-if [ "$#" -lt 2 ]; then
-    echo "Usage: $0 <server> <REGISTER | LOOKUP | VERIFY> [iters = 1] [offset = 0] [verbosity = 0]"
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 <server> [test]"
     exit
 fi
 
 SERVER=$1
-CMD=$2
 
-if [ "$#" = 2 ]; then
-    $RUN_CONIKS $SERVER $CMD
+ if [ ! -d "$CONIKS_CLIENTLOGS" ]; then
+        mkdir "$CONIKS_CLIENTLOGS"
+    fi
 
-elif [ "$#" = 3 ]; then
-    $RUN_CONIKS $SERVER $CMD $3
+if [ "$#" = 1 ]; then
+    echo "Starting up the CONIKS test client in full mode."
+    echo "All logs are in the $CONIKS_CLIENTLOGS directory."
 
-elif [ "$#" = 4 ]; then
-    $RUN_CONIKS $SERVER $CMD $3 $4
+    $RUN_CONIKS $SERVER "full"
 
-elif [ "$#" = 5 ]; then
-    $RUN_CONIKS $SERVER $CMD $3 $4 $5
+elif [ "$#" = 2 ]; then
+    echo "Starting up the CONIKS test client in test mode."
+    echo "All logs are in the $CONIKS_CLIENTLOGS directory."
+
+    $RUN_CONIKS $SERVER $2
 
 else
-    echo echo "Usage: $0 <server> <REGISTER | LOOKUP | VERIFY> [iters = 1] [offset = 0] [verbosity = 0]"
+    echo "Usage: $0 <server> [test]"
 fi

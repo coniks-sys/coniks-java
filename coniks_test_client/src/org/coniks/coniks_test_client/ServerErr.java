@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2016, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -34,36 +34,54 @@
 package org.coniks.coniks_test_client;
 
 /** Defines constants representing the types
- * of errors that can occur during CONIKS
- * consistency checks done by a client.
+ * of errors that the server may return to a client.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  */
-public final class ConsistencyErr {
+public final class ServerErr {
 
-    /** Private constructor for ConsistencyErr
+    /** Private constructor for ServerErr
      * restricts instantiation
      */
-    private ConsistencyErr() {
+    private ServerErr() {
     }
 
-    /** Indicates that no error occurred during the 
-     * consistency check. In other words, the check passed.
+    /** Indicates that the server returned no error.
      */
-    public static final int CHECK_PASSED = 20;
+    public static final int SUCCESS = 10;
 
-    /** Indicates that the binding sent by the server is
-     * inconsistent with the root hash.
+    /** Indicates that an error internal to the server
+     * occurred. 
      */
-    public static final int BAD_BINDING_ERR = 21;
+    public static final int INTERNAL_SERVER_ERR = 11;
 
-    /** Indicates that the STR is inconsistent with the 
-     * Merkle tree root to which it is being compared.
+    /** Indicates that the name the client tried to register
+     * with the server already exists and could not be registered.
      */
-    public static final int BAD_STR_ERR = 22;
+    public static final int NAME_EXISTS_ERR = 12;
 
-    /** Indicates that the server's signature is invalid.
+    /** Indicates that the server could not find the name the
+     * client tried to lookup.
      */
-    public static final int BAD_SERVER_SIG_ERR = 23;
+    public static final int NAME_NOT_FOUND_ERR = 13;
+
+     /** Indicates that the message the server received from the client
+     * was malformed.
+     */
+    public static final int MALFORMED_CLIENT_MSG_ERR = 14;
+
+    /** Indicates that the message the client received from the server
+     * was malformed.
+     */
+    public static final int MALFORMED_SERVER_MSG_ERR = 15;
+
+    /** Indicates that the server could not verify the signed change
+     * message received by the client.
+     */
+    public static final int SIGNED_CHANGE_VERIF_ERR = 16;
+
+    /** Indicates a generic server error.
+     */
+    public static final int SERVER_ERR = 17;
 
 }

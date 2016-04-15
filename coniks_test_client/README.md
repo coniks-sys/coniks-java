@@ -44,6 +44,7 @@ You may write your own config file, but it must follow the following format:
 Defaults are already set, but you may change the following variables:
 ```CLASS_DEST``` if you used a different classpath when building the client.
 ```CONIKS_CLIENTCONFIG``` if you're using a different config file
+```CONIKS_CLIENTLOGS``` to store the client logs somewhere other than a *logs* directory
 
 ###Running
 We provide a run script for the CONIKS test client *coniks_test_client.sh*, which allows you to run
@@ -60,13 +61,11 @@ The test client will prompt you until you no longer want to continue.
 
 Supported operations: 
 - ```REGISTER```: register a new name-to-public key mapping with the CONIKS server.
-- ```LOOKUP```: look up a public key, and obtaining a cryptographic proof is the user exists.
-- ```VERIFY```: verify a cryptographic proof for a key mapping.
+- ```LOOKUP```: look up a public key, and verify the cryptographic proof of inclusion if the user exists.
 
 Some examples:
 - REGISTER 10 10: registers 10 new users, identified as dummy users 10 through 19.
 - LOOKUP 1 18: looks up the key for dummy user 18.
-- VERIFY 4 7: verifies the consistency proof obtained from looking up the key for dummy users 7 through 10.
 
 ## Test Client Installation on a Remote Machine
 You may want to install the test client on a remote machine.

@@ -63,7 +63,7 @@ by the users allowed to run the CONIKS server to protect your keystore password.
 Defaults are already set, but you may change the following variables:
 ```CLASS_DEST``` if you used a different classpath when building the server.
 ```CONIKS_SERVERCONFIG``` if you're using a different config file
-```CONIKS_SERVERLOGS```
+```CONIKS_SERVERLOGS``` to store the server logs somewhere other than a *logs* directory
 
 ###Running
 We provide a run script for the CONIKS server *coniks_server.sh*, which allows you to run the server in

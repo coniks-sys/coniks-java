@@ -38,7 +38,8 @@ CLASS_DEST="bin" #change this if you built the server somewhere else
 CLASSPATH="-cp $CLASS_DEST"
 CLIENT_BIN="org.coniks.coniks_test_client.TestClient"
 CONIKS_CLIENTCONFIG="config"
-RUN_CONIKS="java $CLASSPATH $CLIENT_BIN $CONIKS_CLIENTCONFIG"
+CONIKS_CLIENTLOGS="logs"
+RUN_CONIKS="java $CLASSPATH $CLIENT_BIN $CONIKS_CLIENTCONFIG $CONIKS_CLIENTLOGS"
 
 if [ "$#" -lt 1 ]; then
     echo "Usage: $0 <server> [test]"
@@ -47,10 +48,20 @@ fi
 
 SERVER=$1
 
+ if [ ! -d "$CONIKS_CLIENTLOGS" ]; then
+        mkdir "$CONIKS_CLIENTLOGS"
+    fi
+
 if [ "$#" = 1 ]; then
+    echo "Starting up the CONIKS test client in full mode."
+    echo "All logs are in the $CONIKS_CLIENTLOGS directory."
+
     $RUN_CONIKS $SERVER "full"
 
 elif [ "$#" = 2 ]; then
+    echo "Starting up the CONIKS test client in test mode."
+    echo "All logs are in the $CONIKS_CLIENTLOGS directory."
+
     $RUN_CONIKS $SERVER $2
 
 else

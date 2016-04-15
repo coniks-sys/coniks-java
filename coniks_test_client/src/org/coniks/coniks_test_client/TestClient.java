@@ -44,6 +44,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.NumberFormatException;
 
+import com.google.protobuf.*;
+import org.coniks.coniks_common.C2SProtos.RegistrationResp;
+import org.coniks.coniks_common.C2SProtos.AuthPath;
+import org.coniks.coniks_common.UtilProtos.ServerResp;
+
 /** Implementation of a simple CONIKS test client
  * that simply displays how each component of the
  * protocol works.
@@ -58,18 +63,15 @@ public class TestClient {
 
     // Must be passed in as args to the client
     private static String configFileName;
+    private static String logPath;
     private static String server;
     private static boolean isFullOp;
-    private static final int NUM_ARGS = 3; // ha, don't forget to set this to the right number
+    private static final int NUM_ARGS = 4; // ha, don't forget to set this to the right number
 
     // since we're only creating dummy users, use this 
     // DSA-looking string as the test public key
     private static final String FAKE_PK_BASE = "(dsa \n (p #7712ECAF91762ED4E46076D846624D2A71C67A991D1FEA059593163C2B19690B1A5CA3C603F52A62D73BB91D521BA55682D38E3543CC34E384420AA32CFF440A90D28A6F54C586BB856460969C658B20ABF65A767063FE94A5DDBC2D0D5D1FD154116AE7039CC4E482DCF1245A9E4987EB6C91B32834B49052284027#)\n (q #00B84E385FA6263B26E9F46BF90E78684C245D5B35#)\n (g #77F6AA02740EF115FDA233646AAF479367B34090AEC0D62BA3E37F793D5CB995418E4F3F57F31612561A4BEA41FAC3EE05679D90D2F79A581905E432B85F4C109164EB7846DC9C3669B013D67063747ABCC4B07EAA4AC44D9DE9FC2A349859994DB683DFC7784D0F1DF1DA25014A40D8617E3EC94D8DB8FBBBC37A5C5AAEE5DC#)\n (y #4B41A8AA7B6F23F740DEF994D1A6582E00E4B821F65AC30BDC6710CD6111FA24DE70EACE6F4A92A84038D4B928D79F6A0DF35F729B861A6713BECC934309DE0822B8C9D2A6D3C0A4F0D0FB28A77B0393D72568D72EE60C73B2C5F6E4E1A1347EDC20AC449EFF250AC1C251E16403A610DB9EB90791E63207601714A786792835#)";
-    
-
-    // stores the latest response from the server if it's an error
-    private static ServerResp lastServerErr = null;
-
+   
     /** Creates a dummy public key which is a deterministic
      * function of the {@code username}.
      *
@@ -79,87 +81,114 @@ public class TestClient {
         return String.format(FAKE_PK_BASE, username);
     }
 
+    /** Returns the server error code corresponding to the
+     * given server response proto message.
+     *
+     *@param serverMsg the simple server message
+     *@return the error code corresponding to the simple server message
+     */
+    private static int getServerErr (ServerResp serverResp) {
+
+        ServerResp.Message respType = serverResp.getMessage();
+
+        int serverErr = ServerErr.SUCCESS;
+
+        switch(respType) {
+        case SUCCESS:
+            serverErr = ServerErr.SUCCESS;
+            break;
+        case NAME_EXISTS_ERR:
+            serverErr = ServerErr.NAME_EXISTS_ERR;
+            break;
+        case NAME_NOT_FOUND_ERR:
+            serverErr = ServerErr.NAME_NOT_FOUND_ERR;
+            break;
+        case MALFORMED_ERR:
+            serverErr = ServerErr.MALFORMED_CLIENT_MSG_ERR;
+            break;
+        case VERIFICATION_ERR:
+            serverErr = ServerErr.SIGNED_CHANGE_VERIF_ERR;;
+            break;
+        default:
+            serverErr = ServerErr.SERVER_ERR;
+            break;                
+        }
+
+        return serverErr;
+
+    }
+
     /** Perfoms the CONIKS registration protocol with {@code server}
      * for the dummy user {@code username}.
      *
-     *@return whether the registration succeeded or not.
+     *@return NO_ERR (0) if the registration was successful, an error code
+     * otherwise.
      */
-    public static boolean register (String username, String server) {
+    public static int register (String username, String server) {
         String pk = createPkFor(username);
         
         ConiksClient.sendRegistrationProto(username, pk, server);
         
         AbstractMessage serverMsg = ConiksClient.receiveRegistrationRespProto();
 
-        if (msg == null) {
-            return false;
+        if (serverMsg == null) {
+            return ServerErr.MALFORMED_SERVER_MSG_ERR;
         }
         else if (serverMsg instanceof ServerResp) {
-            lastServerErr = (ServerResp)serverMsg;
-            return false;
+            return getServerErr((ServerResp)serverMsg);
         }
-        
-        return true;
+        else {
+            // TODO: for now just return SUCCESS
+            // eventually we want to process the registration response
+            return ServerErr.SUCCESS;
+        }
+
     }
 
-    /** Perfoms the CONIKS public key lookup protocol with {@code server}
-     * for the dummy user {@code username}.
+    /** Looks up the public key for the given {@code username}
+     * at {@code server}, and verifies the returned proof of inclusion
+     * (authentication path)  if the name exists.
      *
-     *@return whether the lookup succeeded or not.
+     *@return NO_ERR (0) if the registration was successful, an error code
+     * otherwise.
      */
-    // TODO: eventually, I'm going to want to remove this function
-    public static boolean keyLookup (String username, String server) {
-        long epoch = System.currentTimeMillis();
-
-        ConiksClient.sendKeyLookupProto(username, epoch, server);
-        
-        AbstractMessage serverMsg = ConiksClient.receiveAuthPathProto();
-
-        if (msg == null) {
-            return false;
-        }
-        else if (serverMsg instanceof ServerResp) {
-            lastServerErr = (ServerResp)serverMsg;
-            return false;
-        }
-
-        return true;
-    }
-
-    /** Perfoms the data binding consistency check to
-     * verify a dummy user {@code username}'s public key after 
-     * lookup at {@code server}.
-     *
-     *@return whether the verification succeeded or not.
-     */
-    public static boolean doLookupVerification (String username, String server) {
+    public static int lookup (String username, String server) {
         long epoch = System.currentTimeMillis();
 
         ConiksClient.sendKeyLookupProto(username, epoch, server);
 
         AbstractMessage serverMsg = ConiksClient.receiveAuthPathProto();
 
-        if (msg == null) {
-            return false;
+        if (serverMsg == null) {
+            return ServerErr.MALFORMED_SERVER_MSG_ERR;
         }
         else if (serverMsg instanceof ServerResp) {
-            lastServerErr = (ServerResp)serverMsg;
-            return false;
+            return getServerErr((ServerResp)serverMsg);
         }
-        
-        int result = ConsistencyChecks.verifyDataBindingProto(, null);
+        else if (serverMsg instanceof AuthPath) {
+            AuthPath authPath = (AuthPath)serverMsg;
 
-        if (result != ConsistencyErr.NO_ERR) {
-            System.out.println("\nError: consistency error "+result);
-            return false;
+            // TODO, we'll want to get the latest STR here
+
+            // we got an auth path back, so verify it
+            int result = ConsistencyChecks.verifyDataBindingProto(authPath, null);
+
+            // TODO: we'll want to potentially store the looked up key
+            // if it checks out
+
+            return result;
         }
-        
-        return true;
+        else {
+            // we received some unexpected server message
+            // receiveAuthPathProto gave us back something bad
+            ConiksClient.clientLog.error("Got bad protobuf type from receiveAuthPath()");
+            return ClientUtils.INTERNAL_CLIENT_ERR;
+        }
 
     }
 
     /** Performs a key change by randomly changing the user's data-blob
-        and signing and sending a new changekey 
+     * and signing and sending a new changekey 
     */
     public static boolean doSignedKeyChange(String username, String server) {
         SignatureOps.initSignatureOps(ConiksClient.CONFIG);
@@ -182,7 +211,9 @@ public class TestClient {
 
     }
 
-    /** performs an unsigned key change. Should fail if the username previous required signed key changes */
+    /** performs an unsigned key change. Should fail if the username
+     * requires signed key changes. 
+     */
     public static boolean doUnsignedKeyChange(String username, String server) {
         String newBlob = "(unsigned changed: " + new BigInteger(50, new Random()).toString(32);
         KeyPair kp = KeyOps.generateDSAKeyPair();
@@ -221,41 +252,65 @@ public class TestClient {
     /** Prints the usage of the TestClient.
      */
     private static void usage() {
-        System.out.println("valid operations: REGISTER, LOOKUP, VERIFY, SIGNED, UNSIGNED, CHANGES, MIXED");
+        System.out.println("valid operations: REGISTER, LOOKUP, SIGNED, UNSIGNED, CHANGES, MIXED");
     }
 
-    /** Prints an error message for the given user and the given server error.
+    /** Template for an error message.
      *
-     *@param serverResp the server error for which to print the error message
+     *@param msg The error message to print.
+     */
+    private static void printErr (String msg) {
+        System.out.println("Error: "+msg);
+    }
+
+    /** Prints an error message for the given user and the given error code.
+     *
+     *@param err the error code for which to print the error message
      *@param uname the username for which the error occurred
      */
-    private static void printErr (ServerResp serverResp, String uname) {
+    private static void printErrMsg (int err, String uname) {
 
-        if (serverResp == null) {
-            System.out.println("Error: Some internal error occurred. Check logs for details.");
-            return;
-        }
-
-        ServerResp.Message respType = serverResp.getMessage();
-
-        switch(respType) {
-        case SUCCESS:
+        switch(err) {
+        case ServerErr.SUCCESS:
             // don't print anything for a successful operation
             break;
-        case NAME_EXISTS_ERR:
-            System.out.println("Error: Couldn't register the name "+uname+" because it already exists.");
+        case ConsistencyErr.CHECK_PASSED:
+            // don't print anything here either
             break;
-        case NAME_NOT_FOUND_ERR:
-            System.out.println("Error: Couldn't find the name "+uname+".");
+        case ClientUtils.INTERNAL_CLIENT_ERR:
+            printErr("Some internal client error occurred while processing user "+uname+". Check the logs for details.");
             break;
-        case MALFORMED_ERR:
-            System.out.println("Error: The server received a malformed message.");
+        case ServerErr.INTERNAL_SERVER_ERR:
+            printErr("The server experienced some internal error. Current user: "+uname);
             break;
-        case VERIFICATION_ERR:
-            System.out.println("Error: There was a verification error.");
+        case ServerErr.NAME_EXISTS_ERR:
+            printErr("Couldn't register the name "+uname+" because it already exists.");
+            break;
+        case ServerErr.NAME_NOT_FOUND_ERR:
+            printErr("Couldn't find the name "+uname+".");
+            break;
+        case ServerErr.MALFORMED_CLIENT_MSG_ERR:
+            printErr("The server received a malformed message for user "+uname);
+            break;
+        case ServerErr.MALFORMED_SERVER_MSG_ERR:
+            printErr("Received a malformed server message. Current user: "+uname);
+        case ServerErr.SIGNED_CHANGE_VERIF_ERR:
+            printErr("The server could not verify the signed data change for user "+uname+".");
+            break;
+        case ServerErr.SERVER_ERR:
+            printErr("Some other server error occurred. Current user: "+uname);
+            break;
+        case ConsistencyErr. BAD_BINDING_ERR:
+            printErr("Unexpected key for user "+uname+".");
+            break;
+        case ConsistencyErr.BAD_STR_ERR:
+            printErr("Inconsistent signed tree roots. Current user: "+uname);
+            break;
+        case ConsistencyErr.BAD_SERVER_SIG_ERR:
+            printErr("Could not verify the server's identity. Current user: "+uname);
             break;
         default:
-            System.out.println("Error: Some unknown server error occurred.");
+            printErr("Some unknown server error occurred.");
             break;                
         }
 
@@ -269,7 +324,6 @@ public class TestClient {
     private static boolean isValidOperation (String op) {
          if (op.equalsIgnoreCase("LOOKUP") || 
             op.equalsIgnoreCase("REGISTER") || 
-            op.equalsIgnoreCase("VERIFY") ||
             op.equalsIgnoreCase("SIGNED") || 
             op.equalsIgnoreCase("UNSIGNED") ||
             op.equalsIgnoreCase("CHANGES") ||
@@ -314,15 +368,14 @@ public class TestClient {
             }
 
             String uname = "test-"+(offset+i);
+
+            int error = 0;
             
             if(op.equalsIgnoreCase("LOOKUP")){
-                keyLookup(uname, server);
+                error = lookup(uname, server);
             }
             else if (op.equalsIgnoreCase("REGISTER")){
-                register(uname, server);
-            }
-            else if (op.equalsIgnoreCase("VERIFY")){                
-                doLookupVerification(uname, server);
+                error = register(uname, server);
             }
             else if (op.equalsIgnoreCase("SIGNED")) {
                 if (!doSignedKeyChange(uname, server)) {
@@ -346,7 +399,14 @@ public class TestClient {
                     System.out.println("An error occured");
                 }
             }
-            
+        
+            // if we got an error, print a new line so the error msg doesn't
+            // appear next to the progress dots
+            if (error != ServerErr.SUCCESS && error != ConsistencyErr.CHECK_PASSED) {
+                System.out.println();
+            }
+
+            printErrMsg(error, uname);
         }
         System.out.println(" done!");
     }
@@ -356,7 +416,7 @@ public class TestClient {
     public static void main(String[] args){
 
         if (args.length != NUM_ARGS) {
-            System.out.println("Need "+(NUM_ARGS-1)+" arguments: CONIKS_CLIENTCONFIG and SERVER");
+            System.out.println("Need "+(NUM_ARGS-1)+" arguments: CONIKS_CLIENTCONFIG CONIKS_CLIENTLOGS and SERVER");
             System.out.println("Check run script for more info.");
             System.exit(-1);
         }
@@ -366,13 +426,16 @@ public class TestClient {
             configFileName = args[0];
             configFile = new File(configFileName);
 
-            if (!configFile.exists()) {
+            logPath = args[1];
+            File logDir = new File(logPath);
+
+            if (!configFile.exists() || !logDir.isDirectory()) {
                 throw new FileNotFoundException();
             }
 
-            server = args[1];
+            server = args[2];
 
-            String opMode = args[2];
+            String opMode = args[NUM_ARGS-1];
             if (opMode.equalsIgnoreCase("full")) {
                 isFullOp = true;
             }
@@ -396,6 +459,9 @@ public class TestClient {
         if (!ConiksClient.CONFIG.readClientConfig(configFile, isFullOp)) {
             System.exit(-1);
         }
+
+        // setup the logging
+        ConiksClient.setupLogging(logPath);
 
         // set the client's operating mode
         ConiksClient.setOpMode(isFullOp);

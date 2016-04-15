@@ -66,6 +66,10 @@ public class TestClient {
     // DSA-looking string as the test public key
     private static final String FAKE_PK_BASE = "(dsa \n (p #7712ECAF91762ED4E46076D846624D2A71C67A991D1FEA059593163C2B19690B1A5CA3C603F52A62D73BB91D521BA55682D38E3543CC34E384420AA32CFF440A90D28A6F54C586BB856460969C658B20ABF65A767063FE94A5DDBC2D0D5D1FD154116AE7039CC4E482DCF1245A9E4987EB6C91B32834B49052284027#)\n (q #00B84E385FA6263B26E9F46BF90E78684C245D5B35#)\n (g #77F6AA02740EF115FDA233646AAF479367B34090AEC0D62BA3E37F793D5CB995418E4F3F57F31612561A4BEA41FAC3EE05679D90D2F79A581905E432B85F4C109164EB7846DC9C3669B013D67063747ABCC4B07EAA4AC44D9DE9FC2A349859994DB683DFC7784D0F1DF1DA25014A40D8617E3EC94D8DB8FBBBC37A5C5AAEE5DC#)\n (y #4B41A8AA7B6F23F740DEF994D1A6582E00E4B821F65AC30BDC6710CD6111FA24DE70EACE6F4A92A84038D4B928D79F6A0DF35F729B861A6713BECC934309DE0822B8C9D2A6D3C0A4F0D0FB28A77B0393D72568D72EE60C73B2C5F6E4E1A1347EDC20AC449EFF250AC1C251E16403A610DB9EB90791E63207601714A786792835#)";
     
+
+    // stores the latest response from the server if it's an error
+    private static ServerResp lastServerErr = null;
+
     /** Creates a dummy public key which is a deterministic
      * function of the {@code username}.
      *
@@ -85,10 +89,16 @@ public class TestClient {
         
         ConiksClient.sendRegistrationProto(username, pk, server);
         
-        if (ConiksClient.receiveRegistrationRespProto() == null) {
+        AbstractMessage serverMsg = ConiksClient.receiveRegistrationRespProto();
+
+        if (msg == null) {
             return false;
         }
-
+        else if (serverMsg instanceof ServerResp) {
+            lastServerErr = (ServerResp)serverMsg;
+            return false;
+        }
+        
         return true;
     }
 
@@ -103,7 +113,13 @@ public class TestClient {
 
         ConiksClient.sendKeyLookupProto(username, epoch, server);
         
-        if (ConiksClient.receiveAuthPathProto() == null) {
+        AbstractMessage serverMsg = ConiksClient.receiveAuthPathProto();
+
+        if (msg == null) {
+            return false;
+        }
+        else if (serverMsg instanceof ServerResp) {
+            lastServerErr = (ServerResp)serverMsg;
             return false;
         }
 
@@ -120,9 +136,18 @@ public class TestClient {
         long epoch = System.currentTimeMillis();
 
         ConiksClient.sendKeyLookupProto(username, epoch, server);
+
+        AbstractMessage serverMsg = ConiksClient.receiveAuthPathProto();
+
+        if (msg == null) {
+            return false;
+        }
+        else if (serverMsg instanceof ServerResp) {
+            lastServerErr = (ServerResp)serverMsg;
+            return false;
+        }
         
-        int result = ConsistencyChecks.verifyDataBindingProto(
-                                                              ConiksClient.receiveAuthPathProto(), null);
+        int result = ConsistencyChecks.verifyDataBindingProto(, null);
 
         if (result != ConsistencyErr.NO_ERR) {
             System.out.println("\nError: consistency error "+result);
@@ -197,6 +222,43 @@ public class TestClient {
      */
     private static void usage() {
         System.out.println("valid operations: REGISTER, LOOKUP, VERIFY, SIGNED, UNSIGNED, CHANGES, MIXED");
+    }
+
+    /** Prints an error message for the given user and the given server error.
+     *
+     *@param serverResp the server error for which to print the error message
+     *@param uname the username for which the error occurred
+     */
+    private static void printErr (ServerResp serverResp, String uname) {
+
+        if (serverResp == null) {
+            System.out.println("Error: Some internal error occurred. Check logs for details.");
+            return;
+        }
+
+        ServerResp.Message respType = serverResp.getMessage();
+
+        switch(respType) {
+        case SUCCESS:
+            // don't print anything for a successful operation
+            break;
+        case NAME_EXISTS_ERR:
+            System.out.println("Error: Couldn't register the name "+uname+" because it already exists.");
+            break;
+        case NAME_NOT_FOUND_ERR:
+            System.out.println("Error: Couldn't find the name "+uname+".");
+            break;
+        case MALFORMED_ERR:
+            System.out.println("Error: The server received a malformed message.");
+            break;
+        case VERIFICATION_ERR:
+            System.out.println("Error: There was a verification error.");
+            break;
+        default:
+            System.out.println("Error: Some unknown server error occurred.");
+            break;                
+        }
+
     }
 
     /** Checks whether the given operation is valid.

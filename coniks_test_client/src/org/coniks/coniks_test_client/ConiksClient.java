@@ -94,14 +94,6 @@ public class ConiksClient {
         System.setProperty("javax.net.ssl.keyStorePassword", CONFIG.PRIVATE_KEYSTORE_PWD);
     }
 
-    /** Prints out an error message.
-     *
-     *@param msg the error message to print out.
-     */
-    private static void printErr (String msg) {
-        System.out.println("\nError: "+msg);
-    }
-
     /* Functions for sending CONIKS messages to the server */
 
     /** Sends a Registration protobuf message with the given
@@ -285,14 +277,10 @@ public class ConiksClient {
 
         RegistrationResp regResp = null;
 
-        if (serverMsg == null || 
-            !((serverMsg instanceof RegistrationResp) || (serverMsg instanceof ServerResp))) {
-            printErr("Unexpected server response");
+        if (serverMsg instanceof ServerResp) {
+            regResp = (ServerResp)serverMsg;
         }
-        else if (serverMsg instanceof ServerResp) {
-            printServerRespMsgProto((ServerResp)serverMsg);
-        }
-        else {
+        else if (serverMsg instanceof RegistrationResp) {
             regResp = (RegistrationResp)serverMsg;
         }
         
@@ -312,14 +300,10 @@ public class ConiksClient {
 
         AuthPath authPath = null;
 
-        if (serverMsg == null || 
-            !((serverMsg instanceof AuthPath) || (serverMsg instanceof ServerResp))) {
-            printErr("Unexpected server response");
+        if (serverMsg instanceof ServerResp) {
+            authPath = (ServerResp)serverMsg;
         }
-        else if (serverMsg instanceof ServerResp) {
-            printServerRespMsgProto((ServerResp)serverMsg);
-        }
-        else {
+        else if (serverMsg instanceof AuthPath) {
             authPath = (AuthPath)serverMsg;
         }
         
@@ -339,14 +323,10 @@ public class ConiksClient {
 
         Commitment comm = null;
 
-        if (serverMsg == null || 
-            !((serverMsg instanceof Commitment) || (serverMsg instanceof ServerResp))) {
-            printErr("Unexpected server response");
+        if (serverMsg instanceof ServerResp) {
+            comm = (ServerResp)serverMsg;
         }
-        else if (serverMsg instanceof ServerResp) {
-            printServerRespMsgProto((ServerResp)serverMsg);
-        }
-        else {
+        else if (serverMsg instanceof Commitment) {
             comm = (Commitment)serverMsg;
         }
         
@@ -425,37 +405,6 @@ public class ConiksClient {
 
         // unexpected message type from the server
         return null;
-
-    }
-
-    /** Retrieves the simple server response message from 
-        {@code serverResp}
-     * and prints out an appropriate message to stdout.
-     */
-    private static void printServerRespMsgProto(ServerResp serverResp) {
-
-        ServerResp.Message respType = serverResp.getMessage();
-
-        switch(respType) {
-        case SUCCESS:
-            printErr("Server successful.");
-            break;
-        case NAME_EXISTS_ERR:
-            printErr("The name you tried to register already exists.");
-            break;
-        case NAME_NOT_FOUND_ERR:
-            printErr("The name you tried to look up could not be found.");
-            break;
-        case MALFORMED_ERR:
-            printErr("The message received by the server was malformed.");
-            break;
-        case VERIFICATION_ERR:
-            printErr("There was a verification error");
-            break;
-        default:
-            printErr("Some server error occurred.");
-            break;                
-        }
 
     }
 

@@ -113,7 +113,23 @@ public class ConiksServer{
     // logs are useful
     private static MsgHandlerLogger msgLog = null;
     private static TimerLogger timerLog = null;
-    private static ServerLogger serverLog = null;
+    public static ServerLogger serverLog = null;
+
+    /** Prints server status and error messages. 
+     * Used primarily for testing mode.
+     *
+     *@param isErr indicates whether this is an error message
+     *@param msg the status message to print
+     */
+    private static void printStatusMsg (boolean isErr, String msg) {
+        String status = msg;
+        if (isErr) {
+            status = "Error: "+status;
+        }
+
+        System.out.println(status);
+    }
+    
       
     /** Adds a new name-to-key binding ({@code uname}, {@code pk})
      * to the pending registrations queue.
@@ -219,7 +235,7 @@ public class ConiksServer{
 	    new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>(
 		16384, new ServerUtils.PrefixComparator());
 
-	serverLog.log("Beginning initNamespace()");
+        serverLog.log("Beginning initNamespace()");
 
         // At this point, if we're using a DB, we want to check if we already have
         // a commitment history stored in the DB
@@ -250,8 +266,13 @@ public class ConiksServer{
         initRoot = utb.extendTree(initUsers);
          
         if(initRoot == null) {
-            serverLog.error("An error occured while trying to build the initial tree");
-            throw new RuntimeException("initialization error.");
+            if (isFullOp) {
+                serverLog.error("An error occured while trying to build the initial tree");
+            }
+            else {
+                printStatusMsg(true, "An error occured while trying to build the initial tree");
+            }
+            return;
         }
         
         initUsers.clear();
@@ -259,14 +280,26 @@ public class ConiksServer{
         utb.clearTemps();
             
         byte[] commSig = ServerOps.generateSTR(initRoot);
-        serverLog.log("initial root epoch: "+initRoot.getEpoch()+"\n"+
-                      "comm sig: "+ServerUtils.bytesToHex(commSig));
-        serverLog.log("epoch len: " + CONFIG.EPOCH_INTERVAL);
+
+        if (isFullOp) {
+            serverLog.log("initial root epoch: "+initRoot.getEpoch()+"\n"+
+                          "comm sig: "+ServerUtils.bytesToHex(commSig));
+            serverLog.log("epoch len: " + CONFIG.EPOCH_INTERVAL);
+        }
+        else {
+            printStatusMsg(false, "initial root epoch: "+initRoot.getEpoch());
+            printStatusMsg(false, "epoch len: " + CONFIG.EPOCH_INTERVAL);
+        }
         curRecord = new ServerUtils.Record(initRoot,
                                            initRoot.getEpoch(), commSig, null);
-        // headRecord = curRecord;
         epochCounter++;
-        serverLog.log("Namespace initialized with "+size+" dummy users.");
+
+        if (isFullOp) {
+            serverLog.log("Namespace initialized with "+size+" dummy users.");
+        }
+        else {
+            printStatusMsg(false, "Namespace initialized with "+size+" dummy users.");
+        }
     }
     
     /** Adds the new root node {@code newRoot} and STR {@code str} 
@@ -444,11 +477,21 @@ public class ConiksServer{
             boolean isGood = updateHistory();
 
             if(isGood){
-                timerLog.log("Snapshot taken");
+                if (isFullOp) {
+                    timerLog.log("STR taken");
+                }
+                else {
+                    printStatusMsg(false, "Next epoch");
+                }
             }
             else{
                  // Need to figure out what to do in case it fails
-                timerLog.error("An error occurred while updating the history");
+                if (isFullOp) {
+                    timerLog.error("An error occurred while updating the history");
+                }
+                else {
+                    printStatusMsg(true, "An error occurred while updating the history");
+                }
                 throw new UnsupportedOperationException("Something went wrong in updateHistory()");
             }
         }
@@ -521,7 +564,12 @@ public class ConiksServer{
                 
             }
             catch(IOException e){
-                msgLog.error("Error connecting to client: "+e.getMessage());
+                if (isFullOp) {
+                    msgLog.error("Error connecting to client: "+e.getMessage());
+                }
+                else {
+                    printStatusMsg(true, "Error connecting to client: "+e.getMessage());
+                }
                 e.printStackTrace();
             }
 
@@ -597,10 +645,20 @@ public class ConiksServer{
                 }
             }
             catch (InvalidProtocolBufferException e) {
-                System.out.println("An error occurred while parsing a protobuf message");
+                if (isFullOp) {
+                    msgLog.error("parsing a protobuf message");
+                }
+                else {
+                    printStatusMsg(true, "parsing a protobuf message");
+                }
             }
             catch (IOException e) {
-                System.out.println("An error occurred while receiving data from the server");
+                 if (isFullOp) {
+                    msgLog.error("receiving data from client");
+                }
+                else {
+                    printStatusMsg(true, "receiving data from client");
+                }
             }
 
             // unexpected message type from the client
@@ -745,7 +803,7 @@ public class ConiksServer{
             DSAPublicKey newChangeKey = changeReq.hasNewChangeKey() ? SignatureOps.makeDSAPublicKeyFromParams(changeReq.getNewChangeKey()) : uln.getChangeKey();
             
             ulnChange(username, newBlob, newChangeKey, allowsUnsignedKC, allowsPublicLookup, changeReq.toByteArray(), sig);
-            ServerLogger.log("ulnChange: " + Arrays.toString(changeReq.toByteArray()));
+            serverLog.log("ulnChange: " + Arrays.toString(changeReq.toByteArray()));
             // If using a DB, insert the new user
 
             // Send a registration response so that the client knows when to check
@@ -767,8 +825,6 @@ public class ConiksServer{
             if(username.charAt(username.length()-1) == '/' ){
                 username = username.substring(0,username.length()-1);
             }
-
-
             
             ServerUtils.Record r = getRecord(curEpoch);
             RootNode root = r.getRoot();      
@@ -809,7 +865,7 @@ public class ConiksServer{
             int curOffset = 0;
             TreeNode runner = root;
             
-            msgLog.error("searching for: "+ServerUtils.bytesToHex(lookupIndex));
+            msgLog.log("searching for: "+ServerUtils.bytesToHex(lookupIndex));
 
             while (!(runner instanceof UserLeafNode)) {
 

@@ -48,8 +48,8 @@ import java.io.FileInputStream;
 public class ClientConfig{
 
     private final int PORT_IDX = 0;
-    private final int PRIVATE_KEYSTORE_PATH_IDX = 1;
-    private final int PRIVATE_KEYSTORE_PWD_IDX = 2;
+    private final int KEYSTORE_PATH_IDX = 1;
+    private final int KEYSTORE_PWD_IDX = 2;
     private final int TRUSTSTORE_PATH_IDX = 3;
     private final int TRUSTSTORE_PWD_IDX = 4;
 
@@ -58,10 +58,10 @@ public class ClientConfig{
     public int PORT;
 
     /** The path to the client's private DSA key */
-    public String PRIVATE_KEYSTORE_PATH;
+    public String KEYSTORE_PATH;
 
     /** The password to the client's private DSA key */
-    public String PRIVATE_KEYSTORE_PWD;
+    public String KEYSTORE_PWD;
 
     /** The path to the client's trusted certificate store
      */
@@ -76,10 +76,10 @@ public class ClientConfig{
      */
     public ClientConfig(){
         this.PORT = -1;
+        this.KEYSTORE_PATH = "";
+        this.KEYSTORE_PWD = "";
         this.TRUSTSTORE_PATH = "";
         this.TRUSTSTORE_PWD = "";
-        this.PRIVATE_KEYSTORE_PATH = "";
-        this.PRIVATE_KEYSTORE_PWD = "";
     }
 
      /** Set a {@link ConiksClient}'s configuration according to the parameters in
@@ -109,8 +109,8 @@ public class ClientConfig{
             in.close();
             
             this.PORT = Integer.parseInt(configs.get(PORT_IDX));
-            //this.PRIVATE_KEYSTORE_PATH = configs.get(PRIVATE_KEYSTORE_PATH_IDX);
-            //this.PRIVATE_KEYSTORE_PWD = configs.get(PRIVATE_KEYSTORE_PWD_IDX);
+            this.KEYSTORE_PATH = configs.get(KEYSTORE_PATH_IDX);
+            this.KEYSTORE_PWD = configs.get(KEYSTORE_PWD_IDX);
 
             // skip these if we're testing the client
             if (isFullOp) {

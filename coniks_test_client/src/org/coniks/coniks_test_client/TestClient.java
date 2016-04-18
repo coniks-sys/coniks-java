@@ -121,6 +121,8 @@ public class TestClient {
     /** Perfoms the CONIKS registration protocol with {@code server}
      * for the dummy user {@code username}.
      *
+     *@param username the dummy user to register
+     *@param server the CONIKS key server with which to register the name
      *@return NO_ERR (0) if the registration was successful, an error code
      * otherwise.
      */
@@ -149,6 +151,8 @@ public class TestClient {
      * at {@code server}, and verifies the returned proof of inclusion
      * (authentication path)  if the name exists.
      *
+     *@param username the dummy user whose key to look up
+     *@param server the CONIKS key server at which to lookup the key
      *@return NO_ERR (0) if the registration was successful, an error code
      * otherwise.
      */
@@ -190,7 +194,7 @@ public class TestClient {
     /** Performs a key change by randomly changing the user's data-blob
      * and signing and sending a new changekey 
     */
-    public static boolean doSignedKeyChange(String username, String server) {
+    public static int signedKeyChange(String username, String server) {
         SignatureOps.initSignatureOps(ConiksClient.CONFIG);
         DSAPrivateKey prKey = SignatureOps.unsafeLoadDSAPrivateKey(username);
         System.out.print(username + " : " + prKey + " ");

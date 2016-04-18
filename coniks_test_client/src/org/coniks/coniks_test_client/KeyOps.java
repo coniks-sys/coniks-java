@@ -34,9 +34,9 @@
 package org.coniks.coniks_test_client;
 
 import java.security.*;
-import java.security.interfaces.RSAPublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.RSAPublicKeySpec;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.DSAPrivateKey;
+import java.security.spec.DSAPublicKeySpec;
 import java.security.cert.CertificateException;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -51,6 +51,64 @@ import java.io.*;
  */
 public class KeyOps{
 
+    /** Load <i>this</i> CONIKS client's private key from the keystore
+     * indicated in the clients's configuration {@code config}.
+     *
+     *@return The client's private DSA key, or {@code null}
+     * in the case of an Exception.
+     */
+    public static DSAPrivateKey loadSigningKey(ClientConfig config){
+
+        KeyStore ks = null;
+        DSAPrivateKey myPrivateKey = null;
+
+        try{
+            ks = KeyStore.getInstance(KeyStore.getDefaultType());
+
+            // get user password and file input stream
+            char[] ks_password = config.KEYSTORE_PWD.toCharArray();
+            
+            FileInputStream fis = null;
+      
+            fis = new FileInputStream(config.KEYSTORE_PATH);
+            ks.load(fis, ks_password);
+
+            if(ks.isKeyEntry(config.NAME)){
+                KeyStore.ProtectionParameter protParam = 
+                    new KeyStore.PasswordProtection(ks_password);
+
+                KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
+                    ks.getEntry(config.NAME, protParam);
+                myPrivateKey = (DSAPrivateKey)pkEntry.getPrivateKey();
+            }
+            else{
+                throw new CertificateException();
+            }
+            fis.close();
+            return myPrivateKey;
+        }
+        catch(IOException e){
+            ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem loading the keystore");
+        }   
+        catch(NoSuchAlgorithmException e){
+            ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem with integrity check algorithm");
+        }
+        catch(CertificateException e){
+            ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem with the cert(s) in keystore");
+        }   
+        catch(KeyStoreException e){
+            ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem getting Keystore instance");
+        }
+        catch(UnrecoverableEntryException e){
+            ConiksClient.clientLog.error("KeyOps:loadSigningKey: specified protParam were insufficient or invalid");
+        }
+        return null;
+    }
+
+    /** Generates a DSA key pair for the client.
+     *
+     *@return the DSA key pair or null in case of an error
+     */
     public static KeyPair generateDSAKeyPair(){
 
         KeyPairGenerator kg;
@@ -73,6 +131,39 @@ public class KeyOps{
         return kp;
 
     } //ends generateKeyPair()
+
+    /** Saves the given key pair to the keystore. Generates an empty
+     * keystore if one doesn't exist.
+     *
+     *@param kp the key pair to be saved
+     */
+    public static void saveKeyPair(KeyPair kp) {
+        File ksFile = new File(config.KEYSTORE_PATH);
+
+        // generate an empty keystore if it doesn't exist
+        if (!ksFile.exists()) {
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+
+            // get user password and file input stream
+            char[] ksPassword = config.KEYSTORE_PWD.toCharArray();;
+            
+            try {
+                ks.load(null, ksPassword);
+            }
+            catch(IOException e){
+                ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem loading the keystore");
+            }   
+            catch(NoSuchAlgorithmException e){
+                ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem with integrity check algorithm");
+            }
+            catch(CertificateException e){
+                ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem with the cert(s) in keystore");
+            }
+        }
+        
+
+
+    }
 
     /** This is a really bad function that takes a string we assume contains a DSA key in 
         a poorly designed format, and returns the parameters if it can */

@@ -71,7 +71,7 @@ public class ClientConfig{
      */
     public String TRUSTSTORE_PWD;
 
-    /** Initializes a {@link ConiksClient}'s configuration with empty values.
+    /** Initializes a {@link ConiksClient}'s configuration with empty values for the fields.
      * The client must invoke {@link readClientConfig}, otherwise errors may occur.
      */
     public ClientConfig(){

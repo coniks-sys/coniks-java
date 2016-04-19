@@ -56,6 +56,8 @@ CLASSES = ./src/org/coniks/coniks_test_client/ClientConfig.java \
 	./src/org/coniks/coniks_test_client/ConiksClient.java \
 	./src/org/coniks/coniks_test_client/ConsistencyErr.java \
 	./src/org/coniks/coniks_test_client/ConsistencyChecks.java \
+	./src/org/coniks/coniks_test_client/KeyOps.java \
+	./src/org/coniks/coniks_test_client/SignatureOps.java \
 	./src/org/coniks/coniks_test_client/TestClient.java
 
 #

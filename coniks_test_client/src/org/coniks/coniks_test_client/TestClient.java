@@ -129,9 +129,9 @@ public class TestClient {
     public static int register (String username, String server) {
         String pk = createPkFor(username);
         
-        ConiksClient.sendRegistrationProto(username, pk, server);
+        ClientMessaging.sendRegistrationProto(username, pk, server);
         
-        AbstractMessage serverMsg = ConiksClient.receiveRegistrationRespProto();
+        AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();
 
         if (serverMsg == null) {
             return ServerErr.MALFORMED_SERVER_MSG_ERR;
@@ -159,9 +159,9 @@ public class TestClient {
     public static int lookup (String username, String server) {
         long epoch = System.currentTimeMillis();
 
-        ConiksClient.sendKeyLookupProto(username, epoch, server);
+        ClientMessaging.sendKeyLookupProto(username, epoch, server);
 
-        AbstractMessage serverMsg = ConiksClient.receiveAuthPathProto();
+        AbstractMessage serverMsg = ClientMessaging.receiveAuthPathProto();
 
         if (serverMsg == null) {
             return ServerErr.MALFORMED_SERVER_MSG_ERR;

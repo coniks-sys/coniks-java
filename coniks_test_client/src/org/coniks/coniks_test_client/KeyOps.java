@@ -140,29 +140,62 @@ public class KeyOps{
     public static void saveKeyPair(KeyPair kp) {
         File ksFile = new File(config.KEYSTORE_PATH);
 
-        // generate an empty keystore if it doesn't exist
-        if (!ksFile.exists()) {
-            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
-            // get user password and file input stream
-            char[] ksPassword = config.KEYSTORE_PWD.toCharArray();;
-            
-            try {
-                ks.load(null, ksPassword);
+        // get user password
+        char[] ksPassword = config.KEYSTORE_PWD.toCharArray();;
+
+        // File streams
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+
+        // load the keystore
+        try { 
+            // generate an empty keystore if it doesn't exist
+            if (!ksFile.exists()) {            
+                ks.load(fis, ksPassword);
             }
-            catch(IOException e){
-                ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem loading the keystore");
-            }   
-            catch(NoSuchAlgorithmException e){
-                ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem with integrity check algorithm");
+            else {
+                fis = new FileInputStream(ksFile);
+                ks.load(fis, ksPassword);
             }
-            catch(CertificateException e){
-                ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem with the cert(s) in keystore");
+
+            // save the private key
+            KeyStore.PrivateKeyEntry privKeyEntry = new KeyStore.PrivateKeyEntry(kp.getPrivate());
+
+            KeyStore.ProtectionParameter protParam = 
+                new KeyStore.PasswordProtection(ksPassword);
+
+            // for now, let's not store another entry if this client already has one
+            if (ks.getEntry(config.USERNAME+"-priv", protParam) != null) {
+                ConiksClient.clientLog.error("trying to override an existing private key");
+                break;
+            }
+
+            ks.setEntry(config.USERNAME+"-priv", privKeyEntry, protParam);
+
+            fos = FileOutputStream(ksFile);
+
+            ks.store(fos, ksPassword);
+        }
+        catch(IOException e){
+            ConiksClient.clientLog.error("");
+        }   
+        catch(NoSuchAlgorithmException e){
+            ConiksClient.clientLog.error("");
+        }
+        catch(CertificateException e){
+            ConiksClient.clientLog.error("");
+        }
+        finally {
+            if (fis != null) {
+                fis.close();
+            }
+            if (fos != null) {
+                fos.close();
             }
         }
-        
-
-
+     
     }
 
     /** This is a really bad function that takes a string we assume contains a DSA key in 

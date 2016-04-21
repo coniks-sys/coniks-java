@@ -71,6 +71,37 @@ public class TestClient {
     // since we're only creating dummy users, use this 
     // DSA-looking string as the test public key
     private static final String FAKE_PK_BASE = "(dsa \n (p #7712ECAF91762ED4E46076D846624D2A71C67A991D1FEA059593163C2B19690B1A5CA3C603F52A62D73BB91D521BA55682D38E3543CC34E384420AA32CFF440A90D28A6F54C586BB856460969C658B20ABF65A767063FE94A5DDBC2D0D5D1FD154116AE7039CC4E482DCF1245A9E4987EB6C91B32834B49052284027#)\n (q #00B84E385FA6263B26E9F46BF90E78684C245D5B35#)\n (g #77F6AA02740EF115FDA233646AAF479367B34090AEC0D62BA3E37F793D5CB995418E4F3F57F31612561A4BEA41FAC3EE05679D90D2F79A581905E432B85F4C109164EB7846DC9C3669B013D67063747ABCC4B07EAA4AC44D9DE9FC2A349859994DB683DFC7784D0F1DF1DA25014A40D8617E3EC94D8DB8FBBBC37A5C5AAEE5DC#)\n (y #4B41A8AA7B6F23F740DEF994D1A6582E00E4B821F65AC30BDC6710CD6111FA24DE70EACE6F4A92A84038D4B928D79F6A0DF35F729B861A6713BECC934309DE0822B8C9D2A6D3C0A4F0D0FB28A77B0393D72568D72EE60C73B2C5F6E4E1A1347EDC20AC449EFF250AC1C251E16403A610DB9EB90791E63207601714A786792835#)";
+
+    /** This client's configuration */
+    private static ClientConfig CONFIG;
+
+    /** List of coniks users - for now used for testing */
+    private static ConiksUser[] users;    
+
+    // logs are useful
+    public static ClientLogger clientLog = null;
+    
+    /** Sets the default truststore according to the {@link ClientConfig}.
+     * This is needed to set up SSL connections with a CONIKS server.
+     */
+    public void setDefaultTruststore() {
+        System.setProperty("javax.net.ssl.trustStore", 
+                           CONFIG.TRUSTSTORE_PATH);
+        System.setProperty("javax.net.ssl.trustStorePassword",
+                           CONFIG.TRUSTSTORE_PWD);
+        System.setProperty("javax.net.ssl.keyStore", CONFIG.PRIVATE_KEYSTORE_PATH);
+        System.setProperty("javax.net.ssl.keyStorePassword", CONFIG.PRIVATE_KEYSTORE_PWD);
+    }
+
+    /** Sets up the logging for the client.
+     *
+     *@param logPath the path where the logs are to be written
+     */
+    public static void  setupLogging(String logPath) {
+        clientLog = ClientLogger.getInstance(logPath+"/client-%g");
+    }
+
+        
    
     /** Creates a dummy public key which is a deterministic
      * function of the {@code username}.
@@ -119,17 +150,17 @@ public class TestClient {
     }
 
     /** Perfoms the CONIKS registration protocol with {@code server}
-     * for the dummy user {@code username}.
+     * for the dummy user {@code user}.
      *
-     *@param username the dummy user to register
+     *@param user the dummy user to register
      *@param server the CONIKS key server with which to register the name
      *@return NO_ERR (0) if the registration was successful, an error code
      * otherwise.
      */
-    public static int register (String username, String server) {
-        String pk = createPkFor(username);
+    public static int register (ConiksUser user, String server) {
+        String pk = createPkFor(user.getUsername());
         
-        ClientMessaging.sendRegistrationProto(username, pk, server);
+        ClientMessaging.sendRegistrationProto(user.getUsername(), pk, server);
         
         AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();
 
@@ -147,19 +178,19 @@ public class TestClient {
 
     }
 
-    /** Looks up the public key for the given {@code username}
+    /** Looks up the public key for the given {@code user}
      * at {@code server}, and verifies the returned proof of inclusion
      * (authentication path)  if the name exists.
      *
-     *@param username the dummy user whose key to look up
+     *@param user the dummy user whose key to look up
      *@param server the CONIKS key server at which to lookup the key
-     *@return NO_ERR (0) if the registration was successful, an error code
+     *@return NO_ERR (0) if the lookup was successful, an error code
      * otherwise.
      */
-    public static int lookup (String username, String server) {
+    public static int lookup (ConiksUser user, String server) {
         long epoch = System.currentTimeMillis();
 
-        ClientMessaging.sendKeyLookupProto(username, epoch, server);
+        ClientMessaging.sendKeyLookupProto(user.getUsername(), epoch, server);
 
         AbstractMessage serverMsg = ClientMessaging.receiveAuthPathProto();
 
@@ -192,9 +223,14 @@ public class TestClient {
     }
 
     /** Performs a key change by randomly changing the user's data-blob
-     * and signing and sending a new changekey 
-    */
-    public static int signedKeyChange(String username, String server) {
+     * and signing and sending the new key.
+     *
+     *@param user the dummy user whose key to change
+     *@param server the CONIKS key server
+     *@return NO_ERR (0) if the key change was successful, an error code
+     * otherwise.
+     */
+    public static int signedKeyChange(ConiksUser user, String server) {
         SignatureOps.initSignatureOps(ConiksClient.CONFIG);
         DSAPrivateKey prKey = SignatureOps.unsafeLoadDSAPrivateKey(username);
         System.out.print(username + " : " + prKey + " ");
@@ -355,7 +391,6 @@ public class TestClient {
             System.out.print("Performing "+op+" for users test-"+offset+" thru test-"+(offset+numUsers-1));
         }
 
-
         for (int i = 0; i < numUsers; i++){
             // this is just a nicety to give the user some sense of progress
             if (numUsers <= 5 && i == 0) {
@@ -415,6 +450,18 @@ public class TestClient {
         System.out.println(" done!");
     }
 
+     /** Sets the default truststore according to the {@link ClientConfig}.
+     * This is needed to set up SSL connections with a CONIKS server.
+     */
+    public static void setDefaultTruststore() {
+        System.setProperty("javax.net.ssl.trustStore", 
+                           CONFIG.TRUSTSTORE_PATH);
+        System.setProperty("javax.net.ssl.trustStorePassword",
+                           CONFIG.TRUSTSTORE_PWD);
+        System.setProperty("javax.net.ssl.keyStore", CONFIG.PRIVATE_KEYSTORE_PATH);
+        System.setProperty("javax.net.ssl.keyStorePassword", CONFIG.PRIVATE_KEYSTORE_PWD);
+    }
+
     /** Prompts the user to perform a CONIKS operation for one or more users.
      */
     public static void main(String[] args){
@@ -464,11 +511,8 @@ public class TestClient {
             System.exit(-1);
         }
 
-        // setup the logging
-        ConiksClient.setupLogging(logPath);
-
-        // set the client's operating mode
-        ConiksClient.setOpMode(isFullOp);
+        // set up logging
+        clientLog = ClientLogger.getInstance(logPath+"/client-%g");
 
         String cont = "y";
 

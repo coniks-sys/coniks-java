@@ -48,30 +48,35 @@ import java.nio.ByteBuffer;
 
 import org.javatuples.*;
 
-// TODO: Might want to separate this into more specialized classes
-// for consistency checks vs internal ops
-
-/** Implements all operations done by a CONIKS server
- * necessary for a CONIKS client to perform the consistency checks.
- * These include generating data binding proofs and signed tree roots (STR).
+/** Implements all transparency-related operations done by a 
+ * CONIKS server.
+ * These allow a CONIKS client to perform the consistency checks.
  * 
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Michael Rochlin
  */
-public class ServerOps{
+public class TransparencyOps{
 
-    /** Generates the STR from the root node {@code rn}.
+    /** Generates the STR from the root node {@code rn} for the epoch
+     * {@code ep}.
+     * Hashes the current STR, and computes the signature for the next STR.
      *
-     *@return The STR as a {@code byte[]}, or {@code null} in case of an error.
+     *@return The signed tree root, or {@code null} in case of an error.
      */
-    public static byte[] generateSTR(RootNode rn){
-	byte[] rootBytes = ServerUtils.convertRootNode(rn);
+    public static synchronized SignedTreeRoot generateSTR(RootNode rn, long ep){
+
+        long prevEpoch = ServerHistory.curSTR.getEpoch();
+
+        // generate the hash of the current STR to include is in the next
+        // STR as the previous STR hash
+        byte[] prevStrHash = ServerUtils.hash(ServerUtils.getSTRBytes(ServerHistory.curSTR));
+
+        byte[] strBytesPreSig = ServerUtils.getSTRBytesForSig(rn, ep, prevEpoch,
+                                                              prevStrHash);
+
+        byte[] sig = SignatureOps.sign(strBytesPreSig);
         
-        if (rootBytes == null) {
-            return null;
-        }
-        
-	return SignatureOps.sign(rootBytes);
+	return new SignedTreeRoot(rn, ep, prevEpoch, prevStrHash, sig, ServerHistory.curSTR);
     }
     
     /** Generates the authentication path protobuf message from the 
@@ -165,18 +170,6 @@ public class ServerOps{
                 subtree.addAllHash(subTreeHashList);
                 rootBuilder.setSubtree(subtree.build());
                 
-                byte[] prev = curNodeR.getPrev();
-                Hash.Builder prevHash = Hash.newBuilder();
-                ArrayList<Integer> prevHashList = ServerUtils.byteArrToIntList(prev);
-                if(prevHashList.size() != ServerUtils.HASH_SIZE_BYTES){
-                    ConiksServer.serverLog.error("Bad length of prev pointer hash: "+prevHashList.size());
-                    return null;
-                }
-                prevHash.setLen(prevHashList.size());
-                prevHash.addAllHash(prevHashList);
-                rootBuilder.setPrev(prevHash.build());
-                
-                rootBuilder.setEpoch(curNodeR.getEpoch());
                 authPath.setRoot(rootBuilder.build());
                 
                 curOffset++;
@@ -280,27 +273,6 @@ public class ServerOps{
         return utb.createNewTree(pendingQ, initRootHash, ep);
 
     }
-
-    // update the history by adding all new users to the hash tree and updating the tree
-    /** Builds the Merkle prefix tree for the next epoch after 
-     * with the pending registrations in {@code pendingQ}, the current epoch's
-     * root node {@code curRoot}, the current epoch {@code ep},
-     * and the epoch interval {@code epInt}.
-     *
-     *@return The {@link RootNode} for the next epoch or {@code null} in case of an error.
-     */
-    public static RootNode buildNextEpochTree(
-                                              PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
-					      RootNode curRoot, 
-					      long ep, int epInt){
-
-	UserTreeBuilder utb = UserTreeBuilder.getInstance();
-	
-        // curRoot will become the next epoch's prev so we need to pass current root 
-        // hash to buildTree()
-        byte[] rootBytes = ServerUtils.convertRootNode(curRoot);
-	return utb.copyExtendTree(curRoot, ServerUtils.hash(rootBytes), pendingQ, 
-				     ep + epInt);
-    }
+    
 
 } //ends ServerOps class

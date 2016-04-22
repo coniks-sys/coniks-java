@@ -71,10 +71,6 @@ import com.google.protobuf.*;
 
 import java.util.Arrays;
 
-// TODO: Clean this up and structure more like client:
-// separate "networking" from other functionality
-// such as STR generation.
-
 /** Implements the main CONIKS server operations:
  * interface to client, initiates Merkle tree rebuilding
  * and signed tree root (STR) generation.
@@ -92,7 +88,7 @@ public class ConiksServer{
     private static final int NUM_ARGS = 4; // ha, don't forget to set this to the right number
 
     // These configuration settings are now set in main
-    private static ServerConfig CONFIG; 
+    public static ServerConfig CONFIG; 
     private static long curEpoch;
 
     //points to the head of the history list (newest record first)
@@ -103,12 +99,6 @@ public class ConiksServer{
     private static long initEpoch;
     
     private static int epochCounter = 0; 
-
-    // this is a counter to be used to sort the uln changes so they happen in-order for the same person
-    private static long ulnCounter = 0;
-
-    // keeps all the new users on a day-by-day basis
-    private static PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQueue;   
 
     // logs are useful
     private static MsgHandlerLogger msgLog = null;
@@ -129,26 +119,8 @@ public class ConiksServer{
 
         System.out.println(status);
     }
-    
       
-    /** Adds a new name-to-key binding ({@code uname}, {@code pk})
-     * to the pending registrations queue.
-     */
-    public static synchronized void register(String uname, String pk){            
-        byte[] index = ServerUtils.unameToIndex(uname);
-        UserLeafNode uln = new UserLeafNode(uname, pk, curEpoch+CONFIG.EPOCH_INTERVAL, 0, true, true, null, index);
-        pendingQueue.add(Triplet.with(index, uln, (Operation)new Register()));
-    }
-
-    // Adds a ulnChange to the queue with the arguments
-    public static synchronized void ulnChange(String uname, String newKey, DSAPublicKey kPrime, 
-        boolean allowsUnsignedKC, boolean allowsPublicLookup, 
-        byte[] msg, byte[] sig) {
-        byte[] index = ServerUtils.unameToIndex(uname);
-        UserLeafNode uln = new UserLeafNode(uname, newKey, curEpoch+CONFIG.EPOCH_INTERVAL, 0, true, true, kPrime, index);
-        pendingQueue.add(Triplet.with(index, uln, 
-            (Operation)new KeyChange(newKey, kPrime, allowsUnsignedKC, allowsPublicLookup, msg, sig, curEpoch, epochCounter++)));
-    }
+   
     
     /** Updates the server's STR history: inserts any pending registrations 
      * into the Merkle tree, takes a new snapshot of the whole directory,
@@ -161,9 +133,7 @@ public class ConiksServer{
       boolean isGoodExit = true; // the exit status
       RootNode newRoot = null;
 
-    	int toAdd = pendingQueue.size();
-    	long timeUpdateStart = System.nanoTime();
-      // msm: these two cases can probably be condensed
+        // msm: these two cases can probably be condensed
         if(curRecord != null){
             ServerUtils.Record r = curRecord;
             curRoot = r.getRoot();
@@ -181,7 +151,7 @@ public class ConiksServer{
         }
         else {
             // we are in our first epoch
-            // we add epoch_interval since we publish an hour after the current epoch
+            // we add epoch_interval since we publish after the current epoch
             newRoot = ServerOps.buildFirstEpochTree(pendingQueue, 
                                                     ServerUtils.hash(new byte[10]), 
                                                     curEpoch+CONFIG.EPOCH_INTERVAL);
@@ -300,47 +270,6 @@ public class ConiksServer{
         else {
             printStatusMsg(false, "Namespace initialized with "+size+" dummy users.");
         }
-    }
-    
-    /** Adds the new root node {@code newRoot} and STR {@code str} 
-     * as a "record" in the linked 
-     * list representing the STR hash chain. This function is usually
-     * called after updating the Merkle tree.
-     */
-    private static synchronized void addNewRecord(RootNode newRoot, byte[] str) {
-        
-        ServerUtils.Record newRecord = new ServerUtils.Record(newRoot, 
-                                                              curEpoch, str, curRecord);
-      	if (curRecord != null){
-      	    // let's not keep more than one back in memory
-      	    curRecord.setPrev(null);
-      	}
-
-        // reassign pointer
-        curRecord = newRecord;	
-    }
-
-    /** Retrieves the "record" for epoch {@code ep} from the linked
-     * list representing the STR hash chain.
-     *
-     *@return The record for epoch {@code ep}.
-     *@throws An {@code UnsupportedOperationException} in case the 
-     * head of the list is reached before the requested record is found.
-     */
-    public static synchronized ServerUtils.Record getRecord(long ep){
-        ServerUtils.Record runner = curRecord;
-        
-        while(runner.getRoot().getEpoch() > ep && runner != null){                
-                // need to check if we reached the head of the list
-                if (runner.getPrev() == null) {
-                    throw new UnsupportedOperationException("reached the head of the list!");
-                }
-                else{
-                    runner = runner.getPrev();
-                }
-        }
-        
-        return runner;
     }
     
     /** Sets up several configurations and begins listening for

@@ -68,8 +68,6 @@ message ServerResp{
 message CompleteRootNode{
         optional Hash left = 1;
         optional Hash right = 2;
-        optional Hash prev = 3;
-        optional uint64 epoch = 4;
 }  
 
 // this is the format of commitments that servers exchange

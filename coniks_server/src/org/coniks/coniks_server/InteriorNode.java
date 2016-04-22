@@ -156,13 +156,13 @@ public class InteriorNode extends TreeNode implements Serializable {
      * rebuilding process at the beginning of every epoch.
      *@return The cloned interior node.
      */
-    public TreeNode clone(TreeNode parent, long ep0, long ep1){
+    public TreeNode clone(TreeNode parent){
 	InteriorNode cloneN = new InteriorNode(null, null, parent, this.level, 
 					       this.leftHash, this.rightHash, false);
 	if (this.left != null)
-	    cloneN.left = this.left.clone(cloneN, ep0, ep1);
+	    cloneN.left = this.left.clone(cloneN);
 	if (this.right != null)
-	    cloneN.right = this.right.clone(cloneN, ep0, ep1);
+	    cloneN.right = this.right.clone(cloneN);
 	
 	return cloneN;
 

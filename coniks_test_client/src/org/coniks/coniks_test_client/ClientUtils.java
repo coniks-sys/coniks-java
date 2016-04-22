@@ -106,7 +106,7 @@ public class ClientUtils{
 
 	}
 	catch(NoSuchAlgorithmException e){
-	    ConiksClient.clientLog.error("SHA-256 is not a valid algorithm for some reason");
+	    ClientLogger.error("SHA-256 is not a valid algorithm for some reason");
 	}
 
 	return null; // should never get here
@@ -137,7 +137,7 @@ public class ClientUtils{
 
 	}
 	catch(NoSuchAlgorithmException e){
-	    ConiksClient.clientLog.error("SHA-256 is not a valid algorithm for some reason");
+	    ClientLogger.error("SHA-256 is not a valid algorithm for some reason");
 	}
 
 	return null; // should never get here
@@ -386,7 +386,7 @@ public class ClientUtils{
             AuthPath.InteriorNode in = inList.get(i);
             
             if(!in.hasPrunedchild() && !in.hasSubtree()){
-                ConiksClient.clientLog.error("No pruned child at level: "+i);
+                ClientLogger.error("No pruned child at level: "+i);
                 return null;
             }
             
@@ -395,7 +395,7 @@ public class ClientUtils{
             ArrayList<Integer> pcHashList = new ArrayList<Integer>(pcHash.getHashList());
 
             if(pcHashList.size() != ClientUtils.HASH_SIZE_BYTES){
-                ConiksClient.clientLog.error("Bad hash length");
+                ClientLogger.error("Bad hash length");
                 return null;
             }
 
@@ -429,7 +429,7 @@ public class ClientUtils{
         ArrayList<Integer> pcHashList = new ArrayList<Integer>(pcHash.getHashList());
         
         if(pcHashList.size() != ClientUtils.HASH_SIZE_BYTES){
-            ConiksClient.clientLog.error("Bad hash length");
+            ClientLogger.error("Bad hash length");
             return null;
         }
         
@@ -437,25 +437,8 @@ public class ClientUtils{
         for(int j = 0; j < pcHashList.size(); j++){
             prunedChild[j] = pcHashList.get(j).byteValue();
         }
-        
-        Hash prevHashProto = root.getPrev();
-        ArrayList<Integer> prevHashList = new ArrayList<Integer>(
-                                                                 prevHashProto.getHashList());
 
-         if(prevHashList.size() != ClientUtils.HASH_SIZE_BYTES){
-            ConiksClient.clientLog.error("Bad prev hash length");
-            return null;
-        }
-        
-        byte[] prevHash = new byte[ClientUtils.HASH_SIZE_BYTES];
-        for(int j = 0; j < prevHashList.size(); j++){
-            prevHash[j] = prevHashList.get(j).byteValue();
-        }
-
-        byte[] ep = longToBytes(root.getEpoch());
-
-        byte[] rootBytes = new byte[authPathHash.length+prunedChild.length+
-                                    prevHash.length+ep.length];
+        byte[] rootBytes = new byte[authPathHash.length+prunedChild.length];
 	
 	ByteBuffer arr = ByteBuffer.wrap(rootBytes);
 
@@ -467,9 +450,6 @@ public class ClientUtils{
             arr.put(authPathHash);
             arr.put(prunedChild);
         }
-
-	arr.put(prevHash);
-	arr.put(ep);
 
         return arr.array();
     }

@@ -31,12 +31,29 @@
   POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.coniks.coniks_server;
+package org.coniks.coniks_common;
 
-/** This class is subclassed for all different kinds of operations 
+import java.io.IOException;
+import java.io.Closeable;
+
+/** Messaging related functions common to the CONIKS
+ * server and client.
  *
- *@author Michael Rochlin
-*/
-public abstract class Operation {
-    public long epoch;
+ *@author Marcela S. Melara (melara@cs.princeton.edu)
+ */
+public class CommonMessaging {
+
+    /** Closes the closeable object {@code c}
+     */
+    public static void close(Closeable c) {
+        if (c != null) {
+            try {
+                c.close();
+            }
+            catch (IOException e) {
+                // ugh, do nothing
+            }
+        }
+    }
+
 }

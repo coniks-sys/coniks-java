@@ -54,15 +54,6 @@ import java.util.Arrays;
  */
 public class SignatureOps{
 
-    private static ServerConfig CONFIG = null;
-
-    /** Initialize the signature operations with the
-     * server configuration {@code config}.
-     */
-    public static void initSignatureOps(ServerConfig config){
-        CONFIG = config;
-    }
-
     /** Digitally sign the {@code input}.
      *
      *@return The {@code byte[]} containing the digital signature
@@ -72,7 +63,7 @@ public class SignatureOps{
      */
     public static byte[] sign(byte[] input) {
 
-        RSAPrivateKey MY_PRIV_KEY = KeyOps.loadSigningKey(CONFIG);
+        RSAPrivateKey MY_PRIV_KEY = KeyOps.loadSigningKey();
 
 	byte[] signed = null;
 
@@ -109,7 +100,7 @@ public class SignatureOps{
      */
     public static boolean verifySig(byte[] msg, byte[] signature, String keyOwner){
 
-        RSAPublicKey pubKey = KeyOps.loadPublicKey(CONFIG, keyOwner);
+        RSAPublicKey pubKey = KeyOps.loadPublicKey(keyOwner);
 
 	try{
 

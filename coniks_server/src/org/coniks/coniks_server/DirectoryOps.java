@@ -1,9 +1,51 @@
+/*
+  Copyright (c) 2016, Princeton University.
+  All rights reserved.
+  
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are 
+  met:
+  * Redistributions of source code must retain the above copyright 
+  notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above 
+  copyright notice, this list of conditions and the following disclaimer 
+  in the documentation and/or other materials provided with the 
+  distribution.
+  * Neither the name of Princeton University nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.coniks.coniks_server;
+
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.interfaces.DSAParams;
+import java.util.PriorityQueue;
+
+import org.javatuples.*;
 
 public class DirectoryOps {
 
     // keeps all the operations pending to be inserted into the directory
-    private static PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQueue;   
+    private static PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQueue =
+        new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>( 
+                                                                    16384, new ServerUtils.PrefixComparator());;   
 
     // this is a counter to be used to sort the uln changes so they happen in-order for the same person
     private static long ulnCounter = 0;
@@ -13,7 +55,7 @@ public class DirectoryOps {
      */
     public static synchronized void register(String uname, String pk){            
         byte[] index = ServerUtils.unameToIndex(uname);
-        UserLeafNode uln = new UserLeafNode(uname, pk, curEpoch+CONFIG.EPOCH_INTERVAL, 0, true, true, null, index);
+        UserLeafNode uln = new UserLeafNode(uname, pk, ServerHistory.nextEpoch(), 0, true, true, null, index);
         pendingQueue.add(Triplet.with(index, uln, (Operation)new Register()));
     }
 
@@ -24,68 +66,60 @@ public class DirectoryOps {
         boolean allowsUnsignedKC, boolean allowsPublicLookup, 
         byte[] msg, byte[] sig) {
         byte[] index = ServerUtils.unameToIndex(uname);
-        UserLeafNode uln = new UserLeafNode(uname, newKey, curEpoch+CONFIG.EPOCH_INTERVAL, 0, true, true, kPrime, index);
-        pendingQueue.add(Triplet.with(index, uln, 
-            (Operation)new KeyChange(newKey, kPrime, allowsUnsignedKC, allowsPublicLookup, msg, sig, curEpoch, epochCounter++)));
+        UserLeafNode uln = new UserLeafNode(uname, newKey, ServerHistory.nextEpoch(), 0, true, true, kPrime, index);
+        KeyChange change = new KeyChange(newKey, kPrime, allowsUnsignedKC, allowsPublicLookup, msg, sig, ServerHistory.nextEpoch(), 0);
+        pendingQueue.add(Triplet.with(index, uln, (Operation)change));
     }
 
-    /** Searches for the username {@code uname} in the key directory.
+    /** Searches for the username {@code uname} in the current version of the
+     * key directory.
      *
      *@return the user's entry in the directory or null if the name can't be found.
      */
     public static synchronized UserLeafNode findUser(String uname) {
-        RootNode root = ServerHistory.curSTR.getRoot();
+        RootNode root = ServerHistory.getCurTree();
         
-        return getUlnFromTree(name, root);
+        return getUlnFromTree(uname, root);
+    }
+
+     /** Searches for the username {@code uname} in the key directory.
+     *
+     *@return the user's entry in the directory or null if the name can't be found.
+     */
+    public static synchronized UserLeafNode findUserInEpoch(String uname, long ep) {
+        SignedTreeRoot str = ServerHistory.getSTR(ep);
+        RootNode root = str.getRoot(); 
+
+        return getUlnFromTree(uname, root);
     }
 
     /** Goes through the pending queue and updates the key directory
      * according to the pending operations.
-     * This function is called at the end of the new epoch.
+     * This function is called at the beginning of the new epoch.
      */
-    public static synchronized void updateDirectory() {
+    public static synchronized RootNode updateDirectory() {
   
         // this should never be the case
-        if(ServerHistory.curSTR == null){
+        if(ServerHistory.getCurSTR() == null){
             ConiksServer.serverLog.error("Trying to update a server without a history.");
-            return;
+            return null;
         }
         
-        RootNode curRoot = ServerHistory.curSTR.getRoot();
-        long curEpoch = ServerHistory.curSTR.getEpoch();
+        RootNode curRoot = ServerHistory.getCurTree();
+        long curEpoch = ServerHistory.getCurEpoch();
 
-        RootNode newRoot = buildNextEpochTree(pendingQueue, curRoot,
-                                               curEpoch, ConiksServer.CONFIG.EPOCH_INTERVAL);
+        RootNode newRoot = TreeBuilder.copyExtendTree(curRoot, pendingQueue);
 
 	// it's safe to clear the pending queue.
 	pendingQueue.clear();
-    }
 
-    /** Builds the Merkle prefix tree for the next epoch after 
-     * with the pending registrations in {@code pendingQ}, the current epoch's
-     * root node {@code curRoot}, the current epoch {@code ep},
-     * and the epoch interval {@code epInt}.
-     *
-     *@return The {@link RootNode} for the next epoch or {@code null} in case of an error.
-     */
-    private static RootNode buildNextEpochTree(
-                                              PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
-					      RootNode curRoot, 
-					      long ep, int epInt){
-
-	UserTreeBuilder utb = UserTreeBuilder.getInstance();
-	
-        // curRoot will become the next epoch's prev so we need to pass current root 
-        // hash to buildTree()
-        byte[] rootBytes = ServerUtils.convertRootNode(curRoot);
-	return utb.copyExtendTree(curRoot, ServerUtils.hash(rootBytes), pendingQ, 
-				     ep + epInt);
+        return newRoot;
     }
 
     // traverses down the tree until we reach the requested user leaf node
     // msm: this pretty much repeats the traversal in ServerOps.generateAuthPathProto
     // so we should really find a way to remove this redundancy
-    private synchronized UserLeafNode getUlnFromTree(String username,
+    private static synchronized UserLeafNode getUlnFromTree(String username,
                                                      RootNode root) {
         
         // traverse based on lookup index for this name
@@ -94,9 +128,7 @@ public class DirectoryOps {
         // not worth doing this recursively
         int curOffset = 0;
         TreeNode runner = root;
-        
-        msgLog.log("searching for: "+ServerUtils.bytesToHex(lookupIndex));
-        
+                
         while (!(runner instanceof UserLeafNode)) {
             
             // direction here is going to be false = left,

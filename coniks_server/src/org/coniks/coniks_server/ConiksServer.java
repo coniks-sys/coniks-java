@@ -48,16 +48,13 @@ import org.coniks.coniks_common.UtilProtos.*;
 
 import java.security.interfaces.DSAPublicKey;
 
-import java.io.*;
-import java.net.*;
-import javax.net.ssl.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.PriorityQueue;
 import java.util.Timer;
+import java.util.PriorityQueue;
 import java.util.TimerTask;
 import java.util.Date;
 import java.util.Scanner;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.lang.NumberFormatException;
@@ -66,9 +63,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 
-import org.javatuples.*;
 import com.google.protobuf.*;
-
+import org.javatuples.*;
 import java.util.Arrays;
 
 /** Implements the main CONIKS server operations:
@@ -87,120 +83,22 @@ public class ConiksServer{
     private static boolean isFullOp;
     private static final int NUM_ARGS = 4; // ha, don't forget to set this to the right number
 
-    // These configuration settings are now set in main
-    public static ServerConfig CONFIG; 
-    private static long curEpoch;
-
-    //points to the head of the history list (newest record first)
-    private static ServerUtils.Record curRecord = null; 
     private static int providerID; // meant to be SP ID to identify different SP's quickly
     private static Timer epochTimer = new Timer("epoch timer", false); // may wish to run as daemon later
 
     private static long initEpoch;
-    
-    private static int epochCounter = 0; 
 
     // logs are useful
-    private static MsgHandlerLogger msgLog = null;
+    public static MsgHandlerLogger msgLog = null;
     private static TimerLogger timerLog = null;
     public static ServerLogger serverLog = null;
 
-    /** Prints server status and error messages. 
-     * Used primarily for testing mode.
-     *
-     *@param isErr indicates whether this is an error message
-     *@param msg the status message to print
-     */
-    private static void printStatusMsg (boolean isErr, String msg) {
-        String status = msg;
-        if (isErr) {
-            status = "Error: "+status;
-        }
-
-        System.out.println(status);
-    }
-      
-   
-    
-    /** Updates the server's STR history: inserts any pending registrations 
-     * into the Merkle tree, takes a new snapshot of the whole directory,
-     * and adds a new link to the hash chain.
-     *
-     *@return {@code true} if the update succeeded, {@code false} otherwise.
-     */
-    public static synchronized boolean updateHistory(){
-      RootNode curRoot = null;
-      boolean isGoodExit = true; // the exit status
-      RootNode newRoot = null;
-
-        // msm: these two cases can probably be condensed
-        if(curRecord != null){
-            ServerUtils.Record r = curRecord;
-            curRoot = r.getRoot();
-
-            // this is just for debugging
-            byte[] rootBytes = ServerUtils.convertRootNode(curRoot);
-
-            timerLog.log("Root hash "+
-                             ServerUtils.bytesToHex(ServerUtils.hash(rootBytes))
-                           +"\n Prev: "+ServerUtils.bytesToHex(curRoot.getPrev()));
-            
-            newRoot = ServerOps.buildNextEpochTree(pendingQueue, curRoot,
-                                                   curEpoch, CONFIG.EPOCH_INTERVAL);
-	    
-        }
-        else {
-            // we are in our first epoch
-            // we add epoch_interval since we publish after the current epoch
-            newRoot = ServerOps.buildFirstEpochTree(pendingQueue, 
-                                                    ServerUtils.hash(new byte[10]), 
-                                                    curEpoch+CONFIG.EPOCH_INTERVAL);
-        }
-
-	// it's safe to clear the pending queue.
-	pendingQueue.clear();
-
-        if(newRoot != null){
-            // now we can sign the new STR
-            byte[] commSig = ServerOps.generateSTR(newRoot);
-            
-            if(commSig == null){
-                return false;
-            }
-
-            // increment curEpoch for the new record
-            curEpoch+=CONFIG.EPOCH_INTERVAL;
-
-            // reset the uln counter
-            ulnCounter = 0;
-            
-            // add the new STR to the linked list
-            addNewRecord(newRoot, commSig);
-
-            epochCounter++;
-                
-            byte[] rootBytes = ServerUtils.convertRootNode(newRoot);
-
-            // At this point, the new root should be stored in a DB
-            
-            timerLog.log("Root hash " +
-                         ServerUtils.bytesToHex(ServerUtils.hash(rootBytes)));
-            
-            return isGoodExit;
-            
-        }
-        else {
-            return false;
-        }
-    }
-
-    /** Initialize the namespace: get the latest STR and root node from the 
-     * database (if using one) and update the namespace internally (i.e. build the hash tree)
-     * Because users are stored in lexicographic order, we can simply load them all at once, 
-     * and load the appropriate previous root hash and epoch number from the db.
+    /** Initialize the directory: get the latest root node from the 
+     * database (if using one) and update the directory internally (i.e. build the hash tree)
+     * Because users are stored in lexicographic order, we can simply load them all at once.
      * N.B. Designed for few restarts in mind.
      */
-    private static void initNamespace(){
+    private static RootNode initDirectory(){
 	PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> initUsers = 
 	    new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>(
 		16384, new ServerUtils.PrefixComparator());
@@ -211,15 +109,10 @@ public class ConiksServer{
         // a commitment history stored in the DB
         // if so, retrieve the latest commitment and root node stored in the DB
      
-        // for demo purposes we're just going to create a bunch of dummy users 
-
-        initEpoch = curEpoch;
-	
+        // for demo purposes we're just going to create a bunch of dummy users 	
         long handled = 0;
         long size = initNumUsers;
         long batchSize = size/10; // unused right now, but it's here for future versions
-        UserTreeBuilder utb = ServerOps.startBuildInitTree(ServerUtils.hash(new byte[10]), 
-                                                           initEpoch);
         
         RootNode initRoot = null;    
         // add <size> dummy users
@@ -233,43 +126,18 @@ public class ConiksServer{
             initUsers.add(Triplet.with(index, uln, (Operation)new Register()));
             
         }
-        initRoot = utb.extendTree(initUsers);
-         
-        if(initRoot == null) {
-            if (isFullOp) {
-                serverLog.error("An error occured while trying to build the initial tree");
-            }
-            else {
-                printStatusMsg(true, "An error occured while trying to build the initial tree");
-            }
-            return;
-        }
+        initRoot = TreeBuilder.copyExtendTree(null, initUsers);
         
         initUsers.clear();
 
-        utb.clearTemps();
-            
-        byte[] commSig = ServerOps.generateSTR(initRoot);
-
         if (isFullOp) {
-            serverLog.log("initial root epoch: "+initRoot.getEpoch()+"\n"+
-                          "comm sig: "+ServerUtils.bytesToHex(commSig));
-            serverLog.log("epoch len: " + CONFIG.EPOCH_INTERVAL);
+            serverLog.log("Directory initialized with "+size+" dummy users.");
         }
         else {
-            printStatusMsg(false, "initial root epoch: "+initRoot.getEpoch());
-            printStatusMsg(false, "epoch len: " + CONFIG.EPOCH_INTERVAL);
+            ServerUtils.printStatusMsg(false, "Directory initialized with "+size+" dummy users.");
         }
-        curRecord = new ServerUtils.Record(initRoot,
-                                           initRoot.getEpoch(), commSig, null);
-        epochCounter++;
 
-        if (isFullOp) {
-            serverLog.log("Namespace initialized with "+size+" dummy users.");
-        }
-        else {
-            printStatusMsg(false, "Namespace initialized with "+size+" dummy users.");
-        }
+        return initRoot;
     }
     
     /** Sets up several configurations and begins listening for
@@ -321,45 +189,57 @@ public class ConiksServer{
             System.out.println("The path you entered for CONIKS_SERVERCONFIG or CONIKS_SERVERLOGS doesn't exist.");
             System.exit(-1);
         }
-
-        // read in the server config
-        CONFIG = new ServerConfig();
         
         // false indictaes an error, so exit
-        if (!CONFIG.readServerConfig(configFile, isFullOp)) {
+        if (!ServerConfig.readServerConfig(configFile, isFullOp)) {
             System.exit(-1);
         }
         
         // set some more configs
-        curEpoch = CONFIG.STARTUP_TIME;
+        initEpoch = ServerConfig.STARTUP_TIME;
         msgLog = MsgHandlerLogger.getInstance(logPath+"/msg-handler-%g");
         timerLog = TimerLogger.getInstance(logPath+"/epoch-timer-%g");
         serverLog = ServerLogger.getInstance(logPath+"/server-%g");
 
-        pendingQueue = new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>( 
-	    16384, new ServerUtils.PrefixComparator());
-
-        System.setProperty("javax.net.ssl.keyStore", CONFIG.KEYSTORE_PATH);
-        System.setProperty("javax.net.ssl.keyStorePassword", CONFIG.KEYSTORE_PWD);
+        System.setProperty("javax.net.ssl.keyStore", ServerConfig.KEYSTORE_PATH);
+        System.setProperty("javax.net.ssl.keyStorePassword", ServerConfig.KEYSTORE_PWD);
 
         // this is needed to set up the SSL connection
         if (isFullOp) {
-            System.setProperty("javax.net.ssl.trustStore", CONFIG.TRUSTSTORE_PATH);
-            System.setProperty("javax.net.ssl.trustStorePassword", CONFIG.TRUSTSTORE_PWD);
+            System.setProperty("javax.net.ssl.trustStore", ServerConfig.TRUSTSTORE_PATH);
+            System.setProperty("javax.net.ssl.trustStorePassword", ServerConfig.TRUSTSTORE_PWD);
         }
 
-        SignatureOps.initSignatureOps(CONFIG);
-        initNamespace(); // initializes the namespace with latest stored snapshot and all registered users
+        RootNode initRoot = initDirectory(); // initializes the directory
+
+        // check that we got a good first tree
+        if(initRoot == null) {
+            if (isFullOp) {
+                serverLog.error("An error occured while trying to build the initial tree");
+            }
+            else {
+                ServerUtils.printStatusMsg(true, "An error occured while trying to build the initial tree");
+            }
+            // just bail
+            System.exit(-1);
+        }
+
+        // init the history
+         if (!ServerHistory.initHistory(initRoot, initEpoch, 0, 
+                                       new byte[ServerUtils.HASH_SIZE_BYTES])) {
+            ServerUtils.printStatusMsg(true, "Error initializing the history");
+            System.exit(-1);
+         }
         
         EpochTimerTask epochSnapshotTaker = new EpochTimerTask();
         
     	ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleWithFixedDelay(epochSnapshotTaker, 
-    					 CONFIG.EPOCH_INTERVAL, 
-    					 CONFIG.EPOCH_INTERVAL,
+    					 ServerConfig.EPOCH_INTERVAL, 
+    					 ServerConfig.EPOCH_INTERVAL,
     					 TimeUnit.MILLISECONDS);
 
-        ServerMessaging.listen();
+        ServerMessaging.listenForRequests(isFullOp);
         
     }
     
@@ -367,32 +247,39 @@ public class ConiksServer{
      */
     private static class EpochTimerTask implements Runnable {
 
-        private DataOutputStream dout;
-
         public void run() {
 	    timerLog.log("Timer task started.");
-            boolean isGood = updateHistory();
+            RootNode nextRoot = DirectoryOps.updateDirectory();
 
-            if(isGood){
+            // check that we got a good first tree
+            if(nextRoot == null) {
                 if (isFullOp) {
-                    timerLog.log("STR taken");
+                    serverLog.error("An error occured while trying to update the tree");
                 }
                 else {
-                    printStatusMsg(false, "Next epoch");
+                    ServerUtils.printStatusMsg(true, "An error occured while trying to update the tree");
                 }
+                // let's not quite bail here
+                throw new UnsupportedOperationException("Next root was null");
             }
-            else{
-                 // Need to figure out what to do in case it fails
+
+            // this should approximately be EPOCH_INTERVAL millis since the last call
+            long nextEpoch = System.currentTimeMillis();
+
+            SignedTreeRoot nextSTR = TransparencyOps.generateNextSTR(nextRoot, nextEpoch);
+
+            if (!ServerHistory.updateHistory(nextSTR)) {
                 if (isFullOp) {
-                    timerLog.error("An error occurred while updating the history");
+                    serverLog.error("An error occured while trying to update the tree");
                 }
                 else {
-                    printStatusMsg(true, "An error occurred while updating the history");
+                    ServerUtils.printStatusMsg(true, "An error occured while trying to update the tree");
                 }
-                throw new UnsupportedOperationException("Something went wrong in updateHistory()");
+                // let's not quite bail here
+                throw new UnsupportedOperationException("Next STR was null or malformed");
             }
         }
-
+        
     }
     
-} // ends class
+}

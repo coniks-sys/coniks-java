@@ -53,30 +53,46 @@ import org.javatuples.*;
  * These allow a CONIKS client to perform the consistency checks.
  * 
  *@author Marcela S. Melara (melara@cs.princeton.edu)
- *@author Michael Rochlin
  */
 public class TransparencyOps{
 
-    /** Generates the STR from the root node {@code rn} for the epoch
+    /** Generates the STR from the root node {@code root}, the epoch
+     * {@code ep}, the previous epoch {@code prevEp}, and the previous
+     * STR's hash {@code prevStrHash}.
+     *
+     *@return The signed tree root, or {@code null} in case of an error.
+     */
+    public static SignedTreeRoot generateSTR(RootNode root, long ep,
+                                             long prevEp, byte[] prevStrHash) {
+        
+        byte[] strBytesPreSig = ServerUtils.getSTRBytesForSig(root, ep, prevEp,
+                                                              prevStrHash);
+
+        byte[] sig = SignatureOps.sign(strBytesPreSig);
+        
+	return new SignedTreeRoot(root, ep, prevEp, prevStrHash, sig, null);
+    }
+
+    /** Generates the STR from the root node {@code root} for the epoch
      * {@code ep}.
      * Hashes the current STR, and computes the signature for the next STR.
      *
      *@return The signed tree root, or {@code null} in case of an error.
      */
-    public static synchronized SignedTreeRoot generateSTR(RootNode rn, long ep){
+    public static synchronized SignedTreeRoot generateNextSTR(RootNode root, long ep){
 
-        long prevEpoch = ServerHistory.curSTR.getEpoch();
+        long prevEpoch = ServerHistory.getCurEpoch();
 
         // generate the hash of the current STR to include is in the next
         // STR as the previous STR hash
-        byte[] prevStrHash = ServerUtils.hash(ServerUtils.getSTRBytes(ServerHistory.curSTR));
+        byte[] prevStrHash = ServerUtils.hash(ServerUtils.getSTRBytes(ServerHistory.getCurSTR()));
 
-        byte[] strBytesPreSig = ServerUtils.getSTRBytesForSig(rn, ep, prevEpoch,
+        byte[] strBytesPreSig = ServerUtils.getSTRBytesForSig(root, ep, prevEpoch,
                                                               prevStrHash);
 
         byte[] sig = SignatureOps.sign(strBytesPreSig);
         
-	return new SignedTreeRoot(rn, ep, prevEpoch, prevStrHash, sig, ServerHistory.curSTR);
+	return new SignedTreeRoot(root, ep, prevEpoch, prevStrHash, sig, ServerHistory.getCurSTR());
     }
     
     /** Generates the authentication path protobuf message from the 
@@ -237,42 +253,5 @@ public class TransparencyOps{
          return hash.build();
 
     }
-
-    /** Builds a Merkle prefix tree consisting of only a root node
-     * with the previous root hash {@code prevRootHash} for
-     * epoch {@code ep}. This tree "skeleton"
-     * is used when initializing the server's namespace.
-     *
-     *@return The {@link UserTreeBuilder} set up for building the intial
-     * Merkle prefix tree.
-     */
-    public static UserTreeBuilder startBuildInitTree(byte[] prevRootHash,
-						     long ep){
-
-	UserTreeBuilder utb = UserTreeBuilder.getInstance();
-	utb.createNewTree(null, prevRootHash, ep);
-	return utb;
-
-    }
-
-    /** Builds the Merkle prefix tree for the first epoch after intializing
-     * the server's namespace with the pending registrations in {@code pendingQ},
-     * the initial epoch's root hash {@code initRootHash} and the new epoch
-     * epoch {@code ep}. 
-     *
-     *@return The {@link RootNode} for the first epoch after initializing
-     * the server's namespace or {@code null} in case of an error.
-     */
-    public static RootNode buildFirstEpochTree(
-                                               PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
-					       byte[] initRootHash,
-					       long ep){
-
-	UserTreeBuilder utb = UserTreeBuilder.getInstance();
-	
-        return utb.createNewTree(pendingQ, initRootHash, ep);
-
-    }
     
-
-} //ends ServerOps class
+}

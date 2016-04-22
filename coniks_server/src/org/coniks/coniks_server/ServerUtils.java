@@ -83,19 +83,20 @@ public class ServerUtils{
 
     private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-    /** Defines the <i>specific<i> responses a server can
-     * present to a CONIKS client.
+    /** Prints server status and error messages. 
+     * Used primarily for testing mode.
+     *
+     *@param isErr indicates whether this is an error message
+     *@param msg the status message to print
      */
-    public enum RespType {
-        SUCCESS,
-        NAME_NOT_FOUND_ERR, //name is not in server's chat namespace
-        SERVER_ERR,
-        NAME_EXISTS_ERR, //name is already in server's Coniks namespace
-        MALFORMED_ERR,
-        COMMITMENT_RESP,
-        AUTH_PATH,
-        VERIFICATION_ERR
-     }
+    public static void printStatusMsg (boolean isErr, String msg) {
+        String status = msg;
+        if (isErr) {
+            status = "Error: "+status;
+        }
+
+        System.out.println(status);
+    }
 
     /** Generates the cryptographic hash of {@code input}.
      * Current hashing algorithm: SHA-256.
@@ -430,7 +431,7 @@ public class ServerUtils{
 
         byte[] epBytes = longToBytes(str.getEpoch());
         byte[] prevEpBytes = longToBytes(str.getPrevEpoch());
-        byte[] prevStrHash = str.getPrevStrHash();
+        byte[] prevStrHash = str.getPrevSTRHash();
         byte[] sig = str.getSignature();
 
 	byte[] strBytes = new byte[rootBytes.length+epBytes.length+prevEpBytes.length+
@@ -478,20 +479,21 @@ public class ServerUtils{
     		    return -1;
     		}
 	    }
-                // registrations must always happen before ulnChanges
-        // earlier ulnChanges must always happen before later ones
-        Operation op1 = p1.getValue2();
-        Operation op2 = p2.getValue2();
-        if (op1 instanceof Register) {
-            return 1;
-        }
-        if (op2 instanceof Register) {
-            return -1;
-        }
-        if (op1 instanceof KeyChange && op2 instanceof KeyChange) {
-            return (((KeyChange)op1).counter > ((KeyChange)op2).counter) ? 1 : -1;
-        }
-
+                
+            // registrations must always happen before ulnChanges
+            // earlier ulnChanges must always happen before later ones
+            Operation op1 = p1.getValue2();
+            Operation op2 = p2.getValue2();
+            if (op1 instanceof Register) {
+                return 1;
+            }
+            if (op2 instanceof Register) {
+                return -1;
+            }
+            if (op1 instanceof KeyChange && op2 instanceof KeyChange) {
+                return (((KeyChange)op1).counter > ((KeyChange)op2).counter) ? 1 : -1;
+            }
+            
 	    return 0;
 	}
     }

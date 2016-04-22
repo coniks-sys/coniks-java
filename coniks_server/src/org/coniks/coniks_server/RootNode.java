@@ -51,7 +51,7 @@ public class RootNode extends InteriorNode{
      * and the level in tree {@code lvl}.
      */
     public RootNode(TreeNode l, TreeNode r, int lvl){
-	this(l, r, lvl, null, null);
+        super(l, r, null, lvl, null, null, false);
     }
 
     /** Constructs a root node specified
@@ -91,14 +91,14 @@ public class RootNode extends InteriorNode{
      * rebuilding process at the beginning of every epoch.
      *@return The cloned root node.
      */
-    public RootNode clone(long epoch0, long epoch1){
+    public RootNode clone(){
         // the epoch will be reset in UserTreeBuilder.
 	RootNode cloneN = new RootNode(null, null, this.level, 
                                        leftHash, rightHash);
 	if (this.left != null)
-	    cloneN.left = this.left.clone(cloneN, epoch0, epoch1);
+	    cloneN.left = this.left.clone(cloneN);
 	if (this.right != null)
-	    cloneN.right = this.right.clone(cloneN, epoch0, epoch1);
+	    cloneN.right = this.right.clone(cloneN);
 	
 	return cloneN;
     }

@@ -49,33 +49,11 @@ import org.javatuples.*;
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Michael Rochlin
  */
-public class UserTreeBuilder{
+public class TreeBuilder{
     
-    private int lastLevel;
-    private RootNode out;
-    private long prevEpoch, epoch;
-
-    /** Clears some temporary variables set
-     * during a previous call to 
-     * {@link UserTreeBuilder#createNewTree(PriorityQueue<Pair<byte[], UserLeafNode>>, byte[], long)}.
-     */
-    public void clearTemps(){
-        out = null;
-    }
+    private static int lastLevel;
     
-    private UserTreeBuilder(){
-        lastLevel = 0;
-    }
-
-    /** Generates a single instance of the user tree builder.
-     *
-     *@return A new user tree builder.
-     */
-    public static UserTreeBuilder getInstance(){
-        return new UserTreeBuilder();
-    }
-    
-    private void insertNode(byte[] key, UserLeafNode toAdd, RootNode root, Operation op){
+    private static void insertNode(byte[] key, UserLeafNode toAdd, RootNode root, Operation op){
         int curOffset = 0;
         // This code would be a lot more natural
         //   if our tries were byte-branching rather than bit-branching, but whatevs.
@@ -115,7 +93,7 @@ public class UserTreeBuilder{
                     // must be some kind of key-change or flag change
                     else if (op instanceof KeyChange) {
                         if (((KeyChange)op).changeInfo(curNodeUL)) {
-                            curNodeUL.setEpochChanged(epoch);
+                            curNodeUL.setEpochChanged(op.epoch);
                             return;
                         }
                         else {
@@ -157,7 +135,6 @@ public class UserTreeBuilder{
                     newInt.parent.right = newInt;
                 }
                 curNode = newInt;
-                // msm: why is this next line here?
                 toAdd.level--;                
             } 
             else {
@@ -228,11 +205,11 @@ public class UserTreeBuilder{
     		// compute right-side hash
     		curNodeI.rightHash = innerComputeHash(curNode.right);
     	    }
-    	    return ServerUtils.hash(ServerUtils.convertInteriorNode(curNodeI));
+    	    return ServerUtils.hash(ServerUtils.getInteriorNodeBytes(curNodeI));
     	}else{
     	    // assertion: must be user leaf node.
     	    UserLeafNode curNodeU = (UserLeafNode) curNode;
-    	    return ServerUtils.hash(ServerUtils.convertUserLeafNode(curNodeU));
+    	    return ServerUtils.hash(ServerUtils.getUserLeafNodeBytes(curNodeU));
     	}
     }
 
@@ -241,33 +218,25 @@ public class UserTreeBuilder{
      * to add for the next epoch {@code epoch}.
      *<p> 
      * This is a useful wrapper for 
-     * {@link UserTreeBuilder#extendTree(PriorityQueue<Pair<byte[], UserLeafNode>>)}.
+     * {@link TreeBuilder#extendTree(PriorityQueue<Pair<byte[], UserLeafNode>>)}.
      *
      *@return The {@link RootNode} for the next epoch's Merkle tree.
      */
-    public RootNode copyExtendTree(RootNode prevRoot,
-                                   byte[] prevRootHash,
-                                   PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ, 
-                                   long epoch){
+    public static RootNode copyExtendTree(RootNode prevRoot,
+                                   PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ){
         // clone old tree
-        RootNode out;
-        long prevEpoch;
+        RootNode newRoot;
         if (prevRoot != null){
-            prevEpoch = prevRoot.epoch;
-            out = (prevRoot.clone(prevEpoch, epoch));
+            newRoot = prevRoot.clone();
         }else{
-            out = new RootNode(null, null, 0, null, 0);
-            prevEpoch = -1;
+            newRoot = new RootNode(null, null, 0);
         }
-        out.prev = prevRootHash;
         
-        this.prevEpoch = prevEpoch;
-        this.epoch = epoch;
-        this.out = out;
-        
-        if(pendingQ == null)
+        if(pendingQ == null) {
+            ConiksServer.serverLog.error("Trying to extend using null pending queue");
             return null;
-        return extendTree(pendingQ);
+        }
+        return extendTree(pendingQ, newRoot);
     }
 
     /** Inserts any new nodes in {@code pendingQ} ordered by the 24-bit prefix
@@ -276,9 +245,11 @@ public class UserTreeBuilder{
      *
      *@return The {@link RootNode} of the extended Merkle tree.
      */
-    public RootNode extendTree(PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ){        
-        // set up new root
-        out.epoch = epoch;
+    private static RootNode extendTree(
+                                       PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
+                                       RootNode root) {
+
+        RootNode newRoot = root;
         
         // insert nodes
         // record the prefix for each index and compare to the prefix of the
@@ -302,11 +273,10 @@ public class UserTreeBuilder{
             UserLeafNode toAdd = p.getValue1();
             Operation op = p.getValue2();
             
-            insertNode(index, toAdd, out, op);
+            insertNode(index, toAdd, newRoot, op);
             
             if (prevPrefixLevel < toAdd.getLevel())
                 prevPrefixLevel = toAdd.getLevel(); 
-            
 
             prevPrefix = prefix;
             
@@ -315,21 +285,9 @@ public class UserTreeBuilder{
         }
         
         // recompute hashes
-        computeHashes(out);
+        computeHashes(newRoot);
         
-        return out;
-    }
-    
-    /** Creates a completely new Merkle tree with any nodes in {@code pendingQ},
-     * and with the previous epoch's root hash {@code prevRootHash} for the new epoch
-     * {@code epoch}.
-     *
-     *@return The {@link RootNode} of the new Merkle tree.
-     */
-    public RootNode createNewTree(PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
-                                  byte[] prevRootHash, long epoch){
-        return copyExtendTree(null, prevRootHash, pendingQ, epoch);
-
+        return newRoot;
     }
     
 }

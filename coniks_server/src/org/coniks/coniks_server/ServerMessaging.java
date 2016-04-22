@@ -1,13 +1,49 @@
+/*
+  Copyright (c) 2016, Princeton University.
+  All rights reserved.
+  
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are 
+  met:
+  * Redistributions of source code must retain the above copyright 
+  notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above 
+  copyright notice, this list of conditions and the following disclaimer 
+  in the documentation and/or other materials provided with the 
+  distribution.
+  * Neither the name of Princeton University nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.coniks.coniks_server;
 
 import javax.net.ssl.*;
 import java.net.*;
 import java.io.*;
+import java.util.ArrayList;
 
 import com.google.protobuf.*;
+import org.javatuples.*;
 
 import org.coniks.coniks_common.MsgType;
 import org.coniks.coniks_common.ServerErr;
+import org.coniks.coniks_common.CommonMessaging;
 import org.coniks.coniks_common.C2SProtos.Registration;
 import org.coniks.coniks_common.C2SProtos.CommitmentReq;
 import org.coniks.coniks_common.C2SProtos.KeyLookup;
@@ -23,9 +59,8 @@ import org.coniks.coniks_common.UtilProtos.*;
 public class ServerMessaging {
 
     // send back a simple server response based on the result of the request
-    public static synchronized void sendSimpleResponseProto(int reqResult
-                                                      Socket socket){
-        msgLog.log("Sending simple server response... ");
+    public static synchronized void sendSimpleResponseProto(int reqResult, Socket socket){
+        MsgHandlerLogger.log("Sending simple server response... ");
         
         ServerResp respMsg = buildServerRespMsg(reqResult);
         sendMsgProto(MsgType.SERVER_RESP, respMsg, socket);     
@@ -33,17 +68,10 @@ public class ServerMessaging {
     }
     
     // send back the commitment returned for the commitment request
-    public static synchronized void sendCommitmentProto(Pair<RootNode, 
-                                                        byte[]> commPair, Socket socket){
-        msgLog.log("Sending commitment response... ");
+    public static synchronized void sendCommitmentProto(SignedTreeRoot str, Socket socket){
+        MsgHandlerLogger.log("Sending commitment response... ");
      
-        Commitment comm = buildCommitmentMsg(commPair.getValue0(), 
-                                             commPair.getValue1());
-        byte[] rootBytes = ServerUtils.convertRootNode(commPair.getValue0());
-        msgLog.log("Root hash "+
-                   ServerUtils.bytesToHex(ServerUtils.hash(rootBytes))
-                   +"\n Epoch: "+commPair.getValue0().getEpoch()
-                   +"\n Prev: "+ServerUtils.bytesToHex(commPair.getValue0().getPrev()));
+        Commitment comm = buildCommitmentMsg(str);
       
         sendMsgProto(MsgType.COMMITMENT, comm, socket);
     }
@@ -51,7 +79,7 @@ public class ServerMessaging {
     // send back the initial epoch and epoch interval for the newly registered user, who will cache this info
     public static synchronized void sendRegistrationRespProto(long initEpoch, int epochInterval,
                                                               Socket socket){
-        msgLog.log("Sending registration response... ");
+        MsgHandlerLogger.log("Sending registration response... ");
           
         RegistrationResp regResp = buildRegistrationRespMsg(initEpoch, epochInterval);
         sendMsgProto(MsgType.REGISTRATION_RESP, regResp, socket);
@@ -59,7 +87,7 @@ public class ServerMessaging {
     
     // send back the authentication path based on the key lookup
     public static synchronized void sendAuthPathProto(UserLeafNode uln, RootNode root, Socket socket){
-        msgLog.log("Sending authentication path response... ");
+        MsgHandlerLogger.log("Sending authentication path response... ");
   
         AuthPath authPath = buildAuthPathMsg(uln, root);
         sendMsgProto(MsgType.AUTH_PATH, authPath, socket);
@@ -71,8 +99,9 @@ public class ServerMessaging {
     private static synchronized void sendMsgProto (int msgType, AbstractMessage msg,
                                 Socket socket) {
 
+        DataOutputStream dout = null;
         try {
-            DataOutputStream dout = new DataOutputStream(socket.getOutputStream());
+            dout = new DataOutputStream(socket.getOutputStream());
 
             // now send the message
             dout.writeByte(msgType);
@@ -80,13 +109,11 @@ public class ServerMessaging {
             dout.flush();
         }
         catch (IOException e) {
-            msgLog.error("Sending msg proto "+msg.toString());
-            msgLog.error("Error: "+e.getMessage());
+            MsgHandlerLogger.error("Sending msg proto "+msg.toString());
+            MsgHandlerLogger.error("Error: "+e.getMessage());
         }
         finally {
-            if (dout != null) {
-                dout.close();
-            }
+            CommonMessaging.close(dout);
         }
 
     }    
@@ -94,7 +121,7 @@ public class ServerMessaging {
     /* Message building functions */
     
     // create the simple server response message
-    private ServerResp buildServerRespMsg(int respType){
+    private static ServerResp buildServerRespMsg(int respType){
         ServerResp.Builder respMsg = ServerResp.newBuilder();
         switch(respType){
         case ServerErr.SUCCESS:
@@ -120,30 +147,30 @@ public class ServerMessaging {
     }
     
     // create the commitment response message
-    private Commitment buildCommitmentMsg(RootNode root, byte[] commSig){            
+    private static Commitment buildCommitmentMsg(SignedTreeRoot str){            
         
         Commitment.Builder commMsg = Commitment.newBuilder();
-        byte[] rootBytes = ServerUtils.convertRootNode(root);
+        byte[] rootBytes = ServerUtils.getRootNodeBytes(str.getRoot());
         byte[] rootHashBytes = ServerUtils.hash(rootBytes);
         
         Hash.Builder rootHash = Hash.newBuilder();
         ArrayList<Integer> rootHashList = ServerUtils.byteArrToIntList(rootHashBytes);
         
         if(rootHashList.size() != ServerUtils.HASH_SIZE_BYTES){
-            msgLog.error("Bad length of root hash: "+rootHashList.size());
+            MsgHandlerLogger.error("Bad length of root hash: "+rootHashList.size());
             return null;
         }
         rootHash.setLen(rootHashList.size());
         rootHash.addAllHash(rootHashList);
-        commMsg.setEpoch(root.getEpoch());
-        ArrayList<Integer> sigList = ServerUtils.byteArrToIntList(commSig);
+        commMsg.setEpoch(str.getEpoch());
+        ArrayList<Integer> sigList = ServerUtils.byteArrToIntList(str.getSignature());
         commMsg.setRootHash(rootHash.build());
         commMsg.addAllSignature(sigList);
         return commMsg.build();
     }
     
     // create the registration response message
-    private RegistrationResp buildRegistrationRespMsg(long initEpoch, int epochInterval){            
+    private static RegistrationResp buildRegistrationRespMsg(long initEpoch, int epochInterval){            
         
         RegistrationResp.Builder regRespMsg = RegistrationResp.newBuilder();
         regRespMsg.setInitEpoch(initEpoch);
@@ -152,8 +179,8 @@ public class ServerMessaging {
     }
     
     // create the commitment response message
-    private AuthPath buildAuthPathMsg(UserLeafNode uln, RootNode root){            
-        return ServerOps.generateAuthPathProto(uln, root);
+    private static AuthPath buildAuthPathMsg(UserLeafNode uln, RootNode root){            
+        return TransparencyOps.generateAuthPathProto(uln, root);
     }
 
     /** Receives a protobuf message from the client and checks that
@@ -165,17 +192,18 @@ public class ServerMessaging {
      */
     public static synchronized AbstractMessage receiveMsgProto(Socket socket) {
         
+        DataInputStream din = null;
         try {
-            DataInputStream din = new DataInputStream(socket.getInputStream());
+            din = new DataInputStream(socket.getInputStream());
             
             // get the message type of the message and read in the stream
-            msgType = din.readUnsignedByte();
+            int msgType = din.readUnsignedByte();
             
             if (msgType == MsgType.REGISTRATION){
                 Registration reg = Registration.parseDelimitedFrom(din);
                 
                 if(!reg.hasBlob()){
-                    msgLog.log("Malformed registration message");
+                    MsgHandlerLogger.log("Malformed registration message");
                 }
                 else {
                     return reg;
@@ -186,7 +214,7 @@ public class ServerMessaging {
                 
                 if(!lookup.hasName() || !lookup.hasEpoch() || 
                    lookup.getEpoch() <= 0){
-                    msgLog.log("Malformed key lookup");
+                    MsgHandlerLogger.log("Malformed key lookup");
                 }
                 else {
                     return lookup;
@@ -196,7 +224,7 @@ public class ServerMessaging {
                 CommitmentReq commReq = CommitmentReq.parseDelimitedFrom(din);
                 
                 if (!commReq.hasType() || !commReq.hasEpoch() || commReq.getEpoch() <= 0) {
-                    msgLog.log("Malformed commitment request message");
+                    MsgHandlerLogger.log("Malformed commitment request message");
                 }
                 else {
                     return commReq;
@@ -205,7 +233,7 @@ public class ServerMessaging {
             else if (msgType == MsgType.ULNCHANGE_REQ) {
                 ULNChangeReq ulnChange = ULNChangeReq.parseDelimitedFrom(din);
                 if (!ulnChange.hasName()) {
-                    msgLog.log("Malformed uln change req");
+                    MsgHandlerLogger.log("Malformed uln change req");
                 }
                 else {
                     return ulnChange;
@@ -214,37 +242,24 @@ public class ServerMessaging {
             else if (msgType == MsgType.SIGNED_ULNCHANGE_REQ) {
                 SignedULNChangeReq sulnReq = SignedULNChangeReq.parseDelimitedFrom(din);
                 if (!sulnReq.hasReq() || sulnReq.getSigCount() < 1 || !sulnReq.getReq().hasName()) {
-                    msgLog.log("Malformed signed uln change req");
+                    MsgHandlerLogger.log("Malformed signed uln change req");
                 }
                 else {
                     return sulnReq;
                 }
             }
             else {
-                // result = ServerUtils.RespType.SERVER_ERR;
-                msgLog.log("Unknown incoming message type");
+                MsgHandlerLogger.log("Unknown incoming message type");
             }
         }
         catch (InvalidProtocolBufferException e) {
-            if (isFullOp) {
-                msgLog.error("parsing a protobuf message");
-            }
-            else {
-                printStatusMsg(true, "parsing a protobuf message");
-            }
+            MsgHandlerLogger.error("parsing a protobuf message");
         }
         catch (IOException e) {
-            if (isFullOp) {
-                msgLog.error("receiving data from client");
-            }
-            else {
-                printStatusMsg(true, "receiving data from client");
-            }
+            MsgHandlerLogger.error("receiving data from client");
         }
         finally {
-            if (din != null) {
-                din.close();
-            }
+            CommonMessaging.close(din);
         }
         
         // unexpected message type from the client
@@ -254,48 +269,54 @@ public class ServerMessaging {
 
     /* Functions for handling the lower-level communication with the client */
 
-    /** Listens over an SSL connection if in full operating mode.
+    /** Listens for incoming requests. Uses an SSL connection if in full operating mode.
      *
-     *@param server the CONIKS server to which send the message
      *@param isFullOp indicates whether the client is operating in full mode 
      * or in testing mode
-     *@throws an {@code IOException} if any of the socket operations fail.
      */
-    public static void listenAndAccept (String server, boolean isFullOp) 
-        throws IOException {
+    public static void listenForRequests (boolean isFullOp) {
 
-        ServerSocket s;
+        ServerSocket s = null;
         
         try{
 
             if (isFullOp) {
                 SSLServerSocketFactory sslSrvFact = 
                 (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
-                s =(SSLServerSocket)sslSrvFact.createServerSocket(CONFIG.PORT);
+                s =(SSLServerSocket)sslSrvFact.createServerSocket(ServerConfig.PORT);
             }
             else {
-                s = new ServerSocket(CONFIG.PORT);
+                s = new ServerSocket(ServerConfig.PORT);
 
-                System.out.println("Listening for connections on port "+CONFIG.PORT+"...");
+                System.out.println("Listening for connections on port "+ServerConfig.PORT+"...");
             }            
 
-            serverLog.log("Listening for connections on port "+CONFIG.PORT+"...");
+            MsgHandlerLogger.log("Listening for connections on port "+ServerConfig.PORT+"...");
             
             // loop to listen for requests
             while(true){
                 Socket c = s.accept(); // closing done by thread
                 
-                serverLog.log("Server accepted new connection.");
+                MsgHandlerLogger.log("Server accepted new connection.");
+
+                RequestHandler th;
                 
-                RequestHandler th = new RequestHandler(c);
+                if (isFullOp) {
+                    th = new RequestHandler((SSLSocket)c);
+                }
+                else {
+                    th = new RequestHandler(c);
+                }
+
                 th.start();
                 
             }
         }
-        catch(Exception e){
-            serverLog.error("Exception: " + e.getMessage());
-	    e.printStackTrace();
-            System.exit(-1);
+        catch(IOException e){
+            MsgHandlerLogger.error(e.getMessage());
+        }
+        finally {
+            CommonMessaging.close(s);
         }
         
     }

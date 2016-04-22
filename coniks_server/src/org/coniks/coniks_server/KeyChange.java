@@ -47,21 +47,20 @@ public class KeyChange extends Operation {
     public boolean allowsPublicLookup;
     public byte[] sig; 
     public byte[] msg;
-    public long ep0;
     public long counter;
 
     /** A KeyChange object does the actual work of changing the binding 
         It first checks whether the binding change is actually allowed */
     public KeyChange(String newBlob, DSAPublicKey changeKey, 
         boolean allowsUnsignedKeychange, boolean allowsPublicLookup, 
-        byte[] msg, byte[] sig, long ep0, long counter) {
+        byte[] msg, byte[] sig, long epoch, long counter) {
         this.newBlob = newBlob;
         this.newChangeKey = changeKey;
         this.allowsUnsignedKeychange = allowsUnsignedKeychange;
         this.allowsPublicLookup = allowsPublicLookup;
         this.msg = msg == null ? null : Arrays.copyOf(msg, msg.length);
         this.sig = sig == null ? null : Arrays.copyOf(sig, sig.length);
-        this.ep0 = ep0;
+        this.epoch = epoch;
         this.counter = counter;
         ServerLogger.log("Made a KC object with sig = " + Arrays.toString(this.sig));
     }
@@ -101,7 +100,7 @@ public class KeyChange extends Operation {
             uln.setSignature(null);
         }
         uln.setLastMsg(msg);
-        uln.setEpochChanged(ep0);
+        uln.setEpochChanged(epoch);
         return true;
     }
 

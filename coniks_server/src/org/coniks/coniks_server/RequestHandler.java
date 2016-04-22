@@ -73,6 +73,10 @@ private static class RequestHandler extends Thread{
                 // TODO
                 handleSignedULNChangeProto((SignedULNChangeReq) clientMsg);
             }
+            else {
+                ServerMessaging.sendSimpleResponseProto(ServerUtils.RespType.MALFORMED_ERR,
+                                                        clientSocket);
+            }
             
         }
         catch(IOException e){
@@ -99,35 +103,34 @@ private static class RequestHandler extends Thread{
         
         if(!reg.hasBlob()){
             msgLog.log("Malformed registration message");
-            ServerMessaging.sendSimpleResponse(ServerUtils.RespType.MALFORMED_ERR, clientSocket);
+            ServerMessaging.sendSimpleResponse(ServerErr.MALFORMED_CLIENT_MSE_ERR, 
+                                               clientSocket);
             return;
         }
         
-        String name =reg.getName();
-        
         // want to check first whether the name already 
         // exists in the database before we register, if it does, reply with error
-        ServerUtils.Record r = getRecord(curEpoch);
-        RootNode root = r.getRoot();
-        
-        UserLeafNode uln = getUlnFromTree(name, root);
+        String name =reg.getName();
+        UserLeafNode uln = DirectoryOps.find(name);
         
         if (uln != null) {
             msgLog.error("Found: "+
                          ServerUtils.bytesToHex(ServerUtils.unameToIndex(uln.getUsername()))+
                          "\n"+uln.getUsername()+" found when trying to insert "+name);
-            sendSimpleResponse(ServerUtils.RespType.NAME_EXISTS_ERR);
+            ServerMessaging.sendSimpleResponse(ServerErr.NAME_EXISTS_ERR, clientSocket);
             return;
         }
         
-        this.regEpoch = curEpoch+CONFIG.EPOCH_INTERVAL;
+        long curEpoch = ServerHistory.curSTR.getEpoch();
+        this.regEpoch = curEpoch+ConiksServer.CONFIG.EPOCH_INTERVAL;
         
         // If using a DB, insert the new user
         
         // we register the user in the pendingQueue
-        register(name, reg.getBlob());
+        DirectoryOps.register(name, reg.getBlob());
         
-        ServerMessaging.sendRegistrationRespResponse(regEpoch, CONFIG.EPOCH_INTERVAL);
+        ServerMessaging.sendRegistrationRespResponse(regEpoch, 
+                                                     ConiksServer.CONFIG.EPOCH_INTERVAL);
         
     }
     
@@ -278,76 +281,4 @@ private static class RequestHandler extends Thread{
         handleULNChangeProto(changeReq, sig);
     }
     
-    // traverses down the tree until we reach the requested user leaf node
-    // msm: this pretty much repeats the traversal in ServerOps.generateAuthPathProto
-    // so we should really find a way to remove this redundancy
-    private synchronized UserLeafNode getUlnFromTree(String username,
-                                                     RootNode root) {
-        
-        // traverse based on lookup index for this name
-        byte[] lookupIndex = ServerUtils.unameToIndex(username);
-        
-        // not worth doing this recursively
-        int curOffset = 0;
-        TreeNode runner = root;
-        
-        msgLog.log("searching for: "+ServerUtils.bytesToHex(lookupIndex));
-        
-        while (!(runner instanceof UserLeafNode)) {
-            
-            // direction here is going to be false = left,
-            //                               true = right
-            boolean direction = ServerUtils.getNthBit(lookupIndex, curOffset);
-            
-            if (runner == null){
-                break;
-            }
-            
-            if (runner instanceof RootNode) {
-                
-                    RootNode curNodeR = (RootNode) runner;
-                    
-                    if(!direction){
-                        runner = curNodeR.getLeft();
-                    }
-                    else {
-                        runner = curNodeR.getRight();
-                    }
-
-                }
-
-                else {
-                    InteriorNode curNodeI = (InteriorNode) runner;
-               
-                    if(!direction){
-                        runner = curNodeI.getLeft();
-                    }                             
-                    else {
-                        runner = curNodeI.getRight();
-                    }
-
-                    // msm: rather be safe than sorry
-                    if (runner == null){
-                        break;
-                    }
-                    
-                }
-               
-                curOffset++;
-            }
-
-            // if we have found a uln, make sure it doesn't just have a common prefix
-            // with the requested node
-            if (runner != null && runner instanceof UserLeafNode) {
-                // msm: this is ugly
-                if (!username.equals(((UserLeafNode)runner).getUsername())) {
-                        return null;
-                    }
-            }
-
-            // we expect the runner to be the right uln at this point
-            return (UserLeafNode) runner;
-  
-        }
-        
-    } //ends ServerThread class
+}

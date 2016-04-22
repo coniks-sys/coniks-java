@@ -140,8 +140,6 @@ message AuthPath{
                 // client does not assume server has not sent malformed root node
                 optional PrunedChild prunedchild = 1;
                 optional Hash subtree = 2;
-                optional Hash prev = 3;
-                optional uint64 epoch = 4;
          }
 
          optional RootNode root = 3;

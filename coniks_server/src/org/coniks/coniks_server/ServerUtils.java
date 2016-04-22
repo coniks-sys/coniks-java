@@ -329,7 +329,7 @@ public class ServerUtils{
      *
      *@return The {@code byte[]} containing the serialized UserLeafNode.
      */
-    public static byte[] convertUserLeafNode(UserLeafNode uln){
+    public static byte[] getUserLeafNodeBytes(UserLeafNode uln){
         byte[] pubKey = strToBytes(uln.getPublicKey());
 	byte[] usr = strToBytes(uln.getUsername());
         byte[] ep_add = longToBytes(uln.getEpochAdded());
@@ -353,7 +353,7 @@ public class ServerUtils{
      *
      *@return The {@code byte[]} containing the serialized InteriorNode.
      */
-    public static byte[] convertInteriorNode(InteriorNode in){
+    public static byte[] getInteriorNodeBytes(InteriorNode in){
 	byte[] left = in.getLeftHash();
 	byte[] right = in.getRightHash();
 
@@ -370,90 +370,80 @@ public class ServerUtils{
      *
      *@return The {@code byte[]} containing the serialized RootNode.
      */
-    public static byte[] convertRootNode(RootNode rn){
+    public static byte[] getRootNodeBytes(RootNode rn){
 	byte[] left = rn.getLeftHash();
 	byte[] right = rn.getRightHash();
-	byte[] prev = rn.getPrev();
-	byte[] ep = longToBytes(rn.getEpoch());
 
-	byte[] rootBytes = new byte[left.length+right.length+prev.length+ep.length];
+	byte[] rootBytes = new byte[left.length+right.length];
 	
 	ByteBuffer arr = ByteBuffer.wrap(rootBytes);
 	arr.put(left);
 	arr.put(right);
-	arr.put(prev);
-	arr.put(ep);
 
 	return arr.array();
     }
 
-    // TODO: move this to it's own class
-    /** Represents a link in the hash chain of signed tree roots
-     * that forms the server's history.
+    /** Takes the components of a signed tree root: root node, current epoch,
+     * previous epoch, hash of previous STR, and serializes them into 
+     * a byte[] that can be used to generate the STR's digital signature.
      *
-     *@author Marcela S. Melara (melara@cs.princeton.edu)
+     *@return The {@code byte[]} containing the serialized STR components.
      */
-    public static class Record{
-	RootNode root;
-	long epoch;
-        byte[] str;
-	Record prev;
+    public static byte[] getSTRBytesForSig(RootNode rn, long ep, long prevEp,
+                                                byte[] prevStrHash) {
 
-        /** Constructs a hash chain record containing the RootNode
-         * {@code r}, the STR {@code str}, and the previous link
-         * in the chain {@code p} for epoch {@code ep}.
-         */
-	public Record(RootNode r, long ep, byte[] str, 
-                      Record p){
-	    this.root = r;
-	    this.epoch = ep;
-            this.str = str;
-	    this.prev = p;
-	}
+        byte[] rootBytes = getRootNodeBytes(rn);
 
-        /** Gets this record's root node.
-         *
-         *@return This record's {@link RootNode}.
-         */
-	public RootNode getRoot(){
-	    return this.root;
-	}
-
-        /** Gets this record's epoch.
-         *
-         *@return This record's epoch as a {@code long}.
-         */
-	public long getEpoch(){
-	    return this.epoch;
-	}
-
-        /** Gets this record's STR.
-         *
-         *@return This record's STR as a {@code byte[]}.
-         */
-        public byte[] getSTR(){
-            return this.str;
+        if (rootBytes == null) {
+            ConiksServer.serverLog.error("getSTRBytesForSig: Oops, couldn't get the root node bytes");
+            return null;
         }
 
-        /** Gets the record preceding this record.
-         *
-         *@return This record's preceding {@link ServerUtils.Record}.
-         */
-	public Record getPrev(){
-	    return this.prev;
-	}
+        byte[] epBytes = longToBytes(ep);
+        byte[] prevEpBytes = longToBytes(prevEp);
 
-        /** Sets this record's epoch.
-         */
-        public void setEpoch(long ep){
-            this.epoch = ep;
+	byte[] strBytes = new byte[rootBytes.length+epBytes.length+prevEpBytes.length+
+                                   prevStrHash.length];
+	
+	ByteBuffer arr = ByteBuffer.wrap(strBytes);
+	arr.put(rootBytes);
+	arr.put(epBytes);
+        arr.put(prevEpBytes);
+        arr.put(prevStrHash);
+
+	return arr.array();
+
+    }
+    
+    /** Converts a {@link SignedTreeRoot} {@code str} to a hashable array of bytes
+     *
+     *@return The {@code byte[]} containing the serialized STR components.
+     */
+    public static byte[] getSTRBytes(SignedTreeRoot str) {
+
+        byte[] rootBytes = getRootNodeBytes(str.getRoot());
+
+        if (rootBytes == null) {
+            ConiksServer.serverLog.error("getSTRBytes: Oops, couldn't get the root node bytes");
+            return null;
         }
 
-        /** Sets this record's predecessor.
-         */
-        public void setPrev(Record p) {
-            this.prev = p;
-        }
+        byte[] epBytes = longToBytes(str.getEpoch());
+        byte[] prevEpBytes = longToBytes(str.getPrevEpoch());
+        byte[] prevStrHash = str.getPrevStrHash();
+        byte[] sig = str.getSignature();
+
+	byte[] strBytes = new byte[rootBytes.length+epBytes.length+prevEpBytes.length+
+                                   prevStrHash.length+sig.length];
+	
+	ByteBuffer arr = ByteBuffer.wrap(strBytes);
+	arr.put(rootBytes);
+	arr.put(epBytes);
+        arr.put(prevEpBytes);
+        arr.put(prevStrHash);
+        arr.put(sig);
+
+	return arr.array();
 
     }
 

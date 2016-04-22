@@ -7,6 +7,7 @@ import java.io.*;
 import com.google.protobuf.*;
 
 import org.coniks.coniks_common.MsgType;
+import org.coniks.coniks_common.ServerErr;
 import org.coniks.coniks_common.C2SProtos.Registration;
 import org.coniks.coniks_common.C2SProtos.CommitmentReq;
 import org.coniks.coniks_common.C2SProtos.KeyLookup;
@@ -22,7 +23,7 @@ import org.coniks.coniks_common.UtilProtos.*;
 public class ServerMessaging {
 
     // send back a simple server response based on the result of the request
-    public static synchronized void sendSimpleResponseProto(ServerUtils.RespType reqResult
+    public static synchronized void sendSimpleResponseProto(int reqResult
                                                       Socket socket){
         msgLog.log("Sending simple server response... ");
         
@@ -93,28 +94,22 @@ public class ServerMessaging {
     /* Message building functions */
     
     // create the simple server response message
-    private ServerResp buildServerRespMsg(ServerUtils.RespType respType){
+    private ServerResp buildServerRespMsg(int respType){
         ServerResp.Builder respMsg = ServerResp.newBuilder();
         switch(respType){
-        case SUCCESS:
+        case ServerErr.SUCCESS:
             respMsg.setMessage(ServerResp.Message.SUCCESS);
             break;
-        case NAME_EXISTS_ERR:
+        case ServerErr.NAME_EXISTS_ERR:
             respMsg.setMessage(ServerResp.Message.NAME_EXISTS_ERR);
             break;
-        case NAME_NOT_FOUND_ERR:
+        case ServerErr.NAME_NOT_FOUND_ERR:
             respMsg.setMessage(ServerResp.Message.NAME_NOT_FOUND_ERR);
             break;
-        case MALFORMED_ERR:
+        case ServerErr.MALFORMED_CLIENT_MSG_ERR:
             respMsg.setMessage(ServerResp.Message.MALFORMED_ERR);
             break;
-        case COMMITMENT_RESP:
-            respMsg.setMessage(ServerResp.Message.COMMITMENT_RESP);
-            break;
-        case AUTH_PATH:
-            respMsg.setMessage(ServerResp.Message.AUTH_PATH);
-            break;
-        case VERIFICATION_ERR:
+        case ServerErr.SIGNED_CHANGE_VERIF_ERR:
             respMsg.setMessage(ServerResp.Message.VERIFICATION_ERR);
             break;
         default:

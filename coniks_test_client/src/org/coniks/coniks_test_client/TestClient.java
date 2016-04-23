@@ -48,6 +48,7 @@ import com.google.protobuf.*;
 import org.coniks.coniks_common.C2SProtos.RegistrationResp;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
 import org.coniks.coniks_common.UtilProtos.ServerResp;
+import org.coniks.coniks_common.ServerErr;
 
 /** Implementation of a simple CONIKS test client
  * that simply displays how each component of the
@@ -83,8 +84,8 @@ public class TestClient {
                            ClientConfig.TRUSTSTORE_PATH);
         System.setProperty("javax.net.ssl.trustStorePassword",
                            ClientConfig.TRUSTSTORE_PWD);
-        System.setProperty("javax.net.ssl.keyStore", ClientConfig.PRIVATE_KEYSTORE_PATH);
-        System.setProperty("javax.net.ssl.keyStorePassword", ClientConfig.PRIVATE_KEYSTORE_PWD);
+        System.setProperty("javax.net.ssl.keyStore", ClientConfig.KEYSTORE_PATH);
+        System.setProperty("javax.net.ssl.keyStorePassword", ClientConfig.KEYSTORE_PWD);
     }
    
     /** Creates a dummy public key which is a deterministic
@@ -486,6 +487,9 @@ public class TestClient {
             System.out.println("The path you entered for CONIKS_CLIENTCONFIG doesn't exist.");
             System.exit(-1);
         }
+
+        // set the operation mode in the messaging module
+        ClientMessaging.setIsFullOp(isFullOp);
 
         // false indicates an error, so exit
         if (!ClientConfig.readClientConfig(configFile, isFullOp)) {

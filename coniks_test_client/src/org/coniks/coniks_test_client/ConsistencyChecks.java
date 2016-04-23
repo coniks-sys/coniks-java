@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import com.google.protobuf.*;
 import org.javatuples.*;
 
+import org.coniks.coniks_common.ServerErr;
 import org.coniks.coniks_common.C2SProtos.RegistrationResp;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
 import org.coniks.coniks_common.UtilProtos.Commitment;
@@ -77,7 +78,7 @@ public class ConsistencyChecks {
             new ArrayList<AuthPath.InteriorNode>(authPath.getInteriorList());
 
         if(inList.size() != numInteriors){
-            ConiksClient.clientLog.error("Bad length of auth path");
+            ClientLogger.error("Bad length of auth path");
             return null;
         }
 
@@ -89,8 +90,8 @@ public class ConsistencyChecks {
 
         AuthPath.RootNode root = authPath.getRoot();
 
-        if(!root.hasPrunedchild() || !root.hasPrev() || !root.hasSubtree() || !root.hasEpoch()){
-            ConiksClient.clientLog.error("Root malformed");
+        if(!root.hasPrunedchild() || !root.hasSubtree()){
+            ClientLogger.error("Root malformed");
             return null;
         }
         

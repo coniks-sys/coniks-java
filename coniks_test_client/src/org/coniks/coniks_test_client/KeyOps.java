@@ -44,6 +44,8 @@ import java.util.Scanner;
 import java.io.PrintWriter;
 import java.io.*;
 
+import org.coniks.coniks_common.CommonMessaging;
+
 /** Implements all operations involving encryption keys
  * that a CONIKS client must perform.
  *
@@ -52,12 +54,12 @@ import java.io.*;
 public class KeyOps{
 
     /** Load <i>this</i> CONIKS client's private key from the keystore
-     * indicated in the clients's configuration {@code config}.
+     * indicated in the clients's ClientConfiguration {@code ClientConfig}.
      *
      *@return The client's private DSA key, or {@code null}
      * in the case of an Exception.
      */
-    public static DSAPrivateKey loadSigningKey(ClientConfig config){
+    public static DSAPrivateKey loadSigningKey(String username){
 
         KeyStore ks = null;
         DSAPrivateKey myPrivateKey = null;
@@ -66,19 +68,19 @@ public class KeyOps{
             ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
             // get user password and file input stream
-            char[] ks_password = config.KEYSTORE_PWD.toCharArray();
+            char[] ks_password = ClientConfig.KEYSTORE_PWD.toCharArray();
             
             FileInputStream fis = null;
       
-            fis = new FileInputStream(config.KEYSTORE_PATH);
+            fis = new FileInputStream(ClientConfig.KEYSTORE_PATH);
             ks.load(fis, ks_password);
 
-            if(ks.isKeyEntry(config.NAME)){
+            if(ks.isKeyEntry(username+"-priv")){
                 KeyStore.ProtectionParameter protParam = 
                     new KeyStore.PasswordProtection(ks_password);
 
                 KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
-                    ks.getEntry(config.NAME, protParam);
+                    ks.getEntry(username+"-priv", protParam);
                 myPrivateKey = (DSAPrivateKey)pkEntry.getPrivateKey();
             }
             else{
@@ -88,19 +90,19 @@ public class KeyOps{
             return myPrivateKey;
         }
         catch(IOException e){
-            ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem loading the keystore");
+            ClientLogger.error("KeyOps:loadSigningKey: Problem loading the keystore");
         }   
         catch(NoSuchAlgorithmException e){
-            ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem with integrity check algorithm");
+            ClientLogger.error("KeyOps:loadSigningKey: Problem with integrity check algorithm");
         }
         catch(CertificateException e){
-            ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem with the cert(s) in keystore");
+            ClientLogger.error("KeyOps:loadSigningKey: Problem with the cert(s) in keystore");
         }   
         catch(KeyStoreException e){
-            ConiksClient.clientLog.error("KeyOps:loadSigningKey: Problem getting Keystore instance");
+            ClientLogger.error("KeyOps:loadSigningKey: Problem getting Keystore instance");
         }
         catch(UnrecoverableEntryException e){
-            ConiksClient.clientLog.error("KeyOps:loadSigningKey: specified protParam were insufficient or invalid");
+            ClientLogger.error("KeyOps:loadSigningKey: specified protParam were insufficient or invalid");
         }
         return null;
     }
@@ -118,11 +120,11 @@ public class KeyOps{
             kg.initialize(1024, new SecureRandom());
         }
         catch(NoSuchAlgorithmException e){
-            ConiksClient.clientLog.error("DSA is not valid for some reason.");
+            ClientLogger.error("DSA is not valid for some reason.");
             return null;
         }
         catch(InvalidParameterException e){
-            ConiksClient.clientLog.error("DSA is not valid for some reason.");
+            ClientLogger.error("DSA is not valid for some reason.");
             return null;
         }
 
@@ -137,13 +139,13 @@ public class KeyOps{
      *
      *@param kp the key pair to be saved
      */
-    public static void saveKeyPair(KeyPair kp) {
-        File ksFile = new File(config.KEYSTORE_PATH);
+    public static void saveKeyPair(String username, KeyPair kp) {
+        File ksFile = new File(ClientConfig.KEYSTORE_PATH);
 
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        KeyStore ks;
 
         // get user password
-        char[] ksPassword = config.KEYSTORE_PWD.toCharArray();;
+        char[] ksPassword = ClientConfig.KEYSTORE_PWD.toCharArray();;
 
         // File streams
         FileInputStream fis = null;
@@ -151,6 +153,8 @@ public class KeyOps{
 
         // load the keystore
         try { 
+            ks = KeyStore.getInstance(KeyStore.getDefaultType());
+
             // generate an empty keystore if it doesn't exist
             if (!ksFile.exists()) {            
                 ks.load(fis, ksPassword);
@@ -161,39 +165,38 @@ public class KeyOps{
             }
 
             // save the private key
-            KeyStore.PrivateKeyEntry privKeyEntry = new KeyStore.PrivateKeyEntry(kp.getPrivate());
+            KeyStore.PrivateKeyEntry privKeyEntry = new KeyStore.PrivateKeyEntry(kp.getPrivate(), null);
 
             KeyStore.ProtectionParameter protParam = 
                 new KeyStore.PasswordProtection(ksPassword);
 
             // for now, let's not store another entry if this client already has one
-            if (ks.getEntry(config.USERNAME+"-priv", protParam) != null) {
-                ConiksClient.clientLog.error("trying to override an existing private key");
-                break;
+            if (ks.getEntry(username+"-priv", protParam) == null) {
+                ks.setEntry(username+"-priv", privKeyEntry, protParam);
+                
+                fos = new FileOutputStream(ksFile);
+                
+                ks.store(fos, ksPassword);
             }
-
-            ks.setEntry(config.USERNAME+"-priv", privKeyEntry, protParam);
-
-            fos = FileOutputStream(ksFile);
-
-            ks.store(fos, ksPassword);
         }
         catch(IOException e){
-            ConiksClient.clientLog.error("");
+            ClientLogger.error(e.getMessage());
         }   
         catch(NoSuchAlgorithmException e){
-            ConiksClient.clientLog.error("");
+            ClientLogger.error(e.getMessage());
         }
         catch(CertificateException e){
-            ConiksClient.clientLog.error("");
+            ClientLogger.error(e.getMessage());
+        }
+        catch(KeyStoreException e) {
+            ClientLogger.error(e.getMessage());
+        }
+        catch(UnrecoverableEntryException e) {
+            ClientLogger.error(e.getMessage());
         }
         finally {
-            if (fis != null) {
-                fis.close();
-            }
-            if (fos != null) {
-                fos.close();
-            }
+            CommonMessaging.close(fis);
+            CommonMessaging.close(fos);
         }
      
     }

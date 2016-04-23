@@ -48,10 +48,10 @@ import java.io.FileInputStream;
 public class ClientConfig{
 
     private static final int PORT_IDX = 0;
-    private static final int KEYSTORE_PATH_IDX = 1;
-    private static final int KEYSTORE_PWD_IDX = 2;
-    private static final int TRUSTSTORE_PATH_IDX = 3;
-    private static final int TRUSTSTORE_PWD_IDX = 4;
+    private static final int KEYSTORE_PATH_IDX = 2;
+    private static final int KEYSTORE_PWD_IDX = 3;
+    private static final int TRUSTSTORE_PATH_IDX = 4;
+    private static final int TRUSTSTORE_PWD_IDX = 5;
 
     /** The port number on which the CONIKS server is listening
      */

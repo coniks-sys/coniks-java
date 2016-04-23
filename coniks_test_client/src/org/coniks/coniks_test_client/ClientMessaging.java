@@ -40,6 +40,8 @@ import java.io.*;
 import com.google.protobuf.*;
 
 import org.coniks.coniks_common.MsgType;
+import org.coniks.coniks_common.CommonMessaging;
+
 import org.coniks.coniks_common.C2SProtos.Registration;
 import org.coniks.coniks_common.C2SProtos.CommitmentReq;
 import org.coniks.coniks_common.C2SProtos.KeyLookup;
@@ -69,6 +71,20 @@ public class ClientMessaging {
 
     private static DataOutputStream dout;
     private static DataInputStream din;
+    private static Socket sock;
+
+    // don't want to have to pass this value from the TestClient
+    // in every single function
+    private static boolean isFullOp;
+
+    /** Sets the isFullOp flag
+     *
+     *@param isFull indicates whether the client is operating in
+     * full operating mode or in test mode
+     */
+    public static void setIsFullOp (boolean isFull) {
+        isFullOp = isFull;
+    }
 
     /** Sends a Registration protobuf message with the given
         {@code username} and {@code publicKey} to
@@ -149,13 +165,11 @@ public class ClientMessaging {
             dout.flush();
         }
         catch (IOException e) {
-            clientLog.error("Sending msg proto "+msg.toString());
-            clientLog.error("Error: "+e.getMessage());
+            ClientLogger.error("Sending msg proto "+msg.toString());
+            ClientLogger.error("Error: "+e.getMessage());
         }
         finally {
-            if (dout != null) {
-                dout.close();
-            }
+            CommonMessaging.close(dout);
         }
 
     }
@@ -232,11 +246,11 @@ public class ClientMessaging {
         // implement signing
         try {
             byte[] sig = SignatureOps.sign(changeReq.toByteArray(), prk);
-            clientLog.log("Signed ULNChange. Sig: " + Arrays.toString(sig));
+            ClientLogger.log("Signed ULNChange. Sig: " + Arrays.toString(sig));
             ulnChangeBuilder.addAllSig(ClientUtils.byteArrToIntList(sig));
         }
         catch (InvalidKeyException e) {
-            clientLog.error("signed ULN change - Bad key");
+            ClientLogger.error("signed ULN change - Bad key");
             return null;
         }
         return ulnChangeBuilder.build();
@@ -337,7 +351,7 @@ public class ClientMessaging {
                 RegistrationResp regResp = RegistrationResp.parseDelimitedFrom(din);
                 
                 if(!regResp.hasInitEpoch() || !regResp.hasEpochInterval()){
-                    clientLog.error("Malformed registration response");
+                    ClientLogger.error("Malformed registration response");
                 }
                 else {
                     return regResp;
@@ -347,7 +361,7 @@ public class ClientMessaging {
                 AuthPath authPath = AuthPath.parseDelimitedFrom(din);
                 
                 if (!authPath.hasLeaf() || !authPath.hasRoot()) {
-                    clientLog.error("Malformed auth path");
+                    ClientLogger.error("Malformed auth path");
                 }
                 else {
                     return authPath;
@@ -357,7 +371,7 @@ public class ClientMessaging {
                 Commitment comm = Commitment.parseDelimitedFrom(din);
                 
                 if (!comm.hasEpoch() || !comm.hasRootHash()) {
-                    clientLog.error("Malformed commitment");
+                    ClientLogger.error("Malformed commitment");
                 }
                 else {
                     return comm;
@@ -369,7 +383,7 @@ public class ClientMessaging {
                 ServerResp resp = ServerResp.parseDelimitedFrom(din);
                 
                 if (!resp.hasMessage()) {
-                    clientLog.error("Malformed simple server response");
+                    ClientLogger.error("Malformed simple server response");
                 }
                 else {
                     return resp;
@@ -377,15 +391,14 @@ public class ClientMessaging {
             }
         }
         catch (InvalidProtocolBufferException e) {
-            clientLog.error("parsing proto msg: "+e.getMessage());
+            ClientLogger.error("parsing proto msg: "+e.getMessage());
         }
         catch (IOException e) {
-            clientLog.error("receiving data from the server: "+e.getMessage());
+            ClientLogger.error("receiving data from the server: "+e.getMessage());
         }
         finally {
-            if (din != null) {
-                din.close();
-            }
+            CommonMessaging.close(din);
+            CommonMessaging.close(sock);
         }
 
         // unexpected message type from the server
@@ -402,18 +415,16 @@ public class ClientMessaging {
      * or in testing mode
      *@throws an {@code IOException} if any of the socket operations fail.
      */
-    private static void connect (String server, boolean isFullOp) 
+    private static void connect (String server) 
         throws IOException {
-
-        Socket sock;
 
         if (isFullOp) {
             SSLSocketFactory sslFact =
                 (SSLSocketFactory)SSLSocketFactory.getDefault();
-            sock = (SSLSocket)sslFact.createSocket(server, CONFIG.PORT);
+            sock = (SSLSocket)sslFact.createSocket(server, ClientConfig.PORT);
         }
         else {
-            sock = new Socket(server, CONFIG.PORT);
+            sock = new Socket(server, ClientConfig.PORT);
         }
         dout = new DataOutputStream(sock.getOutputStream());
         din = new DataInputStream(sock.getInputStream());

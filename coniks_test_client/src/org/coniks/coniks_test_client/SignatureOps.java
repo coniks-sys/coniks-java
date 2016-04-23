@@ -57,12 +57,6 @@ import java.io.ObjectOutputStream;
  */
 public class SignatureOps{
 
-    private static ClientConfig CONFIG = null;
-
-    public static void initSignatureOps(ClientConfig config){
-        CONFIG = config;
-    }
-
     /*********************************************************************
      * The following code is used in the reference client, but does not 
      * use a keystore. Instead these functions simply use regular, unprotected
@@ -73,30 +67,26 @@ public class SignatureOps{
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static boolean unsafeSaveDSAKeyPair(KeyPair kp) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
-        return unsafeSaveDSAKeyPairToFile(kp, CONFIG.PRIVATE_KEYSTORE_PATH);
+        return unsafeSaveDSAKeyPairToFile(kp, ClientConfig.KEYSTORE_PATH);
     }
 
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static boolean unsafeSavePublicKey(DSAPublicKey pubKey) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
-        return unsafeSavePublicKeyToFile(pubKey, CONFIG.PRIVATE_KEYSTORE_PATH + "_pub");
+        return unsafeSavePublicKeyToFile(pubKey, ClientConfig.KEYSTORE_PATH + "_pub");
     }
 
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static boolean unsafeSavePrivateKey(DSAPrivateKey prKey) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
-        return unsafeSavePrivateKeyToFile(prKey, CONFIG.PRIVATE_KEYSTORE_PATH + "_pr");
+        return unsafeSavePrivateKeyToFile(prKey, ClientConfig.KEYSTORE_PATH + "_pr");
     }
 
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static boolean unsafeSaveDSAKeyPair(KeyPair kp, String username) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
-        String pubPath = CONFIG.PRIVATE_KEYSTORE_PATH + "_" + username + "_pub";
-        String prPath = CONFIG.PRIVATE_KEYSTORE_PATH + "_" + username + "_pr";
+        String pubPath = ClientConfig.KEYSTORE_PATH + "_" + username + "_pub";
+        String prPath = ClientConfig.KEYSTORE_PATH + "_" + username + "_pr";
         ClientLogger.log("Saving to: " + pubPath + " " + prPath);
         return unsafeSavePublicKeyToFile((DSAPublicKey) kp.getPublic(), pubPath) 
                 && unsafeSavePrivateKeyToFile((DSAPrivateKey) kp.getPrivate(), prPath);
@@ -105,15 +95,13 @@ public class SignatureOps{
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static boolean unsafeSavePublicKey(DSAPublicKey pubKey, String username) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
-        return unsafeSavePublicKeyToFile(pubKey, CONFIG.PRIVATE_KEYSTORE_PATH + "_" + username + "_pub");
+        return unsafeSavePublicKeyToFile(pubKey, ClientConfig.KEYSTORE_PATH + "_" + username + "_pub");
     }
 
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static boolean unsafeSavePrivateKey(DSAPrivateKey prKey, String username) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
-        return unsafeSavePrivateKeyToFile(prKey, CONFIG.PRIVATE_KEYSTORE_PATH + "_" + username + "_pr");
+        return unsafeSavePrivateKeyToFile(prKey, ClientConfig.KEYSTORE_PATH + "_" + username + "_pr");
     }
 
 
@@ -121,7 +109,6 @@ public class SignatureOps{
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static boolean unsafeSaveDSAKeyPairToFile(KeyPair kp, String filePath) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
         String pubPath = filePath + "_pub";
         String prPath = filePath + "_pr";
         return unsafeSavePublicKeyToFile((DSAPublicKey) kp.getPublic(), pubPath) 
@@ -131,7 +118,6 @@ public class SignatureOps{
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static boolean unsafeSavePublicKeyToFile(DSAPublicKey pubKey, String fileName) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
         try {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName));
             out.writeObject(pubKey);
@@ -146,7 +132,6 @@ public class SignatureOps{
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static boolean unsafeSavePrivateKeyToFile(DSAPrivateKey prKey, String fileName) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
         try {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName));
             out.writeObject(prKey);
@@ -161,52 +146,45 @@ public class SignatureOps{
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static KeyPair unsafeLoadDSAKeyPair() {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
-        return unsafeLoadDSAKeyPairFromFile(CONFIG.PRIVATE_KEYSTORE_PATH + "_pub", 
-                                            CONFIG.PRIVATE_KEYSTORE_PATH + "_pr");
+        return unsafeLoadDSAKeyPairFromFile(ClientConfig.KEYSTORE_PATH + "_pub", 
+                                            ClientConfig.KEYSTORE_PATH + "_pr");
     }
 
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static DSAPublicKey unsafeLoadDSAPublicKey() {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
-        return unsafeLoadDSAPublicKeyFromFile(CONFIG.PRIVATE_KEYSTORE_PATH + "_pub");
+        return unsafeLoadDSAPublicKeyFromFile(ClientConfig.KEYSTORE_PATH + "_pub");
     }
 
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static DSAPrivateKey unsafeLoadDSAPrivateKey() {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
-        return unsafeLoadDSAPrivateKeyFromFile(CONFIG.PRIVATE_KEYSTORE_PATH + "_pr");
+        return unsafeLoadDSAPrivateKeyFromFile(ClientConfig.KEYSTORE_PATH + "_pr");
     }
 
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static KeyPair unsafeLoadDSAKeyPair(String username) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
-        return unsafeLoadDSAKeyPairFromFile(CONFIG.PRIVATE_KEYSTORE_PATH + "_" + username + "_pub", 
-                                    CONFIG.PRIVATE_KEYSTORE_PATH + "_" + username + "_pr");
+        return unsafeLoadDSAKeyPairFromFile(ClientConfig.KEYSTORE_PATH + "_" + username + "_pub", 
+                                    ClientConfig.KEYSTORE_PATH + "_" + username + "_pr");
     }
 
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static DSAPublicKey unsafeLoadDSAPublicKey(String username) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
-        return unsafeLoadDSAPublicKeyFromFile(CONFIG.PRIVATE_KEYSTORE_PATH + "_" + username + "_pub");
+        return unsafeLoadDSAPublicKeyFromFile(ClientConfig.KEYSTORE_PATH + "_" + username + "_pub");
     }
 
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static DSAPrivateKey unsafeLoadDSAPrivateKey(String username) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
-        return unsafeLoadDSAPrivateKeyFromFile(CONFIG.PRIVATE_KEYSTORE_PATH + "_" + username + "_pr");
+        return unsafeLoadDSAPrivateKeyFromFile(ClientConfig.KEYSTORE_PATH + "_" + username + "_pr");
     }
 
 
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static KeyPair unsafeLoadDSAKeyPairFromFile(String pubKeyFile, String prKeyFile) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
         DSAPublicKey pubKey = unsafeLoadDSAPublicKeyFromFile(pubKeyFile);
         DSAPrivateKey prKey = unsafeLoadDSAPrivateKeyFromFile(prKeyFile);
         if (pubKey == null || prKey == null) {
@@ -218,7 +196,6 @@ public class SignatureOps{
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static DSAPublicKey unsafeLoadDSAPublicKeyFromFile(String pubKeyFile) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
         try {
             ObjectInputStream keyIn = new ObjectInputStream(new FileInputStream(pubKeyFile));
             DSAPublicKey pubKey = (DSAPublicKey) keyIn.readObject();
@@ -233,7 +210,6 @@ public class SignatureOps{
     // TODO(mrochlin)
     // Should use protected keystore instead of just file streams
     public static DSAPrivateKey unsafeLoadDSAPrivateKeyFromFile(String prKeyFile) {
-        if (CONFIG == null) initSignatureOps(new ClientConfig());
         try {
             ObjectInputStream keyIn = new ObjectInputStream(new FileInputStream(prKeyFile));
             DSAPrivateKey prKey = (DSAPrivateKey) keyIn.readObject();

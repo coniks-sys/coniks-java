@@ -55,7 +55,7 @@ public class ConiksUser {
      *
      *@param uname this user's username
      */
-    public ConiksClient (String uname) {
+    public ConiksUser (String uname) {
         username = uname;
         pubKey = null;
         allowsUnsignedChanges = false; // strict default for now
@@ -74,7 +74,7 @@ public class ConiksUser {
      *@return the CONIKS user's public key
      */
     public PublicKey getPubKey() {
-        return keyPair.getPublic();
+        return pubKey;
     }
 
     /** Indicates whether this CONIKS user allows unsigned key changes
@@ -96,7 +96,7 @@ public class ConiksUser {
      *@return true if the key change authorization passed, or if the user allows unsigned key
      * key changes. False otherwise.
      */
-    public boolean setPubKey(PublicKey pub, bytes[] keyChangeAuth) {
+    public boolean setPubKey(PublicKey pub, byte[] keyChangeAuth) {
 
         // check if we have an auth statement when we need one
         if (keyChangeAuth == null && !allowsUnsignedChanges) {

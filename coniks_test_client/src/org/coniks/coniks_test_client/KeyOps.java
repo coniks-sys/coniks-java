@@ -138,8 +138,9 @@ public class KeyOps{
      * keystore if one doesn't exist.
      *
      *@param kp the key pair to be saved
+     *@return whether the key pair was successfully saved or not
      */
-    public static void saveKeyPair(String username, KeyPair kp) {
+    public static boolean saveKeyPair(String username, KeyPair kp) {
         File ksFile = new File(ClientConfig.KEYSTORE_PATH);
 
         KeyStore ks;
@@ -151,33 +152,40 @@ public class KeyOps{
         FileInputStream fis = null;
         FileOutputStream fos = null;
 
+        boolean success = false;
+
         // load the keystore
         try { 
             ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
             // generate an empty keystore if it doesn't exist
             if (!ksFile.exists()) {            
-                ks.load(fis, ksPassword);
+                ks.load(null, ksPassword);
             }
             else {
                 fis = new FileInputStream(ksFile);
                 ks.load(fis, ksPassword);
             }
 
-            // save the private key
+            // create the private key entry
             KeyStore.PrivateKeyEntry privKeyEntry = new KeyStore.PrivateKeyEntry(kp.getPrivate(), null);
+            
+            // create the public key entry
+            KeyStore.TrustedCertificateEntry pubKeyEntry = 
+                new KeyStore.TrustedCertificateEntry(kp.getPublic(), null);
 
             KeyStore.ProtectionParameter protParam = 
                 new KeyStore.PasswordProtection(ksPassword);
 
-            // for now, let's not store another entry if this client already has one
-            if (ks.getEntry(username+"-priv", protParam) == null) {
-                ks.setEntry(username+"-priv", privKeyEntry, protParam);
+            // TODO: don't override old entries around if this client already has one
+            ks.setEntry(username+"-priv", privKeyEntry, protParam);
+            ks.setEntry(username+"-pub", pubKeyEntry, protParam);
                 
-                fos = new FileOutputStream(ksFile);
-                
-                ks.store(fos, ksPassword);
-            }
+            fos = new FileOutputStream(ksFile);
+            
+            ks.store(fos, ksPassword);
+
+            success = true;
         }
         catch(IOException e){
             ClientLogger.error(e.getMessage());
@@ -198,7 +206,8 @@ public class KeyOps{
             CommonMessaging.close(fis);
             CommonMessaging.close(fos);
         }
-     
+
+        return success;
     }
 
     /** This is a really bad function that takes a string we assume contains a DSA key in 

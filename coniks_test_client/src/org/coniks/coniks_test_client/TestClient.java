@@ -79,7 +79,7 @@ public class TestClient {
     /** Sets the default truststore according to the {@link ClientConfig}.
      * This is needed to set up SSL connections with a CONIKS server.
      */
-    private static void setDefaultTruststore() {
+    private static void setDefaultTruststore () {
         System.setProperty("javax.net.ssl.trustStore", 
                            ClientConfig.TRUSTSTORE_PATH);
         System.setProperty("javax.net.ssl.trustStorePassword",
@@ -216,42 +216,62 @@ public class TestClient {
      * otherwise.
      */
     public static int signedKeyChange(ConiksUser user, String server) {
-        SignatureOps.initSignatureOps(ConiksClient.ClientConfig);
-        DSAPrivateKey prKey = SignatureOps.unsafeLoadDSAPrivateKey(username);
+        String username = user.getUsername();
+        DSAPrivateKey prKey = KeyOps.loadSigningKey(username);
         System.out.print(username + " : " + prKey + " ");
         System.out.printf("x: %s\n", prKey.getX());
 
         String newBlob = "(signed changed: " + new BigInteger(50, new Random()).toString(32);
         KeyPair kp = KeyOps.generateDSAKeyPair();
-        ConiksClient.sendSignedULNChangeReqProto(username, newBlob, (DSAPublicKey) kp.getPublic(),
+        ClientMessaging.sendSignedULNChangeReqProto(username, newBlob, (DSAPublicKey) kp.getPublic(),
                                                  false, true, prKey, server);
 
-        if (ConiksClient.receiveRegistrationRespProto() == null) {
-            return false;
+        AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();
+
+        if (serverMsg == null) {
+            return ServerErr.MALFORMED_SERVER_MSG_ERR;
         }
-
-        SignatureOps.unsafeSaveDSAKeyPair(kp, username);
-
-        return true;
+        else if (serverMsg instanceof ServerResp) {
+            return getServerErr((ServerResp)serverMsg);
+        }
+        else {
+            if (KeyOps.saveKeyPair(username, kp)) {
+                return ConsistencyErr.CHECK_PASSED;
+            }
+            else {
+                return ConsistencyErr.KEYSTORE_ERR;
+            }
+        }
 
     }
 
     /** performs an unsigned key change. Should fail if the username
      * requires signed key changes. 
      */
-    public static boolean doUnsignedKeyChange(String username, String server) {
+    public static int unsignedKeyChange(ConiksUser user, String server) {
+        String username = user.getUsername();
         String newBlob = "(unsigned changed: " + new BigInteger(50, new Random()).toString(32);
         KeyPair kp = KeyOps.generateDSAKeyPair();
-        ConiksClient.sendULNChangeReqProto(username, newBlob, (DSAPublicKey) kp.getPublic(),
+        ClientMessaging.sendULNChangeReqProto(username, newBlob, (DSAPublicKey) kp.getPublic(),
                                                  true, true, server);
 
-        if (ConiksClient.receiveRegistrationRespProto() == null) {
-            return false;
+        AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();
+
+        if (serverMsg == null) {
+            return ServerErr.MALFORMED_SERVER_MSG_ERR;
+        }
+        else if (serverMsg instanceof ServerResp) {
+            return getServerErr((ServerResp)serverMsg);
+        }
+        else {
+            if (KeyOps.saveKeyPair(username, kp)) {
+                return ConsistencyErr.CHECK_PASSED;
+            }
+            else {
+                return ConsistencyErr.KEYSTORE_ERR;
+            }
         }
 
-        SignatureOps.unsafeSaveDSAKeyPair(kp, username);
-
-        return true;
     }
 
     /** changes a user to allow unsigned key changes */
@@ -402,15 +422,10 @@ public class TestClient {
                 error = register(uname, server);
             }
             else if (op.equalsIgnoreCase("SIGNED")) {
-                if (!doSignedKeyChange(uname, server)) {
-                    System.out.println("An error occured");
-                }
+                error = signedKeyChange(uname, server);
             }
             else if (op.equalsIgnoreCase("UNSIGNED")) {
-                if (!doUnsignedKeyChange(uname, server)) {
-                    System.out.println("An error occured");
-                }
-
+                error = unsignedKeyChange(uname, server);
             }
             else if (op.equalsIgnoreCase("CHANGES")) {
                 if (!doChangeToAllowsUnsigned(uname, server)) {
@@ -433,18 +448,6 @@ public class TestClient {
             printErrMsg(error, uname);
         }
         System.out.println(" done!");
-    }
-
-     /** Sets the default truststore according to the {@link ClientConfig}.
-     * This is needed to set up SSL connections with a CONIKS server.
-     */
-    public static void setDefaultTruststore() {
-        System.setProperty("javax.net.ssl.trustStore", 
-                           ClientConfig.TRUSTSTORE_PATH);
-        System.setProperty("javax.net.ssl.trustStorePassword",
-                           ClientConfig.TRUSTSTORE_PWD);
-        System.setProperty("javax.net.ssl.keyStore", ClientConfig.PRIVATE_KEYSTORE_PATH);
-        System.setProperty("javax.net.ssl.keyStorePassword", ClientConfig.PRIVATE_KEYSTORE_PWD);
     }
 
     /** Prompts the user to perform a CONIKS operation for one or more users.

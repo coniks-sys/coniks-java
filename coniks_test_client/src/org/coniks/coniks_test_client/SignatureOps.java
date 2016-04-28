@@ -57,170 +57,6 @@ import java.io.ObjectOutputStream;
  */
 public class SignatureOps{
 
-    /*********************************************************************
-     * The following code is used in the reference client, but does not 
-     * use a keystore. Instead these functions simply use regular, unprotected
-     * files. Future implmentations should use protected keystores 
-     *********************************************************************/
-
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static boolean unsafeSaveDSAKeyPair(KeyPair kp) {
-        return unsafeSaveDSAKeyPairToFile(kp, ClientConfig.KEYSTORE_PATH);
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static boolean unsafeSavePublicKey(DSAPublicKey pubKey) {
-        return unsafeSavePublicKeyToFile(pubKey, ClientConfig.KEYSTORE_PATH + "_pub");
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static boolean unsafeSavePrivateKey(DSAPrivateKey prKey) {
-        return unsafeSavePrivateKeyToFile(prKey, ClientConfig.KEYSTORE_PATH + "_pr");
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static boolean unsafeSaveDSAKeyPair(KeyPair kp, String username) {
-        String pubPath = ClientConfig.KEYSTORE_PATH + "_" + username + "_pub";
-        String prPath = ClientConfig.KEYSTORE_PATH + "_" + username + "_pr";
-        ClientLogger.log("Saving to: " + pubPath + " " + prPath);
-        return unsafeSavePublicKeyToFile((DSAPublicKey) kp.getPublic(), pubPath) 
-                && unsafeSavePrivateKeyToFile((DSAPrivateKey) kp.getPrivate(), prPath);
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static boolean unsafeSavePublicKey(DSAPublicKey pubKey, String username) {
-        return unsafeSavePublicKeyToFile(pubKey, ClientConfig.KEYSTORE_PATH + "_" + username + "_pub");
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static boolean unsafeSavePrivateKey(DSAPrivateKey prKey, String username) {
-        return unsafeSavePrivateKeyToFile(prKey, ClientConfig.KEYSTORE_PATH + "_" + username + "_pr");
-    }
-
-
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static boolean unsafeSaveDSAKeyPairToFile(KeyPair kp, String filePath) {
-        String pubPath = filePath + "_pub";
-        String prPath = filePath + "_pr";
-        return unsafeSavePublicKeyToFile((DSAPublicKey) kp.getPublic(), pubPath) 
-                && unsafeSavePrivateKeyToFile((DSAPrivateKey) kp.getPrivate(), prPath);
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static boolean unsafeSavePublicKeyToFile(DSAPublicKey pubKey, String fileName) {
-        try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName));
-            out.writeObject(pubKey);
-            out.close();
-        }
-        catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static boolean unsafeSavePrivateKeyToFile(DSAPrivateKey prKey, String fileName) {
-        try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName));
-            out.writeObject(prKey);
-            out.close();
-        }
-        catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static KeyPair unsafeLoadDSAKeyPair() {
-        return unsafeLoadDSAKeyPairFromFile(ClientConfig.KEYSTORE_PATH + "_pub", 
-                                            ClientConfig.KEYSTORE_PATH + "_pr");
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static DSAPublicKey unsafeLoadDSAPublicKey() {
-        return unsafeLoadDSAPublicKeyFromFile(ClientConfig.KEYSTORE_PATH + "_pub");
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static DSAPrivateKey unsafeLoadDSAPrivateKey() {
-        return unsafeLoadDSAPrivateKeyFromFile(ClientConfig.KEYSTORE_PATH + "_pr");
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static KeyPair unsafeLoadDSAKeyPair(String username) {
-        return unsafeLoadDSAKeyPairFromFile(ClientConfig.KEYSTORE_PATH + "_" + username + "_pub", 
-                                    ClientConfig.KEYSTORE_PATH + "_" + username + "_pr");
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static DSAPublicKey unsafeLoadDSAPublicKey(String username) {
-        return unsafeLoadDSAPublicKeyFromFile(ClientConfig.KEYSTORE_PATH + "_" + username + "_pub");
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static DSAPrivateKey unsafeLoadDSAPrivateKey(String username) {
-        return unsafeLoadDSAPrivateKeyFromFile(ClientConfig.KEYSTORE_PATH + "_" + username + "_pr");
-    }
-
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static KeyPair unsafeLoadDSAKeyPairFromFile(String pubKeyFile, String prKeyFile) {
-        DSAPublicKey pubKey = unsafeLoadDSAPublicKeyFromFile(pubKeyFile);
-        DSAPrivateKey prKey = unsafeLoadDSAPrivateKeyFromFile(prKeyFile);
-        if (pubKey == null || prKey == null) {
-            return null;
-        }
-        return new KeyPair((PublicKey) pubKey, (PrivateKey) prKey);
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static DSAPublicKey unsafeLoadDSAPublicKeyFromFile(String pubKeyFile) {
-        try {
-            ObjectInputStream keyIn = new ObjectInputStream(new FileInputStream(pubKeyFile));
-            DSAPublicKey pubKey = (DSAPublicKey) keyIn.readObject();
-            keyIn.close();
-            return pubKey;
-        }
-        catch (Exception e) {
-            return null;
-        }
-    }
-
-    // TODO(mrochlin)
-    // Should use protected keystore instead of just file streams
-    public static DSAPrivateKey unsafeLoadDSAPrivateKeyFromFile(String prKeyFile) {
-        try {
-            ObjectInputStream keyIn = new ObjectInputStream(new FileInputStream(prKeyFile));
-            DSAPrivateKey prKey = (DSAPrivateKey) keyIn.readObject();
-            keyIn.close();
-            return prKey;
-        }
-        catch (Exception e) {
-            return null;
-        }
-    }
-
     /** Makes a DSA PublicKey from the given parameters */
     public static PublicKey makeDSAPublicKeyFromParams(BigInteger p, BigInteger q, BigInteger g, BigInteger y) {
         try {
@@ -240,7 +76,7 @@ public class SignatureOps{
         return null;
     }
 
-    /** Verifies @code{msg} and the @code{sig} using the DSA PublicKey @code{pk} */
+    /** Verifies {@code msg} and the {@code sig} using the DSA PublicKey {@code pk} */
     public static boolean verifySigFromDSA(byte[] msg, byte[] sig, PublicKey pk) {
         try {
             Signature verifyalg = Signature.getInstance("DSA");
@@ -264,9 +100,11 @@ public class SignatureOps{
         return false;
     }
 
-    /** Signs @code{msg} using DSAPrivateKey @code{prk} 
-        Returns null on an error 
-        Throws @code{InvalidKeyException} if @code{prk} is null */
+    /** Signs {@code msg} using DSAPrivateKey {@code prk} 
+     *
+     *@return the signature or null on an error 
+     *@throws {@code InvalidKeyException} if {@code prk} is null 
+     */
     public static byte[] sign(byte[] msg, DSAPrivateKey prk) throws InvalidKeyException {
         if (prk == null) {
             ClientLogger.error("The given key is invalid.");
@@ -291,4 +129,4 @@ public class SignatureOps{
     }
 
 
-} //ends SignatureOps class
+}

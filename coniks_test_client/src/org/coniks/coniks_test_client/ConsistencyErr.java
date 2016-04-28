@@ -52,18 +52,39 @@ public final class ConsistencyErr {
      */
     public static final int CHECK_PASSED = 20;
 
-    /** Indicates that the binding sent by the server is
+    /** Indicates that the name-to-key mapping sent by the server is
      * inconsistent with the root hash.
      */
-    public static final int BAD_BINDING_ERR = 21;
+    public static final int BAD_MAPPING_ERR = 21;
 
-    /** Indicates that the STR is inconsistent with the 
+    /** Indicates an unexpected key for a known name-to-key mapping.
+     */
+    public static final int UNEXPECTED_KEY_ERR = 22;
+
+    /** Indicates that an STR is inconsistent with the 
      * Merkle tree root to which it is being compared.
      */
-    public static final int BAD_STR_ERR = 22;
+    public static final int BAD_STR_ERR = 23;
+
+    /** Indicates that an STR is inconsistent with another STR
+     * for the same epoch and key server. In other words, the
+     * key server has equivocated showing different parties diverging
+     * views of its key directory.
+    */
+    public static final int EQUIVOCATION_ERR = 24;
 
     /** Indicates that the server's signature is invalid.
      */
-    public static final int BAD_SERVER_SIG_ERR = 23;
+    public static final int BAD_SERVER_SIG_ERR = 25;
+
+    /** Indicates that the signature on a signed key or user info change 
+     * is invalid.
+     */
+    public static final int BAD_SIGNED_CHANGE_ERR = 26;
+
+    /** Indicates an error occurred while trying to load or save
+        a client's key pair.
+    */
+    public static final int KEYSTORE_ERR = 27;
 
 }

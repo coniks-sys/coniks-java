@@ -138,13 +138,15 @@ public class ClientMessaging {
     }
 
     /** Sends a SignedULNChangeReq protobuf with all the arguments and signed with {@code prk} */
-    public static void sendSignedULNChangeReqProto(String username, String newBlob, DSAPublicKey newChangeKey,
-                                         boolean allowsUnsignedKeychange, boolean allowsPublicLookup,
-                                         DSAPrivateKey prk,
-                                         String server) {
+    public static void sendSignedULNChangeReqProto(String username, String newBlob, 
+                                                   DSAPublicKey newChangeKey,
+                                                   boolean allowsUnsignedKeychange, 
+                                                   boolean allowsPublicLookup,
+                                                   byte[] sig,
+                                                   String server) {
         ULNChangeReq changeReq = buildULNChangeReqMsgProto(username, newBlob, newChangeKey, 
                                                            allowsUnsignedKeychange, allowsPublicLookup);
-        SignedULNChangeReq signed = buildSignedULNChangeReqMsgProto(changeReq, prk);
+        SignedULNChangeReq signed = buildSignedULNChangeReqMsgProto(changeReq, sig);
         sendMsgProto(MsgType.SIGNED_ULNCHANGE_REQ, signed, server);
     }
 
@@ -234,25 +236,16 @@ public class ClientMessaging {
 
     /** Builds the SignedULNChangeReq protobuf message with a given 
         {@code changeReq} is a ULNChangeReq that was built previously 
-        {@code sig}
-        Unlike the other methods, this one actually handles the signing        
+        {@code sig}.
     */
-    private static SignedULNChangeReq buildSignedULNChangeReqMsgProto(ULNChangeReq changeReq, DSAPrivateKey prk) {
+    private static SignedULNChangeReq buildSignedULNChangeReqMsgProto(ULNChangeReq changeReq, byte[] sig) {
 
         SignedULNChangeReq.Builder ulnChangeBuilder = SignedULNChangeReq.newBuilder();
         ulnChangeBuilder.setReq(changeReq);
 
-        // TODO (mrochlin)
-        // implement signing
-        try {
-            byte[] sig = SignatureOps.sign(changeReq.toByteArray(), prk);
-            ClientLogger.log("Signed ULNChange. Sig: " + Arrays.toString(sig));
-            ulnChangeBuilder.addAllSig(ClientUtils.byteArrToIntList(sig));
-        }
-        catch (InvalidKeyException e) {
-            ClientLogger.error("signed ULN change - Bad key");
-            return null;
-        }
+        ClientLogger.log("Signed ULNChange. Sig: " + Arrays.toString(sig));
+        ulnChangeBuilder.addAllSig(ClientUtils.byteArrToIntList(sig));
+       
         return ulnChangeBuilder.build();
     }
 

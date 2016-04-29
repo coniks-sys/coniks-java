@@ -36,6 +36,9 @@ package org.coniks.coniks_test_client;
 import javax.net.ssl.*;
 import java.net.*;
 import java.io.*;
+import java.security.*;
+import java.security.spec.*;
+import java.security.interfaces.*;
 import java.util.ArrayList;
 
 import com.google.protobuf.*;
@@ -56,6 +59,42 @@ import org.coniks.coniks_common.UtilProtos.ServerResp;
  */
 public class ConsistencyChecks {
 
+    /** Tries to retrieve the public key for the given user from
+     * disk and checks if the retrieved key is consistent with the public key
+     * received in the auth path.
+     *
+     *@param uname the user whose public key to verify
+     *@param authPath the auth path containing the received public key
+     *@return whether the check succeeded
+     */
+    public static int verifyPubKeyProto (String uname, AuthPath authPath) {
+        
+        DSAPublicKey pubKey = KeyOps.loadDSAPublicKey(uname);
+        
+        // TODO: more fine-grained check for whether the key is null bc the file
+        // doesn't exist or because there was an actual error
+        if (pubKey == null) {
+            System.out.println("public key was null");
+            return ConsistencyErr.CHECK_PASSED;
+        }
+
+        AuthPath.UserLeafNode apUln = authPath.getLeaf();
+
+        String pk = apUln.getPublickey();
+
+        String pubKeyStr = pubKey.getY().toString();
+
+        // TODO: compare the keys directly
+        if (pk.equals(pubKeyStr)) {
+            return ConsistencyErr.CHECK_PASSED;
+        }
+        else {
+            // TODO: check the signed key change if the client requires it
+            return ConsistencyErr.UNEXPECTED_KEY_ERR;
+        }
+
+    }
+
     /** Recomputes the root node from an AuthPath protobuf message
      * {@code authPath}.
      *
@@ -66,8 +105,7 @@ public class ConsistencyChecks {
         
         AuthPath.UserLeafNode apUln = authPath.getLeaf();        
        
-        ArrayList<Integer> lookupIndexList = new ArrayList<Integer>(
-                                                                    apUln.getLookupIndexList());
+        ArrayList<Integer> lookupIndexList = new ArrayList<Integer>(apUln.getLookupIndexList());
 
         byte[] lookupIndex = ClientUtils.intListToByteArr(lookupIndexList);
         int numInteriors = apUln.getIntlevels();
@@ -99,14 +137,13 @@ public class ConsistencyChecks {
 
     }
 
-    /** Verifies that a given data binding is consistent with the server's STR
+    /** Verifies that a given mapping is consistent with the server's STR
      * using the proof {@code authPath} and the STR {@code comm}.
      *
      *@return A {@link utils.ConsistencyErr} error code. {@code NO_ERR} indicates
      * that the verification passed.
      */
-    public static int verifyDataBindingProto (AuthPath authPath, 
-                                                             Commitment comm){
+    public static int verifyMappingProto (AuthPath authPath, Commitment comm){
 
         // this really shouldn't be null at this point, but we'll check jic
         if (authPath == null /*|| comm == null*/) {

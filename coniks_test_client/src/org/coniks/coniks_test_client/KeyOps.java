@@ -180,14 +180,14 @@ public class KeyOps{
         return success;
     }
 
-    /** Saves the given key pair to the keystore. Generates an empty
-     * keystore if one doesn't exist.
+    /** Saves the given user's private key to a keystore.
+     * Generates an empty keystore if one doesn't exist.
      *
      *@param uname the username for which the key pair is to be saved
-     *@param kp the key pair to be saved
-     *@return whether the key pair was successfully saved or not
+     *@param pr the private key to be saved
+     *@return whether the private key was successfully saved or not
      */
-    public static boolean saveDSAKeyPair(String uname, KeyPair kp) {
+    public static boolean saveDSAPrivateKey(String uname, DSAPrivateKey pr) {
         File ksFile = new File(ClientConfig.KEYSTORE_PATH);
 
         KeyStore ks;
@@ -215,20 +215,20 @@ public class KeyOps{
             }
 
             // create the private key entry
-            KeyStore.PrivateKeyEntry privKeyEntry = new KeyStore.PrivateKeyEntry(kp.getPrivate(), null);
+            KeyStore.PrivateKeyEntry privKeyEntry = new KeyStore.PrivateKeyEntry(pr, null);
 
             KeyStore.ProtectionParameter protParam = 
                 new KeyStore.PasswordProtection(ksPassword);
 
             // TODO: don't override old entries around if this client already has one
+            // i.e. keep around old entries so the client can recover old messages
             ks.setEntry(uname+"-priv", privKeyEntry, protParam);
                 
             fos = new FileOutputStream(ksFile);
             
             ks.store(fos, ksPassword);
 
-            // store the public key
-            success = saveDSAPublicKey(uname, (DSAPublicKey)kp.getPublic());
+            success = true;
         }
         catch(IOException e){
             ClientLogger.error(e.getMessage());
@@ -245,6 +245,25 @@ public class KeyOps{
         finally {
             CommonMessaging.close(fis);
             CommonMessaging.close(fos);
+        }
+
+        return success;
+    }
+
+
+    /** Saves the given key pair to disk. Generates an empty
+     * keystore for the private key if one doesn't exist.
+     *
+     *@param uname the username for which the key pair is to be saved
+     *@param kp the key pair to be saved
+     *@param whether the save succeeded
+     */
+    public static boolean saveDSAKeyPair(String uname, KeyPair kp) {
+        
+        boolean success = false;
+
+        if (saveDSAPrivateKey(uname, (DSAPrivateKey)kp.getPrivate())) {
+            success = saveDSAPublicKey(uname, (DSAPublicKey)kp.getPublic());
         }
 
         return success;

@@ -87,4 +87,9 @@ public final class ConsistencyErr {
     */
     public static final int KEYSTORE_ERR = 27;
 
+    /** Indicates the the client has attempted to do a disallowed operation.
+     * E.g. perform an unsigned key change when the user doesn't allow this.
+     */
+    public static final int DISALLOWED_OP_ERR = 28;
+
 }

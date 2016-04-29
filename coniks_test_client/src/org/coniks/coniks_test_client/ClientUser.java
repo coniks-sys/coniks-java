@@ -53,8 +53,9 @@ public class ClientUser extends ConiksUser {
      *
      *@param uname this user's username
      */
-    public ClientUser (String uname) {
-        super(uname);
+    public ClientUser (String uname, KeyPair kp) {
+        super(uname, (DSAPublicKey)kp.getPublic());
+        KeyOps.saveDSAPrivateKey(uname, (DSAPrivateKey)kp.getPrivate());
     }
 
     /** Returns this client user's private key

@@ -47,7 +47,6 @@ import javax.crypto.*;
 public class ConiksUser {
 
     private String username;
-    private PublicKey pubKey;
     private boolean allowsUnsignedChanges;
 
     /** Initializes the user with the username and set the default change policy to
@@ -57,7 +56,6 @@ public class ConiksUser {
      */
     public ConiksUser (String uname) {
         username = uname;
-        pubKey = null;
         allowsUnsignedChanges = false; // strict default for now
     }
     
@@ -73,8 +71,8 @@ public class ConiksUser {
      *
      *@return the CONIKS user's public key
      */
-    public PublicKey getPubKey() {
-        return pubKey;
+    public DSAPublicKey getPubKey() {
+        return KeyOps.loadDSAPublicKey(username);
     }
 
     /** Indicates whether this CONIKS user allows unsigned key changes
@@ -96,7 +94,7 @@ public class ConiksUser {
      *@return true if the key change authorization passed, or if the user allows unsigned key
      * key changes. False otherwise.
      */
-    public boolean setPubKey(PublicKey pub, byte[] keyChangeAuth) {
+    public boolean setPubKey(DSAPublicKey pub, byte[] keyChangeAuth) {
 
         // check if we have an auth statement when we need one
         if (keyChangeAuth == null && !allowsUnsignedChanges) {
@@ -105,8 +103,8 @@ public class ConiksUser {
         }
 
         // TODO acutally check the key change auth
-
-        pubKey = pub;
+        
+        KeyOps.saveDSAPublicKey(username, pub);
 
         return true;
     }

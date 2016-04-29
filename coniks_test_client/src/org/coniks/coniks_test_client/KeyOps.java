@@ -37,6 +37,8 @@ import java.security.*;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.spec.DSAPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.security.spec.InvalidKeySpecException;
 import java.security.cert.CertificateException;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -53,41 +55,81 @@ import org.coniks.coniks_common.CommonMessaging;
  */
 public class KeyOps{
 
-    /** Load <i>this</i> CONIKS client's private key from the keystore
-     * indicated in the clients's ClientConfiguration {@code ClientConfig}.
+    /** Loads a public key from a stored file.
      *
-     *@return The client's private DSA key, or {@code null}
+     *@param uname the username for which to load the public key
+     *@return the public key or null upon an error.
+     */
+    public static DSAPublicKey loadDSAPublicKey (String uname) {
+        String filename = uname+".pub";
+        DSAPublicKey pubKey = null;
+
+        FileInputStream fis = null;
+
+        try {
+            fis = new FileInputStream(filename);
+            byte[] keyBytes = new byte[fis.available()];  
+            fis.read(keyBytes);
+
+            KeyFactory keyFactory = KeyFactory.getInstance("DSA", "SUN");
+
+            X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(keyBytes);
+
+            pubKey = (DSAPublicKey) keyFactory.generatePublic(pubKeySpec);
+        }
+        catch (IOException e) {
+            ClientLogger.error(e.getMessage());
+        }
+        catch (NoSuchAlgorithmException e){
+            ClientLogger.error(e.getMessage());
+        }
+        catch (NoSuchProviderException e){
+            ClientLogger.error(e.getMessage());
+        }
+         catch(InvalidKeySpecException e){
+            ClientLogger.error(e.getMessage());
+        }
+        finally {
+            CommonMessaging.close(fis);
+        }
+
+        return pubKey;
+
+    }
+
+    /** Load <i>this</i> CONIKS client's private key from the keystore
+     * indicated in the clients's {@code ClientConfig}.
+     *
+     *@param uname the username associated with the key to load
+     *@return The client's private key, or {@code null}
      * in the case of an Exception.
      */
-    public static DSAPrivateKey loadSigningKey(String username){
+    public static DSAPrivateKey loadDSAPrivateKey(String uname){
 
         KeyStore ks = null;
         DSAPrivateKey myPrivateKey = null;
 
+        FileInputStream fis = null;
         try{
             ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
             // get user password and file input stream
             char[] ks_password = ClientConfig.KEYSTORE_PWD.toCharArray();
-            
-            FileInputStream fis = null;
       
             fis = new FileInputStream(ClientConfig.KEYSTORE_PATH);
             ks.load(fis, ks_password);
 
-            if(ks.isKeyEntry(username+"-priv")){
+            if(ks.isKeyEntry(uname+"-priv")){
                 KeyStore.ProtectionParameter protParam = 
                     new KeyStore.PasswordProtection(ks_password);
 
                 KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
-                    ks.getEntry(username+"-priv", protParam);
-                myPrivateKey = (DSAPrivateKey)pkEntry.getPrivateKey();
+                    ks.getEntry(uname+"-priv", protParam);
+                myPrivateKey = (DSAPrivateKey) pkEntry.getPrivateKey();
             }
             else{
-                throw new CertificateException();
+                throw new KeyStoreException("no entry for "+uname+" in the keystore");
             }
-            fis.close();
-            return myPrivateKey;
         }
         catch(IOException e){
             ClientLogger.error("KeyOps:loadSigningKey: Problem loading the keystore");
@@ -99,48 +141,53 @@ public class KeyOps{
             ClientLogger.error("KeyOps:loadSigningKey: Problem with the cert(s) in keystore");
         }   
         catch(KeyStoreException e){
-            ClientLogger.error("KeyOps:loadSigningKey: Problem getting Keystore instance");
+            ClientLogger.error(e.getMessage());
         }
         catch(UnrecoverableEntryException e){
             ClientLogger.error("KeyOps:loadSigningKey: specified protParam were insufficient or invalid");
         }
-        return null;
+        finally {
+            CommonMessaging.close(fis);
+        }
+        return myPrivateKey;
     }
 
-    /** Generates a DSA key pair for the client.
+    /** Saves the given user's public key as encoded bytes.
+     * It's the caller's responsibility to ensure that the
+     * an existing saved public key can be overridden.
      *
-     *@return the DSA key pair or null in case of an error
+     *@param uname the username whose public key is to be stored.
+     *@param pubKey the public key to store for this user
+     *@return whether the save succeeded
      */
-    public static KeyPair generateDSAKeyPair(){
+    public static boolean saveDSAPublicKey (String uname, DSAPublicKey pubKey) {
+        byte[] keyBytes = pubKey.getEncoded();
+        String filename = uname+".pub";
 
-        KeyPairGenerator kg;
-        
-        try{
-            kg = KeyPairGenerator.getInstance("DSA");
-            kg.initialize(1024, new SecureRandom());
+        FileOutputStream fos = null;
+        boolean success = false;
+        try {
+            fos = new FileOutputStream(filename);
+            fos.write(keyBytes);
+            success = true;
         }
-        catch(NoSuchAlgorithmException e){
-            ClientLogger.error("DSA is not valid for some reason.");
-            return null;
+        catch (IOException e) {
+            ClientLogger.error(e.getMessage());
         }
-        catch(InvalidParameterException e){
-            ClientLogger.error("DSA is not valid for some reason.");
-            return null;
+        finally {
+            CommonMessaging.close(fos);
         }
-
-        KeyPair kp = kg.generateKeyPair();
-
-        return kp;
-
-    } //ends generateKeyPair()
+        return success;
+    }
 
     /** Saves the given key pair to the keystore. Generates an empty
      * keystore if one doesn't exist.
      *
+     *@param uname the username for which the key pair is to be saved
      *@param kp the key pair to be saved
      *@return whether the key pair was successfully saved or not
      */
-    public static boolean saveKeyPair(String username, KeyPair kp) {
+    public static boolean saveDSAKeyPair(String uname, KeyPair kp) {
         File ksFile = new File(ClientConfig.KEYSTORE_PATH);
 
         KeyStore ks;
@@ -169,23 +216,19 @@ public class KeyOps{
 
             // create the private key entry
             KeyStore.PrivateKeyEntry privKeyEntry = new KeyStore.PrivateKeyEntry(kp.getPrivate(), null);
-            
-            // create the public key entry
-            KeyStore.TrustedCertificateEntry pubKeyEntry = 
-                new KeyStore.TrustedCertificateEntry(kp.getPublic(), null);
 
             KeyStore.ProtectionParameter protParam = 
                 new KeyStore.PasswordProtection(ksPassword);
 
             // TODO: don't override old entries around if this client already has one
-            ks.setEntry(username+"-priv", privKeyEntry, protParam);
-            ks.setEntry(username+"-pub", pubKeyEntry, protParam);
+            ks.setEntry(uname+"-priv", privKeyEntry, protParam);
                 
             fos = new FileOutputStream(ksFile);
             
             ks.store(fos, ksPassword);
 
-            success = true;
+            // store the public key
+            success = saveDSAPublicKey(uname, (DSAPublicKey)kp.getPublic());
         }
         catch(IOException e){
             ClientLogger.error(e.getMessage());
@@ -199,15 +242,39 @@ public class KeyOps{
         catch(KeyStoreException e) {
             ClientLogger.error(e.getMessage());
         }
-        catch(UnrecoverableEntryException e) {
-            ClientLogger.error(e.getMessage());
-        }
         finally {
             CommonMessaging.close(fis);
             CommonMessaging.close(fos);
         }
 
         return success;
+    }
+
+    /** Generates a DSA key pair for the client.
+     *
+     *@return the DSA key pair or null in case of an error
+     */
+    public static KeyPair generateDSAKeyPair(){
+
+        KeyPairGenerator kg;
+        
+        try{
+            kg = KeyPairGenerator.getInstance("DSA");
+            kg.initialize(1024, new SecureRandom());
+        }
+        catch(NoSuchAlgorithmException e){
+            ClientLogger.error("DSA is not valid for some reason.");
+            return null;
+        }
+        catch(InvalidParameterException e){
+            ClientLogger.error("DSA is not valid for some reason.");
+            return null;
+        }
+
+        KeyPair kp = kg.generateKeyPair();
+
+        return kp;
+
     }
 
     /** This is a really bad function that takes a string we assume contains a DSA key in 

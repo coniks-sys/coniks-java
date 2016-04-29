@@ -102,30 +102,30 @@ public class SignatureOps{
 
     /** Signs {@code msg} using DSAPrivateKey {@code prk} 
      *
-     *@return the signature or null on an error 
-     *@throws {@code InvalidKeyException} if {@code prk} is null 
+     *@return the signature or null on an error  
      */
-    public static byte[] sign(byte[] msg, DSAPrivateKey prk) throws InvalidKeyException {
+    public static byte[] signDSA(byte[] msg, DSAPrivateKey prk) throws InvalidKeyException {
         if (prk == null) {
             ClientLogger.error("The given key is invalid.");
-            throw new InvalidKeyException();
         }
-        try {
-            Signature sigProcess = Signature.getInstance("DSA");
-            sigProcess.initSign(prk);
-            sigProcess.update(msg);
-            return sigProcess.sign();
+        else {
+            try {
+                Signature sigProcess = Signature.getInstance("DSA");
+                sigProcess.initSign(prk);
+                sigProcess.update(msg);
+                return sigProcess.sign();
+            }
+            catch(NoSuchAlgorithmException e){
+                ClientLogger.error("DSA is invalid for some reason.");
+            }
+            catch(InvalidKeyException e){
+                ClientLogger.error("The given key is invalid.");
+            }
+            catch(SignatureException e){
+                ClientLogger.error("The format of the input is invalid: "+e.getMessage());
+            }
         }
-        catch(NoSuchAlgorithmException e){
-            ClientLogger.error("DSA is invalid for some reason.");
-        }
-        catch(InvalidKeyException e){
-            ClientLogger.error("The given key is invalid.");
-        }
-        catch(SignatureException e){
-            ClientLogger.error("The format of the input is invalid: "+e.getMessage());
-        }
-        return null;
+            return null;
     }
 
 

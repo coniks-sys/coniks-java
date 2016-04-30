@@ -38,7 +38,9 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
+import javax.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -97,59 +99,48 @@ public class KeyOps{
 
     }
 
-    /** Load <i>this</i> CONIKS client's private key from the keystore
-     * indicated in the clients's {@code ClientConfig}.
+    /** Load the CONIKS client's private key from the file.
      *
      *@param uname the username associated with the key to load
      *@return The client's private key, or {@code null}
      * in the case of an Exception.
      */
-    public static DSAPrivateKey loadDSAPrivateKey(String uname){
+    public static DSAPrivateKey loadDSAPrivateKeyFile(String uname){
 
-        KeyStore ks = null;
-        DSAPrivateKey myPrivateKey = null;
+        String filename = uname+".pr";
+        DSAPrivateKey prKey = null;
 
         FileInputStream fis = null;
-        try{
-            ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
-            // get user password and file input stream
-            char[] ks_password = ClientConfig.KEYSTORE_PWD.toCharArray();
-      
-            fis = new FileInputStream(ClientConfig.KEYSTORE_PATH);
-            ks.load(fis, ks_password);
+        try {
+            fis = new FileInputStream(filename);
+            byte[] keyBytes = new byte[fis.available()];  
+            fis.read(keyBytes);
 
-            if(ks.isKeyEntry(uname+"-priv")){
-                KeyStore.ProtectionParameter protParam = 
-                    new KeyStore.PasswordProtection(ks_password);
+            KeyFactory keyFactory = KeyFactory.getInstance("DSA", "SUN");
 
-                KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
-                    ks.getEntry(uname+"-priv", protParam);
-                myPrivateKey = (DSAPrivateKey) pkEntry.getPrivateKey();
-            }
-            else{
-                throw new KeyStoreException("no entry for "+uname+" in the keystore");
-            }
+            PKCS8EncodedKeySpec prKeySpec = new PKCS8EncodedKeySpec(keyBytes);
+
+            prKey = (DSAPrivateKey) keyFactory.generatePrivate(prKeySpec);
         }
-        catch(IOException e){
-            ClientLogger.error("KeyOps:loadSigningKey: Problem loading the keystore");
-        }   
-        catch(NoSuchAlgorithmException e){
-            ClientLogger.error("KeyOps:loadSigningKey: Problem with integrity check algorithm");
-        }
-        catch(CertificateException e){
-            ClientLogger.error("KeyOps:loadSigningKey: Problem with the cert(s) in keystore");
-        }   
-        catch(KeyStoreException e){
+        catch (IOException e) {
             ClientLogger.error(e.getMessage());
         }
-        catch(UnrecoverableEntryException e){
-            ClientLogger.error("KeyOps:loadSigningKey: specified protParam were insufficient or invalid");
+        catch (NoSuchAlgorithmException e){
+            ClientLogger.error(e.getMessage());
+        }
+        catch (NoSuchProviderException e){
+            ClientLogger.error(e.getMessage());
+        }
+         catch(InvalidKeySpecException e){
+            ClientLogger.error(e.getMessage());
         }
         finally {
             CommonMessaging.close(fis);
         }
-        return myPrivateKey;
+
+        return prKey;
+
     }
 
     /** Saves the given user's public key as encoded bytes.
@@ -180,74 +171,33 @@ public class KeyOps{
         return success;
     }
 
-    /** Saves the given user's private key to a keystore.
+    /** Saves the given user's private key to a file.
      * Generates an empty keystore if one doesn't exist.
      *
      *@param uname the username for which the key pair is to be saved
      *@param pr the private key to be saved
      *@return whether the private key was successfully saved or not
      */
-    public static boolean saveDSAPrivateKey(String uname, DSAPrivateKey pr) {
-        File ksFile = new File(ClientConfig.KEYSTORE_PATH);
+    public static boolean saveDSAPrivateKeyFile(String uname, DSAPrivateKey pr) {
 
-        KeyStore ks;
+        byte[] keyBytes = pr.getEncoded();
+        String filename = uname+".pr";
 
-        // get user password
-        char[] ksPassword = ClientConfig.KEYSTORE_PWD.toCharArray();;
-
-        // File streams
-        FileInputStream fis = null;
         FileOutputStream fos = null;
-
         boolean success = false;
-
-        // load the keystore
-        try { 
-            ks = KeyStore.getInstance(KeyStore.getDefaultType());
-
-            // generate an empty keystore if it doesn't exist
-            if (!ksFile.exists()) {            
-                ks.load(null, ksPassword);
-            }
-            else {
-                fis = new FileInputStream(ksFile);
-                ks.load(fis, ksPassword);
-            }
-
-            // create the private key entry
-            KeyStore.PrivateKeyEntry privKeyEntry = new KeyStore.PrivateKeyEntry(pr, null);
-
-            KeyStore.ProtectionParameter protParam = 
-                new KeyStore.PasswordProtection(ksPassword);
-
-            // TODO: don't override old entries around if this client already has one
-            // i.e. keep around old entries so the client can recover old messages
-            ks.setEntry(uname+"-priv", privKeyEntry, protParam);
-                
-            fos = new FileOutputStream(ksFile);
-            
-            ks.store(fos, ksPassword);
-
+        try {
+            fos = new FileOutputStream(filename);
+            fos.write(keyBytes);
             success = true;
         }
-        catch(IOException e){
-            ClientLogger.error(e.getMessage());
-        }   
-        catch(NoSuchAlgorithmException e){
-            ClientLogger.error(e.getMessage());
-        }
-        catch(CertificateException e){
-            ClientLogger.error(e.getMessage());
-        }
-        catch(KeyStoreException e) {
+        catch (IOException e) {
             ClientLogger.error(e.getMessage());
         }
         finally {
-            CommonMessaging.close(fis);
             CommonMessaging.close(fos);
         }
-
         return success;
+
     }
 
 
@@ -262,7 +212,7 @@ public class KeyOps{
         
         boolean success = false;
 
-        if (saveDSAPrivateKey(uname, (DSAPrivateKey)kp.getPrivate())) {
+        if (saveDSAPrivateKeyFile(uname, (DSAPrivateKey)kp.getPrivate())) {
             success = saveDSAPublicKey(uname, (DSAPublicKey)kp.getPublic());
         }
 

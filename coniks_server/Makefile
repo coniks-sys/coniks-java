@@ -55,7 +55,6 @@ CLASSES = ./src/org/coniks/coniks_server/TreeBuilder.java \
 	./src/org/coniks/coniks_server/RootNode.java \
 	./src/org/coniks/coniks_server/InteriorNode.java \
 	./src/org/coniks/coniks_server/TreeNode.java \
-	./src/org/coniks/coniks_server/ConiksServer.java \
 	./src/org/coniks/coniks_server/DirectoryOps.java \
 	./src/org/coniks/coniks_server/TransparencyOps.java \
 	./src/org/coniks/coniks_server/ServerMessaging.java \
@@ -66,6 +65,7 @@ CLASSES = ./src/org/coniks/coniks_server/TreeBuilder.java \
 	./src/org/coniks/coniks_server/TimerLogger.java \
 	./src/org/coniks/coniks_server/ServerLogger.java \
 	./src/org/coniks/coniks_server/DebugLogger.java \
+	./src/org/coniks/coniks_server/ConiksServer.java
 
 #
 # the default make target entry

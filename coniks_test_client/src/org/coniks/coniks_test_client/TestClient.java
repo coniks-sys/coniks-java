@@ -181,8 +181,6 @@ public class TestClient {
             AuthPath authPath = (AuthPath)serverMsg;
 
             // check if the key we got is the same as the stored key
-            
-
             int result = ConsistencyChecks.verifyPubKeyProto(uname, authPath);
 
             if (result == ConsistencyErr.CHECK_PASSED) {
@@ -192,8 +190,7 @@ public class TestClient {
                 // verify the auth path is consistent with the root
                 result = ConsistencyChecks.verifyMappingProto(authPath, null);
 
-                // TODO: we'll want to potentially store the looked up key
-                // if it checks out and we don't have it yet
+                // TODO: store the looked up key if it checks out and we don't have it yet
 
             }
 
@@ -309,32 +306,41 @@ public class TestClient {
 
     }
 
-    /** Changes a user to allow unsigned key changes, signs the change
+    /** Changes a user's key change policy, signs the change if required
      * and sends the new policy to the server.
      *
      *@param uname the username of the client user whose key change policy to change
+     *@param allowUnsigned whether the client user wants to allow unsigned changes
      *@param server the CONIKS key server
      *@return whether the key change succeeded or an error code
      */
-    public static int changeToAllowsUnsigned(String uname, String server) {
+    public static int changeKeyChangePolicy(String uname, boolean allowUnsigned, 
+                                            String server) {
         ClientUser user = users.get(uname);
 
-        if (user.isAllowsUnsignedChanges()) {
+        // if we're not actually changing the policy, just return
+        if (user.isAllowsUnsignedChanges() == allowUnsigned) {
             return ConsistencyErr.CHECK_PASSED;
         }
 
-        DSAPrivateKey prKey = user.getPrivKey();
+        if (!user.isAllowsUnsignedChanges()) {
+            user.allowUnsignedChanges();
+        }
+        else {
+            user.disallowUnsignedChanges();
+        }
 
+        // default is to always sign the changes no matter what
+        DSAPrivateKey prKey = user.getPrivKey();
+        
         if (prKey == null) {
             return ConsistencyErr.KEYSTORE_ERR;
         }
-
-        user.allowUnsignedChanges();
-
+               
         String newBlob = user.isAllowsUnsignedChanges()+"";
-
+        
         byte[] sig = null;
-
+        
         try {
             sig = SignatureOps.signDSA(newBlob.getBytes(), prKey);
         }
@@ -342,23 +348,23 @@ public class TestClient {
             ClientLogger.error(e.getMessage());
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
-
+        
         DSAPublicKey pubKey = user.getPubKey();
-
+        
         if (pubKey == null) {
             // load the key into memory
             user.loadPubKey();
-
+            
             pubKey = user.getPubKey();
-
+            
             if (pubKey == null) {
                 // alright, key is still null, return an error
                 return ConsistencyErr.KEYSTORE_ERR;
             }
         }
-
+        
         ClientMessaging.sendSignedULNChangeReqProto(uname, newBlob, pubKey,
-                                                 user.isAllowsUnsignedChanges(), true, sig, server);
+                                                    user.isAllowsUnsignedChanges(), true, sig, server);
 
         AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();
 
@@ -377,7 +383,7 @@ public class TestClient {
     /** Prints the usage of the TestClient.
      */
     private static void usage() {
-        System.out.println("valid operations: REGISTER, LOOKUP, SIGNED, UNSIGNED, CHANGES, MIXED");
+        System.out.println("valid operations: REGISTER, LOOKUP, SIGNED, UNSIGNED, POLICY");
     }
 
     /** Template for an error message.
@@ -419,6 +425,7 @@ public class TestClient {
             break;
         case ServerErr.MALFORMED_SERVER_MSG_ERR:
             printErr("Received a malformed server message. Current user: "+uname);
+            break;
         case ServerErr.SIGNED_CHANGE_VERIF_ERR:
             printErr("The server could not verify the signed data change for user "+uname+".");
             break;
@@ -454,7 +461,7 @@ public class TestClient {
             op.equalsIgnoreCase("REGISTER") || 
             op.equalsIgnoreCase("SIGNED") || 
             op.equalsIgnoreCase("UNSIGNED") ||
-            op.equalsIgnoreCase("CHANGES")) {
+            op.equalsIgnoreCase("POLICY")) {
              return true;
          }
          else {
@@ -509,8 +516,8 @@ public class TestClient {
             else if (op.equalsIgnoreCase("UNSIGNED")) {
                 error = unsignedKeyChange(uname, server);
             }
-            else if (op.equalsIgnoreCase("CHANGES")) {
-                error = changeToAllowsUnsigned(uname, server);
+            else if (op.equalsIgnoreCase("POLICY")) {
+                error = changeKeyChangePolicy(uname, false, server);
             }
         
             // if we got an error, print a new line so the error msg doesn't

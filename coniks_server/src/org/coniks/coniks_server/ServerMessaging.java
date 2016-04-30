@@ -121,7 +121,7 @@ public class ServerMessaging {
     /* Message building functions */
     
     // create the simple server response message
-    private static ServerResp buildServerRespMsg(int respType){
+    private static synchronized ServerResp buildServerRespMsg(int respType){
         ServerResp.Builder respMsg = ServerResp.newBuilder();
         switch(respType){
         case ServerErr.SUCCESS:
@@ -147,7 +147,7 @@ public class ServerMessaging {
     }
     
     // create the commitment response message
-    private static Commitment buildCommitmentMsg(SignedTreeRoot str){            
+    private static synchronized Commitment buildCommitmentMsg(SignedTreeRoot str){            
         
         Commitment.Builder commMsg = Commitment.newBuilder();
         byte[] rootBytes = ServerUtils.getRootNodeBytes(str.getRoot());
@@ -170,7 +170,7 @@ public class ServerMessaging {
     }
     
     // create the registration response message
-    private static RegistrationResp buildRegistrationRespMsg(long initEpoch, int epochInterval){            
+    private static synchronized RegistrationResp buildRegistrationRespMsg(long initEpoch, int epochInterval){            
         
         RegistrationResp.Builder regRespMsg = RegistrationResp.newBuilder();
         regRespMsg.setInitEpoch(initEpoch);
@@ -179,7 +179,7 @@ public class ServerMessaging {
     }
     
     // create the commitment response message
-    private static AuthPath buildAuthPathMsg(UserLeafNode uln, RootNode root){            
+    private static synchronized AuthPath buildAuthPathMsg(UserLeafNode uln, RootNode root){            
         return TransparencyOps.generateAuthPathProto(uln, root);
     }
 
@@ -258,9 +258,6 @@ public class ServerMessaging {
         catch (IOException e) {
             MsgHandlerLogger.error("receiving data from client");
         }
-        finally {
-            CommonMessaging.close(din);
-        }
         
         // unexpected message type from the client
         return null;
@@ -313,10 +310,7 @@ public class ServerMessaging {
             }
         }
         catch(IOException e){
-            MsgHandlerLogger.error(e.getMessage());
-        }
-        finally {
-            CommonMessaging.close(s);
+            MsgHandlerLogger.error("hello: "+e.getMessage());
         }
         
     }

@@ -170,9 +170,6 @@ public class ClientMessaging {
             ClientLogger.error("Sending msg proto "+msg.toString());
             ClientLogger.error("Error: "+e.getMessage());
         }
-        finally {
-            CommonMessaging.close(dout);
-        }
 
     }
 
@@ -391,7 +388,6 @@ public class ClientMessaging {
         }
         finally {
             CommonMessaging.close(din);
-            CommonMessaging.close(sock);
         }
 
         // unexpected message type from the server

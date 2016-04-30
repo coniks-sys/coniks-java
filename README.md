@@ -1,6 +1,6 @@
 #CONIKS
 
-[![Build Status](https://travis-ci.org/citp/coniks-ref-implementation.svg?branch=server-refactoring)](https://travis-ci.org/citp/coniks-ref-implementation)
+[![Build Status](https://travis-ci.org/citp/coniks-ref-implementation.svg?branch=master)](https://travis-ci.org/citp/coniks-ref-implementation)
 
 Copyright (C) 2015-16 Princeton University.
 

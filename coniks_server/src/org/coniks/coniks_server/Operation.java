@@ -38,4 +38,5 @@ package org.coniks.coniks_server;
  *@author Michael Rochlin
 */
 public abstract class Operation {
+    public long epoch;
 }

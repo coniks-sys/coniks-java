@@ -40,9 +40,6 @@ package org.coniks.coniks_server;
  */
 public class RootNode extends InteriorNode{
 
-    byte[] prev; // serves as prev pointer to last epoch's root node
-    long epoch;
-
     // blanks: at the moment we are going to hard code this as a "binary" trie.
     /** Specifies the branching factor of the CONIKS Merkle prefix tree.
      * CONIKS is currently uses a binary tree.
@@ -51,50 +48,21 @@ public class RootNode extends InteriorNode{
 
     /** Constructs a root node specified
      * with left and right subtrees {@code l} and {@code r},
-     * the hash of the previous epoch's tree root {@code prev}, 
-     * the level in tree {@code lvl}, and the epoch {@code ep}
-     * for which this root is valid.
-     *<p>
-     * This is the constructor used in 
-     * {@link UserTreeBuilder#copyExtendTree(RootNode, byte[], PriorityQueue<Pair<byte[], UserLeafNode>>, long)}.
+     * and the level in tree {@code lvl}.
      */
-    public RootNode(TreeNode l, TreeNode r, int lvl, byte[] prev, long ep){
-	this(l, r, lvl, prev, ep, null, null);
+    public RootNode(TreeNode l, TreeNode r, int lvl){
+        super(l, r, null, lvl, null, null, false);
     }
 
     /** Constructs a root node specified
      * with left and right subtrees {@code l} and {@code r}
      * and their corresponding hashes {@code lh} and {@code rh},
-     * the hash of the previous epoch's tree root {@code prev}, 
-     * the level in tree {@code lvl}, and the epoch {@code ep}
-     * for which this root is valid.
+     * and the level in tree {@code lvl}.
      *<p>
      * This is the constructor used {@link RootNode#clone(long, long)}.
      */
-    public RootNode(TreeNode l, TreeNode r, int lvl, byte[] prev, long ep, 
-		    byte[] lh, byte[] rh){
-	super(l, r, null, lvl, lh, rh, false);
-	
-	this.prev = prev;
-	this.epoch = ep;	
-	
-    }
-
-    /** Gets the hash of the previous epoch's tree root.
-     *
-     *@return The hash of the previous epoch's tree root as a {@code byte[]} (it should
-     * not be {@code null}).
-     */
-    public byte[] getPrev(){
-	return this.prev;
-    }
-
-    /** Gets the epoch for which this root node is valid.
-     *
-     *@return The epoch for this root node.
-     */
-    public long getEpoch(){
-	return this.epoch;
+    public RootNode(TreeNode l, TreeNode r, int lvl, byte[] lh, byte[] rh){
+	super(l, r, null, lvl, lh, rh, false);	
     }
 
     /** Sets this root node's left and right subtrees to
@@ -115,7 +83,7 @@ public class RootNode extends InteriorNode{
     }
 
      /** Clones (i.e. duplicates) this root node from the current
-     * epoch {@code ep0} for the next epoch {@code ep1} with the. 
+     * epoch {@code ep0} for the next epoch {@code ep1}.
      * It then recursively 
      * calls this function on the original root node's two subtrees.
      *<p>
@@ -123,14 +91,14 @@ public class RootNode extends InteriorNode{
      * rebuilding process at the beginning of every epoch.
      *@return The cloned root node.
      */
-    public RootNode clone(long epoch0, long epoch1){
+    public RootNode clone(){
         // the epoch will be reset in UserTreeBuilder.
 	RootNode cloneN = new RootNode(null, null, this.level, 
-				       null, -1, leftHash, rightHash);
+                                       leftHash, rightHash);
 	if (this.left != null)
-	    cloneN.left = this.left.clone(cloneN, epoch0, epoch1);
+	    cloneN.left = this.left.clone(cloneN);
 	if (this.right != null)
-	    cloneN.right = this.right.clone(cloneN, epoch0, epoch1);
+	    cloneN.right = this.right.clone(cloneN);
 	
 	return cloneN;
     }

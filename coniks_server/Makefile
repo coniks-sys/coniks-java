@@ -50,19 +50,22 @@ PUBPATH=/path/to/server/on/remote
 # CLASSES is a macro consisting of each java source file
 #
 
-CLASSES = ./src/org/coniks/coniks_server/UserTreeBuilder.java \
+CLASSES = ./src/org/coniks/coniks_server/TreeBuilder.java \
 	./src/org/coniks/coniks_server/UserLeafNode.java \
 	./src/org/coniks/coniks_server/RootNode.java \
 	./src/org/coniks/coniks_server/InteriorNode.java \
 	./src/org/coniks/coniks_server/TreeNode.java \
-	./src/org/coniks/coniks_server/ConiksServer.java \
-	./src/org/coniks/coniks_server/ServerOps.java \
+	./src/org/coniks/coniks_server/DirectoryOps.java \
+	./src/org/coniks/coniks_server/TransparencyOps.java \
+	./src/org/coniks/coniks_server/ServerMessaging.java \
+	./src/org/coniks/coniks_server/RequestHandler.java \
 	./src/org/coniks/coniks_server/ServerUtils.java \
 	./src/org/coniks/coniks_server/KeyOps.java \
 	./src/org/coniks/coniks_server/MsgHandlerLogger.java \
 	./src/org/coniks/coniks_server/TimerLogger.java \
 	./src/org/coniks/coniks_server/ServerLogger.java \
 	./src/org/coniks/coniks_server/DebugLogger.java \
+	./src/org/coniks/coniks_server/ConiksServer.java
 
 #
 # the default make target entry

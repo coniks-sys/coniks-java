@@ -53,12 +53,12 @@ import java.io.*;
 public class KeyOps{
 
     /** Load <i>this</i> CONIKS server's private key from the keystore
-     * indicated in the server's configuration {@code config}.
+     * indicated in the server's configuration.
      *
      *@return The server's private RSA key, or {@code null}
      * in the case of an Exception.
      */
-    public static RSAPrivateKey loadSigningKey(ServerConfig config){
+    public static RSAPrivateKey loadSigningKey(){
 
         KeyStore ks = null;
         RSAPrivateKey myPrivateKey = null;
@@ -67,19 +67,19 @@ public class KeyOps{
             ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
             // get user password and file input stream
-            char[] ks_password = config.KEYSTORE_PWD.toCharArray();
+            char[] ks_password = ServerConfig.KEYSTORE_PWD.toCharArray();
             
             FileInputStream fis = null;
       
-            fis = new FileInputStream(config.KEYSTORE_PATH);
+            fis = new FileInputStream(ServerConfig.KEYSTORE_PATH);
             ks.load(fis, ks_password);
 
-            if(ks.isKeyEntry(config.NAME)){
+            if(ks.isKeyEntry(ServerConfig.NAME)){
                 KeyStore.ProtectionParameter protParam = 
                     new KeyStore.PasswordProtection(ks_password);
 
                 KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
-                    ks.getEntry(config.NAME, protParam);
+                    ks.getEntry(ServerConfig.NAME, protParam);
                 myPrivateKey = (RSAPrivateKey)pkEntry.getPrivateKey();
             }
             else{
@@ -112,7 +112,7 @@ public class KeyOps{
      *@return The {@code keyOwner}'s public RSA key, or {@code null} in 
      * the case of an Exception.
      */
-    public static RSAPublicKey loadPublicKey(ServerConfig config, String keyOwner){
+    public static RSAPublicKey loadPublicKey(String keyOwner){
 
         KeyStore ks = null;
         RSAPublicKey publicKey = null;
@@ -120,11 +120,11 @@ public class KeyOps{
         try{
             ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
-            char[] ts_password = config.TRUSTSTORE_PWD.toCharArray();
+            char[] ts_password = ServerConfig.TRUSTSTORE_PWD.toCharArray();
             
             FileInputStream fis = null;
       
-            fis = new FileInputStream(config.TRUSTSTORE_PATH);
+            fis = new FileInputStream(ServerConfig.TRUSTSTORE_PATH);
             ks.load(fis, ts_password);
 
             if(ks.isKeyEntry(keyOwner)){

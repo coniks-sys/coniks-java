@@ -31,7 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.coniks.coniks_test_client;
+package org.coniks.coniks_common;
 
 /** Defines constants representing the types
  * of errors that the server may return to a client.

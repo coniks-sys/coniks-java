@@ -130,7 +130,7 @@ public class TreeNode implements Serializable {
      *
      *@throws An UnsupportedOperationException.
      */
-    public TreeNode clone(TreeNode parent, long ep0, long ep1){
+    public TreeNode clone(TreeNode parent){
 	throw new UnsupportedOperationException();
     }
 

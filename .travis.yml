@@ -6,10 +6,6 @@ env:
         global:
         - MAKE=make
 
-branches:
-        only:
-        - master
-
 addons:
         apt:
                 packages: &common_packages

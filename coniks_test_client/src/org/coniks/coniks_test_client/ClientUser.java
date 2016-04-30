@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2016, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -14,6 +14,7 @@
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
@@ -30,49 +31,40 @@
   POSSIBILITY OF SUCH DAMAGE.
  */
 
-// author: Marcela S. Melara (melara@cs.princeton.edu)
-// author: Michael Rochlin
+package org.coniks.coniks_test_client;
 
-package org.coniks.coniks_common;
+import java.security.*;
+import java.security.spec.*;
+import java.security.interfaces.*;
+import javax.crypto.*;
 
-option java_package = "org.coniks.coniks_common";
-option java_outer_classname = "UtilProtos";   
+/** Represents the user using a CONIKS client. This is an
+ * extension of a regular {@link ConiksUser} since the client's
+ * user also has an associated username, public key and
+ * security policy flags, but also needs access to a corresponding
+ * private key used for signing key changes etc.
+ * 
+ *@author Marcela S. Melara (melara@cs.princeton.edu)
+ */
+public class ClientUser extends ConiksUser {
 
-message Hash{
-        // check that len matches the Hash size in bytes defined in client/server
-        optional int32 len = 1;  // need to check that len field is specified
-        repeated fixed32 hash = 2 [packed = true];
-}
+    /** Initializes the client's user with the username and 
+     * ConiksUser defaults.
+     *
+     *@param uname this user's username
+     */
+    public ClientUser (String uname, KeyPair kp) {
+        super(uname, (DSAPublicKey)kp.getPublic());
+        KeyOps.saveDSAPrivateKeyFile(uname, (DSAPrivateKey)kp.getPrivate());
+    }
 
-message Commitment{
-        optional uint64 epoch = 1;  // this is actually the epoch date in milli seconds
-        optional Hash root_hash = 2;  // need to check that root hash is included
-        repeated fixed32 signature = 3;
-}
+    /** Returns this client user's private key
+     * retrieveing it from the key store.
+     *
+     *@return the client user's private key
+     */
+    public DSAPrivateKey getPrivKey() {
+        return KeyOps.loadDSAPrivateKeyFile(username);
+    }
 
-message ServerResp{
-        // generic server response, sent when error occurs or as ACK
-        enum Message{
-             SUCCESS = 0;
-             NAME_EXISTS_ERR = 1;
-             MALFORMED_ERR = 2;
-             SERVER_ERR = 3;
-             NAME_NOT_FOUND_ERR = 4;
-             COMMITMENT_RESP = 5;
-             AUTH_PATH = 6;
-             VERIFICATION_ERR = 7;
-        }
-        optional Message message = 1;
-}
-
-message CompleteRootNode{
-        optional Hash left = 1;
-        optional Hash right = 2;
-}  
-
-// this is the format of commitments that servers exchange
-message WitnessedCommitment{
-        optional string provider = 1;
-        optional Commitment comm = 2;
-        optional CompleteRootNode root = 3;
 }

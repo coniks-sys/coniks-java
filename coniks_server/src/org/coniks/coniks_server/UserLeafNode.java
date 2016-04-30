@@ -232,15 +232,14 @@ public class UserLeafNode extends LeafNode implements Serializable {
         this.index = i;
     }
 
-    /** Clones (i.e. duplicates) this user leaf node from the current
-     * epoch {@code ep0} for the next epoch {@code ep1} with the
+    /** Clones (i.e. duplicates) this user leaf node with the
      * given {@code parent} tree node.
      *<p>
      * This function is called as part of the CONIKS Merkle tree
      * rebuilding process at the beginning of every epoch.
      *@return The cloned user leaf node.
      */
-    public UserLeafNode clone(TreeNode parent, long ep0, long ep1){
+    public UserLeafNode clone(TreeNode parent){
 	
 	UserLeafNode cloneN = new UserLeafNode(this.username, this.pubKey,
 					       this.epochAdded, this.level, this.index);

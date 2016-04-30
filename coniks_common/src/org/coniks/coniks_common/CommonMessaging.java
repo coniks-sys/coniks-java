@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2016, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -14,6 +14,7 @@
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
@@ -30,49 +31,29 @@
   POSSIBILITY OF SUCH DAMAGE.
  */
 
-// author: Marcela S. Melara (melara@cs.princeton.edu)
-// author: Michael Rochlin
-
 package org.coniks.coniks_common;
 
-option java_package = "org.coniks.coniks_common";
-option java_outer_classname = "UtilProtos";   
+import java.io.IOException;
+import java.io.Closeable;
 
-message Hash{
-        // check that len matches the Hash size in bytes defined in client/server
-        optional int32 len = 1;  // need to check that len field is specified
-        repeated fixed32 hash = 2 [packed = true];
-}
+/** Messaging related functions common to the CONIKS
+ * server and client.
+ *
+ *@author Marcela S. Melara (melara@cs.princeton.edu)
+ */
+public class CommonMessaging {
 
-message Commitment{
-        optional uint64 epoch = 1;  // this is actually the epoch date in milli seconds
-        optional Hash root_hash = 2;  // need to check that root hash is included
-        repeated fixed32 signature = 3;
-}
-
-message ServerResp{
-        // generic server response, sent when error occurs or as ACK
-        enum Message{
-             SUCCESS = 0;
-             NAME_EXISTS_ERR = 1;
-             MALFORMED_ERR = 2;
-             SERVER_ERR = 3;
-             NAME_NOT_FOUND_ERR = 4;
-             COMMITMENT_RESP = 5;
-             AUTH_PATH = 6;
-             VERIFICATION_ERR = 7;
+    /** Closes the closeable object {@code c}
+     */
+    public static void close(Closeable c) {
+        if (c != null) {
+            try {
+                c.close();
+            }
+            catch (IOException e) {
+                // ugh, do nothing
+            }
         }
-        optional Message message = 1;
-}
+    }
 
-message CompleteRootNode{
-        optional Hash left = 1;
-        optional Hash right = 2;
-}  
-
-// this is the format of commitments that servers exchange
-message WitnessedCommitment{
-        optional string provider = 1;
-        optional Commitment comm = 2;
-        optional CompleteRootNode root = 3;
 }

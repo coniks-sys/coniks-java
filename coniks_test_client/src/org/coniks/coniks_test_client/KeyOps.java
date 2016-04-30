@@ -34,15 +34,21 @@
 package org.coniks.coniks_test_client;
 
 import java.security.*;
-import java.security.interfaces.RSAPublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.RSAPublicKeySpec;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.DSAPrivateKey;
+import java.security.spec.DSAPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.InvalidKeySpecException;
+import javax.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.io.PrintWriter;
 import java.io.*;
+
+import org.coniks.coniks_common.CommonMessaging;
 
 /** Implements all operations involving encryption keys
  * that a CONIKS client must perform.
@@ -51,6 +57,172 @@ import java.io.*;
  */
 public class KeyOps{
 
+    /** Loads a public key from a stored file.
+     *
+     *@param uname the username for which to load the public key
+     *@return the public key or null upon an error.
+     */
+    public static DSAPublicKey loadDSAPublicKey (String uname) {
+        String filename = uname+".pub";
+        DSAPublicKey pubKey = null;
+
+        FileInputStream fis = null;
+
+        try {
+            fis = new FileInputStream(filename);
+            byte[] keyBytes = new byte[fis.available()];  
+            fis.read(keyBytes);
+
+            KeyFactory keyFactory = KeyFactory.getInstance("DSA", "SUN");
+
+            X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(keyBytes);
+
+            pubKey = (DSAPublicKey) keyFactory.generatePublic(pubKeySpec);
+        }
+        catch (IOException e) {
+            ClientLogger.error(e.getMessage());
+        }
+        catch (NoSuchAlgorithmException e){
+            ClientLogger.error(e.getMessage());
+        }
+        catch (NoSuchProviderException e){
+            ClientLogger.error(e.getMessage());
+        }
+         catch(InvalidKeySpecException e){
+            ClientLogger.error(e.getMessage());
+        }
+        finally {
+            CommonMessaging.close(fis);
+        }
+
+        return pubKey;
+
+    }
+
+    /** Load the CONIKS client's private key from the file.
+     *
+     *@param uname the username associated with the key to load
+     *@return The client's private key, or {@code null}
+     * in the case of an Exception.
+     */
+    public static DSAPrivateKey loadDSAPrivateKeyFile(String uname){
+
+        String filename = uname+".pr";
+        DSAPrivateKey prKey = null;
+
+        FileInputStream fis = null;
+
+        try {
+            fis = new FileInputStream(filename);
+            byte[] keyBytes = new byte[fis.available()];  
+            fis.read(keyBytes);
+
+            KeyFactory keyFactory = KeyFactory.getInstance("DSA", "SUN");
+
+            PKCS8EncodedKeySpec prKeySpec = new PKCS8EncodedKeySpec(keyBytes);
+
+            prKey = (DSAPrivateKey) keyFactory.generatePrivate(prKeySpec);
+        }
+        catch (IOException e) {
+            ClientLogger.error(e.getMessage());
+        }
+        catch (NoSuchAlgorithmException e){
+            ClientLogger.error(e.getMessage());
+        }
+        catch (NoSuchProviderException e){
+            ClientLogger.error(e.getMessage());
+        }
+         catch(InvalidKeySpecException e){
+            ClientLogger.error(e.getMessage());
+        }
+        finally {
+            CommonMessaging.close(fis);
+        }
+
+        return prKey;
+
+    }
+
+    /** Saves the given user's public key as encoded bytes.
+     * It's the caller's responsibility to ensure that the
+     * an existing saved public key can be overridden.
+     *
+     *@param uname the username whose public key is to be stored.
+     *@param pubKey the public key to store for this user
+     *@return whether the save succeeded
+     */
+    public static boolean saveDSAPublicKey (String uname, DSAPublicKey pubKey) {
+        byte[] keyBytes = pubKey.getEncoded();
+        String filename = uname+".pub";
+
+        FileOutputStream fos = null;
+        boolean success = false;
+        try {
+            fos = new FileOutputStream(filename);
+            fos.write(keyBytes);
+            success = true;
+        }
+        catch (IOException e) {
+            ClientLogger.error(e.getMessage());
+        }
+        finally {
+            CommonMessaging.close(fos);
+        }
+        return success;
+    }
+
+    /** Saves the given user's private key to a file.
+     * Generates an empty keystore if one doesn't exist.
+     *
+     *@param uname the username for which the key pair is to be saved
+     *@param pr the private key to be saved
+     *@return whether the private key was successfully saved or not
+     */
+    public static boolean saveDSAPrivateKeyFile(String uname, DSAPrivateKey pr) {
+
+        byte[] keyBytes = pr.getEncoded();
+        String filename = uname+".pr";
+
+        FileOutputStream fos = null;
+        boolean success = false;
+        try {
+            fos = new FileOutputStream(filename);
+            fos.write(keyBytes);
+            success = true;
+        }
+        catch (IOException e) {
+            ClientLogger.error(e.getMessage());
+        }
+        finally {
+            CommonMessaging.close(fos);
+        }
+        return success;
+
+    }
+
+
+    /** Saves the given key pair to disk. Generates an empty
+     * keystore for the private key if one doesn't exist.
+     *
+     *@param uname the username for which the key pair is to be saved
+     *@param kp the key pair to be saved
+     *@param whether the save succeeded
+     */
+    public static boolean saveDSAKeyPair(String uname, KeyPair kp) {
+        
+        boolean success = false;
+
+        if (saveDSAPrivateKeyFile(uname, (DSAPrivateKey)kp.getPrivate())) {
+            success = saveDSAPublicKey(uname, (DSAPublicKey)kp.getPublic());
+        }
+
+        return success;
+    }
+
+    /** Generates a DSA key pair for the client.
+     *
+     *@return the DSA key pair or null in case of an error
+     */
     public static KeyPair generateDSAKeyPair(){
 
         KeyPairGenerator kg;
@@ -60,11 +232,11 @@ public class KeyOps{
             kg.initialize(1024, new SecureRandom());
         }
         catch(NoSuchAlgorithmException e){
-            ConiksClient.clientLog.error("DSA is not valid for some reason.");
+            ClientLogger.error("DSA is not valid for some reason.");
             return null;
         }
         catch(InvalidParameterException e){
-            ConiksClient.clientLog.error("DSA is not valid for some reason.");
+            ClientLogger.error("DSA is not valid for some reason.");
             return null;
         }
 
@@ -72,7 +244,7 @@ public class KeyOps{
 
         return kp;
 
-    } //ends generateKeyPair()
+    }
 
     /** This is a really bad function that takes a string we assume contains a DSA key in 
         a poorly designed format, and returns the parameters if it can */

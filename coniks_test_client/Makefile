@@ -53,9 +53,13 @@ PUBPATH=/path/to/client/on/remote
 
 CLASSES = ./src/org/coniks/coniks_test_client/ClientConfig.java \
 	./src/org/coniks/coniks_test_client/ClientUtils.java \
-	./src/org/coniks/coniks_test_client/ConiksClient.java \
+	./src/org/coniks/coniks_test_client/ClientMessaging.java \
+	./src/org/coniks/coniks_test_client/ConiksUser.java \
+	./src/org/coniks/coniks_test_client/ClientUser.java \
 	./src/org/coniks/coniks_test_client/ConsistencyErr.java \
 	./src/org/coniks/coniks_test_client/ConsistencyChecks.java \
+	./src/org/coniks/coniks_test_client/KeyOps.java \
+	./src/org/coniks/coniks_test_client/SignatureOps.java \
 	./src/org/coniks/coniks_test_client/TestClient.java
 
 #

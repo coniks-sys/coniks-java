@@ -46,79 +46,52 @@ import java.io.FileInputStream;
  */
 public class ServerConfig{
 
-    private final int PORT_IDX = 0;
-    private final int NAME_IDX = 1;
-    private final int FULL_NAME_IDX = 2;
-    private final int EPOCH_INTERVAL_IDX = 3;   
-    private final int KEYSTORE_PATH_IDX = 4;
-    private final int KEYSTORE_PWD_IDX = 5;
-    private final int TRUSTSTORE_PATH_IDX = 6;
-    private final int TRUSTSTORE_PWD_IDX = 7;
+    private static final int PORT_IDX = 0;
+    private static final int NAME_IDX = 1;
+    private static final int FULL_NAME_IDX = 2;
+    private static final int EPOCH_INTERVAL_IDX = 3;   
+    private static final int KEYSTORE_PATH_IDX = 4;
+    private static final int KEYSTORE_PWD_IDX = 5;
+    private static final int TRUSTSTORE_PATH_IDX = 6;
+    private static final int TRUSTSTORE_PWD_IDX = 7;
 
     /** The port number on which the CONIKS server is listening
      */
-    public int PORT;
+    public static int PORT = -1;
 
     /** A short name for the server (e.g. an alias used when
      * generating certificates for this server
      */
-    public String NAME;
+    public static String NAME = "";
 
     /** The server's full hostname (can also be an IP address)
      */
-    public String FULL_NAME;
-
-    /** The path to the server's message handler log
-     */
-    public String MSGHAND_LOG_PATH;
-
-    /** The path to the server's epoch timer log
-     */
-    public String TIMER_LOG_PATH;
-
-    /** The path to the server's main log
-     */
-    public String SERVER_LOG_PATH;
+    public static String FULL_NAME = "";
 
     /** The time interval between epochs in milliseconds
      */
-    public int EPOCH_INTERVAL;
+    public static int EPOCH_INTERVAL = -1;
 
     /** The path to the server's private key store
      */
-    public String KEYSTORE_PATH;
+    public static String KEYSTORE_PATH = "";
 
     /** The password to the server's private key store
      */
-    public String KEYSTORE_PWD;
+    public static String KEYSTORE_PWD = "";
     
     /** The path to the server's trusted certificate store
      */
-    public String TRUSTSTORE_PATH;
+    public static String TRUSTSTORE_PATH = "";
     
     /** The password to the server's trusted certificate store
      */
-    public String TRUSTSTORE_PWD;
+    public static String TRUSTSTORE_PWD = "";
 
     /** The UNIX epoch time at which this instance of the server
      * was started up. This is used as the starting point for "counting" epochs.
      */
-    public long STARTUP_TIME;
-
-    /** Initializes a {@link ConiksServer}'s configuration with empty values.
-     * The server must invoke {@link readServerConfig}, otherwise many errors will occur.
-     */
-    public ServerConfig(){
-        this.PORT = -1;
-        this.NAME = "";
-        this.FULL_NAME = "";
-        this.EPOCH_INTERVAL = -1;
-        this.KEYSTORE_PATH = "";
-        this.KEYSTORE_PWD = "";
-        this.TRUSTSTORE_PATH = "";
-        this.TRUSTSTORE_PWD = "";
-        this.STARTUP_TIME = -1;
-    }
+    public static long STARTUP_TIME = -1;
 
     /** Set a {@link ConiksServer}'s configuration according to the parameters in
      * {@code configFile}.
@@ -133,7 +106,7 @@ public class ServerConfig{
      *@return {@code true} if the config file can be read in successfully, {@code false}
      * if an exception occurs, which will cause the server to halt.
      */
-    public boolean readServerConfig(File configFile, boolean isFullOp) {
+    public static boolean readServerConfig(File configFile, boolean isFullOp) {
 
         try {
             Scanner in = new Scanner (new FileInputStream(configFile));
@@ -146,21 +119,21 @@ public class ServerConfig{
 
             in.close();
             
-            this.PORT = Integer.parseInt(configs.get(PORT_IDX));
-            this.NAME = configs.get(NAME_IDX);
-            this.FULL_NAME = configs.get(FULL_NAME_IDX);
-            this.EPOCH_INTERVAL = Integer.parseInt(configs.get(EPOCH_INTERVAL_IDX));
-            this.KEYSTORE_PATH = configs.get(KEYSTORE_PATH_IDX);
-            this.KEYSTORE_PWD = configs.get(KEYSTORE_PWD_IDX);
+            PORT = Integer.parseInt(configs.get(PORT_IDX));
+            NAME = configs.get(NAME_IDX);
+            FULL_NAME = configs.get(FULL_NAME_IDX);
+            EPOCH_INTERVAL = Integer.parseInt(configs.get(EPOCH_INTERVAL_IDX));
+            KEYSTORE_PATH = configs.get(KEYSTORE_PATH_IDX);
+            KEYSTORE_PWD = configs.get(KEYSTORE_PWD_IDX);
 
             // skip these if we're testing the server
             if (isFullOp) {
-                this.TRUSTSTORE_PATH = configs.get(TRUSTSTORE_PATH_IDX);
-                this.TRUSTSTORE_PWD = configs.get(TRUSTSTORE_PWD_IDX);
+                TRUSTSTORE_PATH = configs.get(TRUSTSTORE_PATH_IDX);
+                TRUSTSTORE_PWD = configs.get(TRUSTSTORE_PWD_IDX);
             }
             
             // this is always going to be set to the current time
-            this.STARTUP_TIME = System.currentTimeMillis();
+            STARTUP_TIME = System.currentTimeMillis();
 
             return true;
         }

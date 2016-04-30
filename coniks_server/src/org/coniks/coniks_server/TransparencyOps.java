@@ -48,30 +48,51 @@ import java.nio.ByteBuffer;
 
 import org.javatuples.*;
 
-// TODO: Might want to separate this into more specialized classes
-// for consistency checks vs internal ops
-
-/** Implements all operations done by a CONIKS server
- * necessary for a CONIKS client to perform the consistency checks.
- * These include generating data binding proofs and signed tree roots (STR).
+/** Implements all transparency-related operations done by a 
+ * CONIKS server.
+ * These allow a CONIKS client to perform the consistency checks.
  * 
  *@author Marcela S. Melara (melara@cs.princeton.edu)
- *@author Michael Rochlin
  */
-public class ServerOps{
+public class TransparencyOps{
 
-    /** Generates the STR from the root node {@code rn}.
+    /** Generates the STR from the root node {@code root}, the epoch
+     * {@code ep}, the previous epoch {@code prevEp}, and the previous
+     * STR's hash {@code prevStrHash}.
      *
-     *@return The STR as a {@code byte[]}, or {@code null} in case of an error.
+     *@return The signed tree root, or {@code null} in case of an error.
      */
-    public static byte[] generateSTR(RootNode rn){
-	byte[] rootBytes = ServerUtils.convertRootNode(rn);
+    public static SignedTreeRoot generateSTR(RootNode root, long ep,
+                                             long prevEp, byte[] prevStrHash) {
         
-        if (rootBytes == null) {
-            return null;
-        }
+        byte[] strBytesPreSig = ServerUtils.getSTRBytesForSig(root, ep, prevEp,
+                                                              prevStrHash);
+
+        byte[] sig = SignatureOps.sign(strBytesPreSig);
         
-	return SignatureOps.sign(rootBytes);
+	return new SignedTreeRoot(root, ep, prevEp, prevStrHash, sig, null);
+    }
+
+    /** Generates the STR from the root node {@code root} for the epoch
+     * {@code ep}.
+     * Hashes the current STR, and computes the signature for the next STR.
+     *
+     *@return The signed tree root, or {@code null} in case of an error.
+     */
+    public static synchronized SignedTreeRoot generateNextSTR(RootNode root, long ep){
+
+        long prevEpoch = ServerHistory.getCurEpoch();
+
+        // generate the hash of the current STR to include is in the next
+        // STR as the previous STR hash
+        byte[] prevStrHash = ServerUtils.hash(ServerUtils.getSTRBytes(ServerHistory.getCurSTR()));
+
+        byte[] strBytesPreSig = ServerUtils.getSTRBytesForSig(root, ep, prevEpoch,
+                                                              prevStrHash);
+
+        byte[] sig = SignatureOps.sign(strBytesPreSig);
+        
+	return new SignedTreeRoot(root, ep, prevEpoch, prevStrHash, sig, ServerHistory.getCurSTR());
     }
     
     /** Generates the authentication path protobuf message from the 
@@ -165,18 +186,6 @@ public class ServerOps{
                 subtree.addAllHash(subTreeHashList);
                 rootBuilder.setSubtree(subtree.build());
                 
-                byte[] prev = curNodeR.getPrev();
-                Hash.Builder prevHash = Hash.newBuilder();
-                ArrayList<Integer> prevHashList = ServerUtils.byteArrToIntList(prev);
-                if(prevHashList.size() != ServerUtils.HASH_SIZE_BYTES){
-                    ConiksServer.serverLog.error("Bad length of prev pointer hash: "+prevHashList.size());
-                    return null;
-                }
-                prevHash.setLen(prevHashList.size());
-                prevHash.addAllHash(prevHashList);
-                rootBuilder.setPrev(prevHash.build());
-                
-                rootBuilder.setEpoch(curNodeR.getEpoch());
                 authPath.setRoot(rootBuilder.build());
                 
                 curOffset++;
@@ -244,63 +253,5 @@ public class ServerOps{
          return hash.build();
 
     }
-
-    /** Builds a Merkle prefix tree consisting of only a root node
-     * with the previous root hash {@code prevRootHash} for
-     * epoch {@code ep}. This tree "skeleton"
-     * is used when initializing the server's namespace.
-     *
-     *@return The {@link UserTreeBuilder} set up for building the intial
-     * Merkle prefix tree.
-     */
-    public static UserTreeBuilder startBuildInitTree(byte[] prevRootHash,
-						     long ep){
-
-	UserTreeBuilder utb = UserTreeBuilder.getInstance();
-	utb.createNewTree(null, prevRootHash, ep);
-	return utb;
-
-    }
-
-    /** Builds the Merkle prefix tree for the first epoch after intializing
-     * the server's namespace with the pending registrations in {@code pendingQ},
-     * the initial epoch's root hash {@code initRootHash} and the new epoch
-     * epoch {@code ep}. 
-     *
-     *@return The {@link RootNode} for the first epoch after initializing
-     * the server's namespace or {@code null} in case of an error.
-     */
-    public static RootNode buildFirstEpochTree(
-                                               PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
-					       byte[] initRootHash,
-					       long ep){
-
-	UserTreeBuilder utb = UserTreeBuilder.getInstance();
-	
-        return utb.createNewTree(pendingQ, initRootHash, ep);
-
-    }
-
-    // update the history by adding all new users to the hash tree and updating the tree
-    /** Builds the Merkle prefix tree for the next epoch after 
-     * with the pending registrations in {@code pendingQ}, the current epoch's
-     * root node {@code curRoot}, the current epoch {@code ep},
-     * and the epoch interval {@code epInt}.
-     *
-     *@return The {@link RootNode} for the next epoch or {@code null} in case of an error.
-     */
-    public static RootNode buildNextEpochTree(
-                                              PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
-					      RootNode curRoot, 
-					      long ep, int epInt){
-
-	UserTreeBuilder utb = UserTreeBuilder.getInstance();
-	
-        // curRoot will become the next epoch's prev so we need to pass current root 
-        // hash to buildTree()
-        byte[] rootBytes = ServerUtils.convertRootNode(curRoot);
-	return utb.copyExtendTree(curRoot, ServerUtils.hash(rootBytes), pendingQ, 
-				     ep + epInt);
-    }
-
-} //ends ServerOps class
+    
+}

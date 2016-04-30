@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2016, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,8 @@ import java.io.*;
 import com.google.protobuf.*;
 
 import org.coniks.coniks_common.MsgType;
+import org.coniks.coniks_common.CommonMessaging;
+
 import org.coniks.coniks_common.C2SProtos.Registration;
 import org.coniks.coniks_common.C2SProtos.CommitmentReq;
 import org.coniks.coniks_common.C2SProtos.KeyLookup;
@@ -59,53 +61,30 @@ import javax.crypto.*;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-/** Implements the operations that interface
- * a CONIKS client with a CONIKS server.
- * 
+/** Implements all functions for exchanging CONIKS messages with a CONIKS
+ * server.
+ *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Michael Rochlin
- */
-public class ConiksClient {
-
-    // Config settings now set in main in TestClient
-    public static ClientConfig CONFIG;
-    private static boolean isFullOp = true;
+*/
+public class ClientMessaging {
 
     private static DataOutputStream dout;
     private static DataInputStream din;
+    private static Socket sock;
 
-    // logs are useful
-    public static ClientLogger clientLog = null;
+    // don't want to have to pass this value from the TestClient
+    // in every single function
+    private static boolean isFullOp;
 
-    /** Sets the operating mode of the client: either full or testing.
+    /** Sets the isFullOp flag
      *
-     *@param isFullOp indicates if the client is in full operating mode or not.
+     *@param isFull indicates whether the client is operating in
+     * full operating mode or in test mode
      */
-    public static void setOpMode (boolean isFullOpMode) {
-        isFullOp = isFullOpMode;
+    public static void setIsFullOp (boolean isFull) {
+        isFullOp = isFull;
     }
-
-    /** Sets the default truststore according to the {@link ClientConfig}.
-     * This is needed to set up SSL connections with a CONIKS server.
-     */
-    public static void setDefaultTruststore() {
-        System.setProperty("javax.net.ssl.trustStore", 
-                           CONFIG.TRUSTSTORE_PATH);
-        System.setProperty("javax.net.ssl.trustStorePassword",
-                           CONFIG.TRUSTSTORE_PWD);
-        System.setProperty("javax.net.ssl.keyStore", CONFIG.PRIVATE_KEYSTORE_PATH);
-        System.setProperty("javax.net.ssl.keyStorePassword", CONFIG.PRIVATE_KEYSTORE_PWD);
-    }
-
-    /** Sets up the logging for the client.
-     *
-     *@param logPath the path where the logs are to be written
-     */
-    public static void  setupLogging(String logPath) {
-        clientLog = ClientLogger.getInstance(logPath+"/client-%g");
-    }
-
-    /* Functions for sending CONIKS messages to the server */
 
     /** Sends a Registration protobuf message with the given
         {@code username} and {@code publicKey} to
@@ -131,7 +110,8 @@ public class ConiksClient {
 
     }
 
-    /** Sends a CommitmentReq protobuf message requesting {@code provider}'s commitment for {@code epoch} from {@code server}.
+    /** Sends a CommitmentReq protobuf message requesting {@code provider}'s 
+        commitment for {@code epoch} from {@code server}.
         If the server and provider are the same, {@code commitmentType} 
         is {@code SELF}, otherwise it is {@code WITNESSED}.
     */
@@ -158,13 +138,15 @@ public class ConiksClient {
     }
 
     /** Sends a SignedULNChangeReq protobuf with all the arguments and signed with {@code prk} */
-    public static void sendSignedULNChangeReqProto(String username, String newBlob, DSAPublicKey newChangeKey,
-                                         boolean allowsUnsignedKeychange, boolean allowsPublicLookup,
-                                         DSAPrivateKey prk,
-                                         String server) {
+    public static void sendSignedULNChangeReqProto(String username, String newBlob, 
+                                                   DSAPublicKey newChangeKey,
+                                                   boolean allowsUnsignedKeychange, 
+                                                   boolean allowsPublicLookup,
+                                                   byte[] sig,
+                                                   String server) {
         ULNChangeReq changeReq = buildULNChangeReqMsgProto(username, newBlob, newChangeKey, 
                                                            allowsUnsignedKeychange, allowsPublicLookup);
-        SignedULNChangeReq signed = buildSignedULNChangeReqMsgProto(changeReq, prk);
+        SignedULNChangeReq signed = buildSignedULNChangeReqMsgProto(changeReq, sig);
         sendMsgProto(MsgType.SIGNED_ULNCHANGE_REQ, signed, server);
     }
 
@@ -185,8 +167,8 @@ public class ConiksClient {
             dout.flush();
         }
         catch (IOException e) {
-            clientLog.error("Sending msg proto "+msg.toString());
-            clientLog.error("Error: "+e.getMessage());
+            ClientLogger.error("Sending msg proto "+msg.toString());
+            ClientLogger.error("Error: "+e.getMessage());
         }
 
     }
@@ -251,25 +233,16 @@ public class ConiksClient {
 
     /** Builds the SignedULNChangeReq protobuf message with a given 
         {@code changeReq} is a ULNChangeReq that was built previously 
-        {@code sig}
-        Unlike the other methods, this one actually handles the signing        
+        {@code sig}.
     */
-    private static SignedULNChangeReq buildSignedULNChangeReqMsgProto(ULNChangeReq changeReq, DSAPrivateKey prk) {
+    private static SignedULNChangeReq buildSignedULNChangeReqMsgProto(ULNChangeReq changeReq, byte[] sig) {
 
         SignedULNChangeReq.Builder ulnChangeBuilder = SignedULNChangeReq.newBuilder();
         ulnChangeBuilder.setReq(changeReq);
 
-        // TODO (mrochlin)
-        // implement signing
-        try {
-            byte[] sig = SignatureOps.sign(changeReq.toByteArray(), prk);
-            clientLog.log("Signed ULNChange. Sig: " + Arrays.toString(sig));
-            ulnChangeBuilder.addAllSig(ClientUtils.byteArrToIntList(sig));
-        }
-        catch (InvalidKeyException e) {
-            clientLog.error("signed ULN change - Bad key");
-            return null;
-        }
+        ClientLogger.log("Signed ULNChange. Sig: " + Arrays.toString(sig));
+        ulnChangeBuilder.addAllSig(ClientUtils.byteArrToIntList(sig));
+       
         return ulnChangeBuilder.build();
     }
 
@@ -368,7 +341,7 @@ public class ConiksClient {
                 RegistrationResp regResp = RegistrationResp.parseDelimitedFrom(din);
                 
                 if(!regResp.hasInitEpoch() || !regResp.hasEpochInterval()){
-                    clientLog.error("Malformed registration response");
+                    ClientLogger.error("Malformed registration response");
                 }
                 else {
                     return regResp;
@@ -378,7 +351,7 @@ public class ConiksClient {
                 AuthPath authPath = AuthPath.parseDelimitedFrom(din);
                 
                 if (!authPath.hasLeaf() || !authPath.hasRoot()) {
-                    clientLog.error("Malformed auth path");
+                    ClientLogger.error("Malformed auth path");
                 }
                 else {
                     return authPath;
@@ -388,7 +361,7 @@ public class ConiksClient {
                 Commitment comm = Commitment.parseDelimitedFrom(din);
                 
                 if (!comm.hasEpoch() || !comm.hasRootHash()) {
-                    clientLog.error("Malformed commitment");
+                    ClientLogger.error("Malformed commitment");
                 }
                 else {
                     return comm;
@@ -400,7 +373,7 @@ public class ConiksClient {
                 ServerResp resp = ServerResp.parseDelimitedFrom(din);
                 
                 if (!resp.hasMessage()) {
-                    clientLog.error("Malformed simple server response");
+                    ClientLogger.error("Malformed simple server response");
                 }
                 else {
                     return resp;
@@ -408,13 +381,14 @@ public class ConiksClient {
             }
         }
         catch (InvalidProtocolBufferException e) {
-            clientLog.error("parsing proto msg: "+e.getMessage());
+            ClientLogger.error("parsing proto msg: "+e.getMessage());
         }
         catch (IOException e) {
-            clientLog.error("receiving data from the server: "+e.getMessage());
+            ClientLogger.error("receiving data from the server: "+e.getMessage());
         }
-        
-        close();
+        finally {
+            CommonMessaging.close(din);
+        }
 
         // unexpected message type from the server
         return null;
@@ -423,37 +397,27 @@ public class ConiksClient {
 
     /* Functions for handling the lower-level communication with the server */
 
-    /** Establishes an SSL connection to {@code server}.
+    /** Establishes an SSL connection to {@code server} if in full operating mode.
      *
+     *@param server the CONIKS server to which send the message
+     *@param isFullOp indicates whether the client is operating in full mode 
+     * or in testing mode
      *@throws an {@code IOException} if any of the socket operations fail.
      */
     private static void connect (String server) 
         throws IOException {
 
-        Socket sock;
-
         if (isFullOp) {
             SSLSocketFactory sslFact =
                 (SSLSocketFactory)SSLSocketFactory.getDefault();
-            sock = (SSLSocket)sslFact.createSocket(server, CONFIG.PORT);
+            sock = (SSLSocket)sslFact.createSocket(server, ClientConfig.PORT);
         }
         else {
-            sock = new Socket(server, CONFIG.PORT);
+            sock = new Socket(server, ClientConfig.PORT);
         }
         dout = new DataOutputStream(sock.getOutputStream());
         din = new DataInputStream(sock.getInputStream());
         
     }
 
-    /** Closes the currently open connection to a server
-     */
-    private static void close() {
-        try {
-            din.close();
-            dout.close();
-        }
-        catch (IOException e) {
-            clientLog.error("closing the connection to the server: "+e.getMessage());
-        }
-    }
 }

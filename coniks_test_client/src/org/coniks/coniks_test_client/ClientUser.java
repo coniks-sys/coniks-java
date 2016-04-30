@@ -55,7 +55,7 @@ public class ClientUser extends ConiksUser {
      */
     public ClientUser (String uname, KeyPair kp) {
         super(uname, (DSAPublicKey)kp.getPublic());
-        KeyOps.saveDSAPrivateKey(uname, (DSAPrivateKey)kp.getPrivate());
+        KeyOps.saveDSAPrivateKeyFile(uname, (DSAPrivateKey)kp.getPrivate());
     }
 
     /** Returns this client user's private key
@@ -64,7 +64,7 @@ public class ClientUser extends ConiksUser {
      *@return the client user's private key
      */
     public DSAPrivateKey getPrivKey() {
-        return KeyOps.loadDSAPrivateKey(username);
+        return KeyOps.loadDSAPrivateKeyFile(username);
     }
 
 }

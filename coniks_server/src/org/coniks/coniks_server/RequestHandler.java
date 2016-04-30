@@ -121,9 +121,6 @@ public class RequestHandler extends Thread{
             ConiksServer.msgLog.error("Error connecting to client: "+e.getMessage());
             e.printStackTrace();
         }
-        finally {
-            CommonMessaging.close(clientSocket);
-        }
         
     } //ends run()
     

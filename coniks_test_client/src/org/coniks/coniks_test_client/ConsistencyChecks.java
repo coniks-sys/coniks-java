@@ -74,7 +74,6 @@ public class ConsistencyChecks {
         // TODO: more fine-grained check for whether the key is null bc the file
         // doesn't exist or because there was an actual error
         if (pubKey == null) {
-            System.out.println("public key was null");
             return ConsistencyErr.CHECK_PASSED;
         }
 

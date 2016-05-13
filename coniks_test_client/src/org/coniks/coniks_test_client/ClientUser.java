@@ -48,23 +48,30 @@ import javax.crypto.*;
  */
 public class ClientUser extends ConiksUser {
 
+    private DSAPrivateKey changePrivKey;
+    
     /** Initializes the client's user with the username and 
      * ConiksUser defaults.
      *
      *@param uname this user's username
      */
-    public ClientUser (String uname, KeyPair kp) {
-        super(uname, (DSAPublicKey)kp.getPublic());
+    public ClientUser (String uname, String data, KeyPair kp) {
+        super(uname, data, (DSAPublicKey)kp.getPublic());
         KeyOps.saveDSAPrivateKeyFile(uname, (DSAPrivateKey)kp.getPrivate());
     }
 
-    /** Returns this client user's private key
-     * retrieveing it from the key store.
-     *
-     *@return the client user's private key
+    /** Loads the user's key change private key from disk. The caller should free
+     * the key's memory after use.
      */
-    public DSAPrivateKey getPrivKey() {
-        return KeyOps.loadDSAPrivateKeyFile(username);
+    public DSAPrivateKey loadChangePrivKey() {
+        changePrivKey = KeyOps.loadDSAPrivateKey(username);
+        return changePrivKey;
+    }
+
+    /** Unloads the user's key change private key from memory.
+     */
+    public void unloadChangePrivKey() {
+        changePrivKey = null;
     }
 
 }

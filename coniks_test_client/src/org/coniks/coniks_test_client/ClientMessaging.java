@@ -86,14 +86,13 @@ public class ClientMessaging {
         isFullOp = isFull;
     }
 
-    /** Sends a Registration protobuf message with the given
-        {@code username} and {@code publicKey} to
-        to the {@code server}.
+    /** Sends a Registration protobuf message for the given
+        user to the {@code server}.
     */
-    public static void sendRegistrationProto (String username, String publicKey,
+    public static void sendRegistrationProto (ClientUser user,
                                               String server) {
-      
-        Registration reg = buildRegistrationMsgProto(username, publicKey);
+        
+        Registration reg = buildRegistrationMsgProto(user.getUsername(), user.getPublicKey);
         sendMsgProto(MsgType.REGISTRATION, reg, server);
 
     }
@@ -174,12 +173,17 @@ public class ClientMessaging {
     }
 
     /** Builds the Registration protobuf message with a given
-        {@code username} and {@code publicKey}.
+        {@code username}, {@code publicKey} blob, {@code changeKey}, and unsigned key
+        changes flag.
     */
-    private static Registration buildRegistrationMsgProto(String username, String publicKey) {
+    private static Registration buildRegistrationMsgProto(String username, String publicKey,
+                                                          DSAPublicKey changeKey, boolean allowsUnsignedKeyChange) {
         Registration.Builder regBuild = Registration.newBuilder();
         regBuild.setName(username);
         regBuild.setBlob(publicKey);
+        DSAPublicKeyProto ckProto = buildDSAPublicKeyProto(changeKey);
+        regBuild.setChangeKey(ckProto);
+        regBuild.setAllowsUnsignedKeychange(allowsUnsignedKeyChange);
         return regBuild.build();
     }
 

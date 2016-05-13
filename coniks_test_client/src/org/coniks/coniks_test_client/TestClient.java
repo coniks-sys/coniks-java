@@ -444,6 +444,9 @@ public class TestClient {
         case ConsistencyErr.KEYSTORE_ERR:
             printErr("Could not find the private or public key. Current user: "+uname);
             break;
+        case ConsistencyErr.DISALLOWED_OP_ERR:
+            printErr("Client "+uname+" tried to perform a forbidden operation");
+            break;
         default:
             printErr("Some unknown server error occurred.");
             break;                

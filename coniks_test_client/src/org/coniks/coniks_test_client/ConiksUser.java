@@ -46,20 +46,24 @@ import java.security.interfaces.*;
 public class ConiksUser {
 
     protected String username;
+    private String keyData;
+    private DSAPublicKey changePubKey;
     private boolean allowsUnsignedChanges;
-    private DSAPublicKey pubKey;
 
-    /** Initializes the user with the username and public key,
+    /** Initializes the user with the username, public key data, public change key,
      * and sets the default change policy (i.e. {@code allowsUnsignedChanges} 
      * is {@code true}.
      *
      *@param uname this user's username
+     *@param data this user's key data
+     *@param changePubKey this user's change public key
      */
-    public ConiksUser (String uname, DSAPublicKey pub) {
+    public ConiksUser (String uname, String data, DSAPublicKey changePk) {
         username = uname;
-        pubKey = pub;
-        KeyOps.saveDSAPublicKey(username, pub);
-        allowsUnsignedChanges = false; // strict default for now
+        keyDataBlob = data;
+        changePubKey = changePk;
+        KeyOps.saveDSAPublicKey(username, changePk);
+        allowsUnsignedChanges = true;
     }
     
     /** Returns this CONIKS user's username
@@ -70,12 +74,20 @@ public class ConiksUser {
         return username;
     }
 
-     /** Returns this CONIKS user's public key
+     /** Returns this CONIKS user's key data
      *
-     *@return the CONIKS user's public key
+     *@return the CONIKS user's key data
      */
-    public DSAPublicKey getPubKey() {
-        return pubKey;
+    public String getKeyData() {
+        return keyData;
+    }
+
+     /** Returns this CONIKS user's data change public key
+     *
+     *@return the CONIKS user's data public key
+     */
+    public DSAPublicKey getChangePubKey() {
+        return changePubKey;
     }
 
     /** Indicates whether this CONIKS user allows unsigned key changes
@@ -86,41 +98,31 @@ public class ConiksUser {
         return allowsUnsignedChanges;
     }
 
-    /** Loads the user's key from disk. This can be used after the
-     * user's key has been evicted from memory.
+    /** Loads the user's key change public key from disk. 
+     * This can be used after the user's key has been evicted from memory.
      */
-    public void loadPubKey() {
-        pubKey = KeyOps.loadDSAPublicKey(username);
+    public void loadChangePubKey() {
+        changePubKey = KeyOps.loadDSAPublicKey(username);
     }
 
-    /** Unloads the user's public key from memory.
+    /** Unloads the user's key change public key from memory.
      */
-    public void unloadPubKey() {
-        pubKey = null;
+    public void unloadChangePubKey() {
+        changePubKey = null;
     }
     
     // no setter for name because we don't want the name to change once
     // the user has been created
 
-    /** Change this CONIKS user's public key.
-     *
-     *@param pub the public key  the CONIKS user's public key
-     *@param keyChangeAuth the signed key change statement; null is accepted if 
-     * {@code allowsUnsignedChanges} is set to {@code true}.
-     *@return true if the key change authorization passed, or if the user allows unsigned key
-     * key changes. False otherwise.
+    /** Sets the user's key data. Expects that the caller has verified the
+     * change operation based on the user's key change policy.
      */
-    public boolean changePubKey(DSAPublicKey pub, byte[] keyChangeAuth) {
-
-        // check if we have an auth statement when we need one
-        if (keyChangeAuth == null && !allowsUnsignedChanges) {
-            ClientLogger.error("Attempt to change keys without authorization");
-            return false;
-        }
-        
-        return KeyOps.saveDSAPublicKey(username, pub);
-
+    public void changeKeyData(String newData) {
+        keyData = newData;
     }
+    
+    // TODO: mechanism for changing the key change public key
+    // signed changes, ratcheting?
 
     /** Sets the unsigned key change flag to true
      */

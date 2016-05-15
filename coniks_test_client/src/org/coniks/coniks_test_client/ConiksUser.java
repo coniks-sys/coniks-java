@@ -46,7 +46,7 @@ import java.security.interfaces.*;
 public class ConiksUser {
 
     protected String username;
-    private String keyData;
+    private String keyData; // TODO change this to be bytes
     private DSAPublicKey changePubKey;
     private boolean allowsUnsignedChanges;
 
@@ -60,9 +60,9 @@ public class ConiksUser {
      */
     public ConiksUser (String uname, String data, DSAPublicKey changePk) {
         username = uname;
-        keyDataBlob = data;
+        keyData = data;
         changePubKey = changePk;
-        KeyOps.saveDSAPublicKey(username, changePk);
+        KeyOps.saveDSAPublicKeyFile(username, changePk);
         allowsUnsignedChanges = true;
     }
     
@@ -102,7 +102,7 @@ public class ConiksUser {
      * This can be used after the user's key has been evicted from memory.
      */
     public void loadChangePubKey() {
-        changePubKey = KeyOps.loadDSAPublicKey(username);
+        changePubKey = KeyOps.loadDSAPublicKeyFile(username);
     }
 
     /** Unloads the user's key change public key from memory.
@@ -117,7 +117,7 @@ public class ConiksUser {
     /** Sets the user's key data. Expects that the caller has verified the
      * change operation based on the user's key change policy.
      */
-    public void changeKeyData(String newData) {
+    public void setKeyData(String newData) {
         keyData = newData;
     }
     

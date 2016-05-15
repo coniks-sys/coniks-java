@@ -62,7 +62,7 @@ public class KeyOps{
      *@param uname the username for which to load the public key
      *@return the public key or null upon an error.
      */
-    public static DSAPublicKey loadDSAPublicKey (String uname) {
+    public static DSAPublicKey loadDSAPublicKeyFile (String uname) {
         String filename = uname+".pub";
         DSAPublicKey pubKey = null;
 
@@ -151,7 +151,7 @@ public class KeyOps{
      *@param pubKey the public key to store for this user
      *@return whether the save succeeded
      */
-    public static boolean saveDSAPublicKey (String uname, DSAPublicKey pubKey) {
+    public static boolean saveDSAPublicKeyFile (String uname, DSAPublicKey pubKey) {
         byte[] keyBytes = pubKey.getEncoded();
         String filename = uname+".pub";
 
@@ -208,12 +208,12 @@ public class KeyOps{
      *@param kp the key pair to be saved
      *@param whether the save succeeded
      */
-    public static boolean saveDSAKeyPair(String uname, KeyPair kp) {
+    public static boolean saveDSAKeyPairFile(String uname, KeyPair kp) {
         
         boolean success = false;
 
         if (saveDSAPrivateKeyFile(uname, (DSAPrivateKey)kp.getPrivate())) {
-            success = saveDSAPublicKey(uname, (DSAPublicKey)kp.getPublic());
+            success = saveDSAPublicKeyFile(uname, (DSAPublicKey)kp.getPublic());
         }
 
         return success;

@@ -69,7 +69,7 @@ public class ConsistencyChecks {
      */
     public static int verifyPubKeyProto (String uname, AuthPath authPath) {
         
-        DSAPublicKey pubKey = KeyOps.loadDSAPublicKey(uname);
+        DSAPublicKey pubKey = KeyOps.loadDSAPublicKeyFile(uname);
         
         // TODO: more fine-grained check for whether the key is null bc the file
         // doesn't exist or because there was an actual error

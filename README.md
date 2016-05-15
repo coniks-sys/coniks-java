@@ -1,8 +1,6 @@
 #CONIKS
 
-[![Build Status](https://travis-ci.org/coniks-sys/coniks-ref-implementation.svg?branch=master)](https://travis-ci.org/citp/coniks-ref-implementation)
-
-Copyright (C) 2015-16 Princeton University.
+[![Build Status](https://travis-ci.org/citp/coniks-ref-implementation.svg?branch=test-key-change)](https://travis-ci.org/citp/coniks-ref-implementation)
 
 http://coniks.org
 

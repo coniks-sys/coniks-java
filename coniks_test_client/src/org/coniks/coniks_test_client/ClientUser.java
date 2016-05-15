@@ -64,7 +64,7 @@ public class ClientUser extends ConiksUser {
      * the key's memory after use.
      */
     public DSAPrivateKey loadChangePrivKey() {
-        changePrivKey = KeyOps.loadDSAPrivateKey(username);
+        changePrivKey = KeyOps.loadDSAPrivateKeyFile(username);
         return changePrivKey;
     }
 

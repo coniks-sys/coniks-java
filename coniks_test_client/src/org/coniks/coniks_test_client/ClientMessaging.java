@@ -92,7 +92,8 @@ public class ClientMessaging {
     public static void sendRegistrationProto (ClientUser user,
                                               String server) {
         
-        Registration reg = buildRegistrationMsgProto(user.getUsername(), user.getPublicKey);
+        Registration reg = buildRegistrationMsgProto(user.getUsername(), user.getKeyData(), 
+                                                     user.getChangePubKey(), user.isAllowsUnsignedChanges());
         sendMsgProto(MsgType.REGISTRATION, reg, server);
 
     }
@@ -126,25 +127,33 @@ public class ClientMessaging {
 
     /** Sends a ULNChangeReq protobuf message with all the arguments */
     public static void sendULNChangeReqProto(String username, 
-                                             String newBlob, DSAPublicKey newChangeKey,
+                                             String keyData, DSAPublicKey newChangeKey,
                                              boolean allowsUnsignedKeychange, 
                                              boolean allowsPublicLookup, String server) {
-        ULNChangeReq changeReq = buildULNChangeReqMsgProto(
-                                                           username, newBlob, newChangeKey, 
+        ULNChangeReq changeReq = buildULNChangeReqMsgProto(username, keyData, newChangeKey, 
                                                            allowsUnsignedKeychange, 
                                                            allowsPublicLookup);
         sendMsgProto(MsgType.ULNCHANGE_REQ, changeReq, server);
     }
 
     /** Sends a SignedULNChangeReq protobuf with all the arguments and signed with {@code prk} */
-    public static void sendSignedULNChangeReqProto(String username, String newBlob, 
-                                                   DSAPublicKey newChangeKey,
-                                                   boolean allowsUnsignedKeychange, 
-                                                   boolean allowsPublicLookup,
+    public static void sendSignedULNChangeReqProto(ClientUser user,
                                                    byte[] sig,
                                                    String server) {
-        ULNChangeReq changeReq = buildULNChangeReqMsgProto(username, newBlob, newChangeKey, 
-                                                           allowsUnsignedKeychange, allowsPublicLookup);
+        DSAPublicKey changePk = user.getChangePubKey();
+
+        // let's not assume the key is in memory
+        if (changePk == null) {
+            user.loadChangePubKey();
+
+            // make sure we actually got a key from disk
+            if (user.getChangePubKey() == null) {
+                ClientLogger.error("ClientMessaging: Could not load change public key");
+            }
+        }
+
+        ULNChangeReq changeReq = buildULNChangeReqMsgProto(user.getUsername(), user.getKeyData(), changePk, 
+                                                           user.isAllowsUnsignedChanges(), true);
         SignedULNChangeReq signed = buildSignedULNChangeReqMsgProto(changeReq, sig);
         sendMsgProto(MsgType.SIGNED_ULNCHANGE_REQ, signed, server);
     }
@@ -176,12 +185,12 @@ public class ClientMessaging {
         {@code username}, {@code publicKey} blob, {@code changeKey}, and unsigned key
         changes flag.
     */
-    private static Registration buildRegistrationMsgProto(String username, String publicKey,
+    private static Registration buildRegistrationMsgProto(String username, String keyData,
                                                           DSAPublicKey changeKey, boolean allowsUnsignedKeyChange) {
         Registration.Builder regBuild = Registration.newBuilder();
         regBuild.setName(username);
-        regBuild.setBlob(publicKey);
-        DSAPublicKeyProto ckProto = buildDSAPublicKeyProto(changeKey);
+        regBuild.setBlob(keyData);
+        DSAPublicKeyProto ckProto = ClientUtils.buildDSAPublicKeyProto(changeKey);
         regBuild.setChangeKey(ckProto);
         regBuild.setAllowsUnsignedKeychange(allowsUnsignedKeyChange);
         return regBuild.build();

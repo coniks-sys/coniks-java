@@ -1,6 +1,6 @@
 #CONIKS
 
-[![Build Status](https://travis-ci.org/citp/coniks-ref-implementation.svg?branch=master)](https://travis-ci.org/citp/coniks-ref-implementation)
+[![Build Status](https://travis-ci.org/coniks-sys/coniks-ref-implementation.svg?branch=master)](https://travis-ci.org/citp/coniks-ref-implementation)
 
 Copyright (C) 2015-16 Princeton University.
 
@@ -16,4 +16,4 @@ This software package serves as a reference implementation for the CONIKS system
 Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/citp/coniks-ref-implementation/releases).
 
 ##Documentation
-[Read the package's Java API (javadoc)](https://citp.github.io/coniks-ref-implementation/)
+[Read the package's Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation/)

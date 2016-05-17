@@ -1,6 +1,6 @@
 #CONIKS Protos
 
-http://www.coniks.org
+http://coniks.org
 
 ##Introduction
 These are protobuf source files that define the message format for all communication between the CONIKS test client and the basic server. They are based on [Google Protobufs](https://github.com/google/protobuf) (proto2) and require you to have the protocol buffer compiler protoc installed.

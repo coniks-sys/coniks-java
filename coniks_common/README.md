@@ -2,7 +2,7 @@
 
 Copyright (C) 2015-16 Princeton University.
 
-https://coniks.cs.princeton.edu
+http://coniks.org
 
 ##Introduction
 These are the files common to the basic implementation of a CONIKS server and the simple CONIKS test client, and include the binaries for two supporting libraries: [Google Protobufs](https://github.com/google/protobuf/tree/master/java) and [Javatuples](https://github.com/javatuples/javatuples).
@@ -20,4 +20,4 @@ All common files (including the supporting libraries) are compiled when either c
 Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/citp/coniks-ref-implementation/releases).
 
 ##Documentation
-[Read the common files' Java API (javadoc)](https://citp.github.io/coniks-ref-implementation/org/coniks/coniks_common/package-summary.html)
+[Read the common files' Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation/org/coniks/coniks_common/package-summary.html)

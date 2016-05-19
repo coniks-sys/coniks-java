@@ -53,9 +53,11 @@ public class DirectoryOps {
     /** Adds a new registration with {@code uname} and {@code pk}
      * to the pending queue.
      */
-    public static synchronized void register(String uname, String pk){            
+    public static synchronized void register(String uname, String pk, DSAPublicKey ck,
+                                             boolean allowsUnsignedChanges, boolean allowsPublicVisibility){            
         byte[] index = ServerUtils.unameToIndex(uname);
-        UserLeafNode uln = new UserLeafNode(uname, pk, ServerHistory.nextEpoch(), 0, true, true, null, index);
+        UserLeafNode uln = new UserLeafNode(uname, pk, ServerHistory.nextEpoch(), 0,
+                                            allowsUnsignedChanges, allowsPublicVisibility, ck, index);
         pendingQueue.add(Triplet.with(index, uln, (Operation)new Register()));
     }
 
@@ -66,7 +68,7 @@ public class DirectoryOps {
         boolean allowsUnsignedKC, boolean allowsPublicLookup, 
         byte[] msg, byte[] sig) {
         byte[] index = ServerUtils.unameToIndex(uname);
-        UserLeafNode uln = new UserLeafNode(uname, newKey, ServerHistory.nextEpoch(), 0, true, true, kPrime, index);
+        UserLeafNode uln = new UserLeafNode(uname, newKey, ServerHistory.nextEpoch(), 0, allowsUnsignedKC, allowsPublicLookup, kPrime, index);
         KeyChange change = new KeyChange(newKey, kPrime, allowsUnsignedKC, allowsPublicLookup, msg, sig, ServerHistory.nextEpoch(), 0);
         pendingQueue.add(Triplet.with(index, uln, (Operation)change));
     }

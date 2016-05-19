@@ -34,15 +34,17 @@
 package org.coniks.coniks_server;
 
 import java.security.*;
-import java.security.interfaces.RSAPublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.RSAPublicKeySpec;
+import java.security.interfaces.*;
+import java.security.spec.*;
 import java.security.cert.CertificateException;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.io.PrintWriter;
 import java.io.*;
+
+import org.coniks.coniks_common.*;
+import org.coniks.coniks_common.C2SProtos.*;
 
 /** Implements all operations involving encryption keys
  * that a CONIKS server must perform.
@@ -157,6 +159,34 @@ public class KeyOps{
             ServerLogger.error("KeyOps:loadPublicKey: specified protParam were insufficient or invalid");
         }
         return null;
+    }
+
+    /** Makes a DSAPublicKey from the params */
+    public static DSAPublicKey makeDSAPublicKeyFromParams(BigInteger p, BigInteger q, BigInteger g, BigInteger y) {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("DSA");
+            KeySpec publicKeySpec = new DSAPublicKeySpec(y, p, q, g);
+            return (DSAPublicKey) keyFactory.generatePublic(publicKeySpec);
+        }
+        catch(InvalidParameterException e) {
+            TimerLogger.error("The given DSA key is invalid.");
+        }
+        catch (InvalidKeySpecException e) {
+            TimerLogger.error("The given key params are invalid.");
+        }
+        catch(NoSuchAlgorithmException e){
+            TimerLogger.error("DSA is invalid for some reason.");
+        }
+        return null;
+    }
+
+    // makes a DSA key from the DSAPublicKeyProto protobuf
+    public static DSAPublicKey makeDSAPublicKeyFromProto(DSAPublicKeyProto pkProto) {
+        BigInteger p = new BigInteger(pkProto.getP());
+        BigInteger q = new BigInteger(pkProto.getQ());
+        BigInteger g = new BigInteger(pkProto.getG());
+        BigInteger y = new BigInteger(pkProto.getY());
+        return makeDSAPublicKeyFromParams(p,q,g,y);
     }
 
 } // ends KeyOps class

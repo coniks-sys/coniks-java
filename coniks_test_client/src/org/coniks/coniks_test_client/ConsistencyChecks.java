@@ -67,24 +67,17 @@ public class ConsistencyChecks {
      *@param authPath the auth path containing the received public key
      *@return whether the check succeeded
      */
-    public static int verifyPubKeyProto (String uname, AuthPath authPath) {
-        
-        DSAPublicKey pubKey = KeyOps.loadDSAPublicKeyFile(uname);
-        
-        // TODO: more fine-grained check for whether the key is null bc the file
-        // doesn't exist or because there was an actual error
-        if (pubKey == null) {
-            return ConsistencyErr.CHECK_PASSED;
-        }
+    public static int verifyPubKeyProto (ConiksUser user, AuthPath authPath) {
+
+        // TODO: this should read in the file
+        String keyData = user.getKeyData();
 
         AuthPath.UserLeafNode apUln = authPath.getLeaf();
 
         String pk = apUln.getPublickey();
 
-        String pubKeyStr = pubKey.getY().toString();
-
         // TODO: compare the keys directly
-        if (pk.equals(pubKeyStr)) {
+        if (pk.equals(keyData)) {
             return ConsistencyErr.CHECK_PASSED;
         }
         else {

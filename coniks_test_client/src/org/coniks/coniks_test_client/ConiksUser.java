@@ -49,10 +49,11 @@ public class ConiksUser {
     private String keyData; // TODO change this to be bytes
     private DSAPublicKey changePubKey;
     private boolean allowsUnsignedChanges;
+    private boolean allowsPublicVisibility;
 
     /** Initializes the user with the username, public key data, public change key,
-     * and sets the default change policy (i.e. {@code allowsUnsignedChanges} 
-     * is {@code true}.
+     * and sets the default change and visibility policies (i.e. {@code allowsUnsignedChanges} 
+     * and {@code allowsPublicVisibility} are both {@code true}.
      *
      *@param uname this user's username
      *@param data this user's key data
@@ -64,6 +65,7 @@ public class ConiksUser {
         changePubKey = changePk;
         KeyOps.saveDSAPublicKeyFile(username, changePk);
         allowsUnsignedChanges = true;
+        allowsPublicVisibility = true;
     }
     
     /** Returns this CONIKS user's username
@@ -96,6 +98,14 @@ public class ConiksUser {
      */
     public boolean isAllowsUnsignedChanges() {
         return allowsUnsignedChanges;
+    }
+
+     /** Indicates whether this CONIKS user allows her key to have public visibility
+     *
+     *@return true if the user allows public visibility, false otherwise.
+     */
+    public boolean isAllowsPublicVisibility() {
+        return allowsPublicVisibility;
     }
 
     /** Loads the user's key change public key from disk. 
@@ -134,6 +144,18 @@ public class ConiksUser {
      */
     public void disallowUnsignedChanges() {
         allowsUnsignedChanges = false;
+    }
+
+     /** Sets the public visibility flag to true
+     */
+    public void allowPublicVisibility() {
+        allowsPublicVisibility = true;
+    }
+
+    /** Sets the public visibility flag to false
+     */
+    public void disallowPublicVisibility() {
+        allowsPublicVisibility = false;
     }
 
 }

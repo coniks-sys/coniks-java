@@ -93,7 +93,8 @@ public class ClientMessaging {
                                               String server) {
         
         Registration reg = buildRegistrationMsgProto(user.getUsername(), user.getKeyData(), 
-                                                     user.getChangePubKey(), user.isAllowsUnsignedChanges());
+                                                     user.getChangePubKey(), user.isAllowsUnsignedChanges(),
+                                                     user.isAllowsPublicVisibility());
         sendMsgProto(MsgType.REGISTRATION, reg, server);
 
     }
@@ -126,13 +127,11 @@ public class ClientMessaging {
     }
 
     /** Sends a ULNChangeReq protobuf message with all the arguments */
-    public static void sendULNChangeReqProto(String username, 
-                                             String keyData, DSAPublicKey newChangeKey,
-                                             boolean allowsUnsignedKeychange, 
-                                             boolean allowsPublicLookup, String server) {
-        ULNChangeReq changeReq = buildULNChangeReqMsgProto(username, keyData, newChangeKey, 
-                                                           allowsUnsignedKeychange, 
-                                                           allowsPublicLookup);
+    public static void sendULNChangeReqProto(ClientUser user, String server) {
+        
+        ULNChangeReq changeReq = buildULNChangeReqMsgProto(user.getUsername(), user.getKeyData(),
+                                                           user.getChangePubKey(), user.isAllowsUnsignedChanges(), 
+                                                           user.isAllowsPublicVisibility());
         sendMsgProto(MsgType.ULNCHANGE_REQ, changeReq, server);
     }
 
@@ -152,8 +151,9 @@ public class ClientMessaging {
             }
         }
 
-        ULNChangeReq changeReq = buildULNChangeReqMsgProto(user.getUsername(), user.getKeyData(), changePk, 
-                                                           user.isAllowsUnsignedChanges(), true);
+        ULNChangeReq changeReq = buildULNChangeReqMsgProto(user.getUsername(),
+                                                           user.getKeyData(), changePk, 
+                                                           user.isAllowsUnsignedChanges(), user.isAllowsPublicVisibility());
         SignedULNChangeReq signed = buildSignedULNChangeReqMsgProto(changeReq, sig);
         sendMsgProto(MsgType.SIGNED_ULNCHANGE_REQ, signed, server);
     }
@@ -186,13 +186,15 @@ public class ClientMessaging {
         changes flag.
     */
     private static Registration buildRegistrationMsgProto(String username, String keyData,
-                                                          DSAPublicKey changeKey, boolean allowsUnsignedKeyChange) {
+                                                          DSAPublicKey changeKey, boolean allowsUnsignedKeyChange,
+                                                          boolean allowsPublicVisibility) {
         Registration.Builder regBuild = Registration.newBuilder();
         regBuild.setName(username);
         regBuild.setBlob(keyData);
         DSAPublicKeyProto ckProto = ClientUtils.buildDSAPublicKeyProto(changeKey);
         regBuild.setChangeKey(ckProto);
         regBuild.setAllowsUnsignedKeychange(allowsUnsignedKeyChange);
+        regBuild.setAllowsPublicLookup(allowsPublicVisibility);
         return regBuild.build();
     }
 
@@ -248,7 +250,8 @@ public class ClientMessaging {
         {@code changeReq} is a ULNChangeReq that was built previously 
         {@code sig}.
     */
-    private static SignedULNChangeReq buildSignedULNChangeReqMsgProto(ULNChangeReq changeReq, byte[] sig) {
+    private static SignedULNChangeReq buildSignedULNChangeReqMsgProto(ULNChangeReq changeReq,
+                                                                      byte[] sig) {
 
         SignedULNChangeReq.Builder ulnChangeBuilder = SignedULNChangeReq.newBuilder();
         ulnChangeBuilder.setReq(changeReq);

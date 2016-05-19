@@ -36,8 +36,6 @@ package org.coniks.coniks_server;
 import org.coniks.coniks_common.*;
 import org.coniks.coniks_common.C2SProtos.*;
 import java.security.*;
-import java.security.interfaces.RSAPublicKey;
-import java.security.interfaces.RSAPrivateKey;
 import javax.crypto.*;
 import java.security.spec.*;
 import java.security.interfaces.*;
@@ -122,34 +120,6 @@ public class SignatureOps{
 	
 	return false;
 
-    }
-
-    /** Makes a DSAPublicKey from the params */
-    public static DSAPublicKey makeDSAPublicKeyFromParams(BigInteger p, BigInteger q, BigInteger g, BigInteger y) {
-        try {
-            KeyFactory keyFactory = KeyFactory.getInstance("DSA");
-            KeySpec publicKeySpec = new DSAPublicKeySpec(y, p, q, g);
-            return (DSAPublicKey) keyFactory.generatePublic(publicKeySpec);
-        }
-        catch(InvalidParameterException e) {
-            TimerLogger.error("The given DSA key is invalid.");
-        }
-        catch (InvalidKeySpecException e) {
-            TimerLogger.error("The given key params are invalid.");
-        }
-        catch(NoSuchAlgorithmException e){
-            TimerLogger.error("DSA is invalid for some reason.");
-        }
-        return null;
-    }
-
-    // makes a DSA key from the DSAPublicKeyProto protobuf
-    public static DSAPublicKey makeDSAPublicKeyFromParams(DSAPublicKeyProto pkProto) {
-        BigInteger p = new BigInteger(pkProto.getP());
-        BigInteger q = new BigInteger(pkProto.getQ());
-        BigInteger g = new BigInteger(pkProto.getG());
-        BigInteger y = new BigInteger(pkProto.getY());
-        return makeDSAPublicKeyFromParams(p,q,g,y);
     }
 
     /** Verify {@code msg} with {@code sig} using {@code pk} */

@@ -3,7 +3,7 @@
 http://coniks.org
 
 ##Introduction
-This is a basic implementation of a server for the CONIKS key management system. It currently supports new key registrations, key lookups, and can generate consistency proofs and signed directory summaries. It is designed to communicate with the [CONIKS test client](https://github.com/citp/coniks-ref-implementation/tree/master/coniks_test_client).
+This is a basic reference implementation of a server for the CONIKS key management system. It currently supports new key registrations, key lookups, changes to key data and user policies (**new features**) and can generate consistency proofs and signed directory summaries. It is designed to communicate with the [CONIKS test client](https://github.com/coniks-sys/coniks-ref-implementation/tree/master/coniks_test_client).
 
 ##Building the Server
 - Prerequisites:
@@ -68,8 +68,6 @@ Defaults are already set, but you may change the following variables:
 ###Running
 We provide a run script for the CONIKS server *coniks_server.sh*, which allows you to run the server in
 full operation mode and test mode.
-By default, the server is set to be initialized with 10 dummy users. You may change this by setting 
-```CONIKS_INIT_SIZE``` in the run script the desired number.
 
 The run script supports four commands: 
 - ```start```: start the server in full operation mode (runs in background).

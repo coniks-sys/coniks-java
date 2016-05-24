@@ -3,7 +3,7 @@
 http://coniks.org
 
 ##Introduction
-This is a simple test client for the CONIKS key management system. It supports new key registrations, key lookups and key consistency checks. It is designed to communicate with the basic implementation of a [CONIKS server](https://github.com/citp/coniks-ref-implementation/tree/master/coniks_server).
+This is a simple test client for the CONIKS key management system. It supports new key registrations, key lookups, key changes (**new feature**), and user policy changes (e.g. key change policy) (**new feature**). It is designed to communicate with the basic implementation of a [CONIKS server](https://github.com/coniks-sys/coniks-ref-implementation/tree/master/coniks_server).
 
 ##Building the Test Client
 - Prerequisites:
@@ -62,6 +62,9 @@ The test client will prompt you until you no longer want to continue.
 Supported operations: 
 - ```REGISTER```: register a new name-to-public key mapping with the CONIKS server.
 - ```LOOKUP```: look up a public key, and verify the cryptographic proof of inclusion if the user exists.
+- ```SIGNED```: change the public key registered for an existing name and authorize this change via a digital signature.
+- ```UNSIGNED```: change the public key registered for an existing name, without authorization. This operation will fail if the affected user doesn't allow unsigned key changes.
+` ```POLICY```: change the key change policy -- if unsigned changes are allowed, disallow them, and vice versa. The default policy is to allow unsigned changes.
 
 Some examples:
 - REGISTER 10 10: registers 10 new users, identified as dummy users 10 through 19.

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#  Copyright (c) 2015, Princeton University.
+#  Copyright (c) 2015-16, Princeton University.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -39,8 +39,7 @@ CLASSPATH="-cp $CLASS_DEST"
 SERVER_BIN="org.coniks.coniks_server.ConiksServer"
 CONIKS_SERVERCONFIG="config" #change this if using a different config file
 CONIKS_SERVERLOGS="logs" #change this if storing the logs somewhere else
-CONIKS_INIT_SIZE=10 #change this to initialize the server with a different number of dummy users
-RUN_CONIKS="java $CLASSPATH $SERVER_BIN $CONIKS_SERVERCONFIG $CONIKS_SERVERLOGS $CONIKS_INIT_SIZE"
+RUN_CONIKS="java $CLASSPATH $SERVER_BIN $CONIKS_SERVERCONFIG $CONIKS_SERVERLOGS"
 
 if [ -z "$1" ]; then
     echo "Usage: $0 <start | test | stop | clean>"

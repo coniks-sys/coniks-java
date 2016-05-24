@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -48,22 +48,13 @@ public class DebugLogger {
 
     private static Logger logger;
 
-    private DebugLogger (String serverLog) {
-        logger = Logger.getLogger("ConiksLogger-Debug");
-        setup(serverLog);
-    }
-
-    /** Generates a single instance of the debugging logger
-     * that writes the log at the location given by {@code serverLog}.
+    /** Sets up a debug logger for the CONIKS server.
      *
-     *@return A new debug logger.
+     *@param serverLog the file name for this logger.
      */
-    public static DebugLogger getInstance(String serverLog) {
-        return new DebugLogger(serverLog);
-    }
-
-    private static void setup (String serverLog) {
-
+    public static void setup (String serverLog) {
+        logger = Logger.getLogger("ConiksLogger-Debug");
+        
         // suppress the logging output to the console
         logger.setUseParentHandlers(false);
         

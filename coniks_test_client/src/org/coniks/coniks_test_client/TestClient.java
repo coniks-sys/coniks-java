@@ -53,8 +53,8 @@ import org.coniks.coniks_common.ServerErr;
  * that simply displays how each component of the
  * protocol works.
  * The client is completely agnostic to the underlying format
- * of the messages sent to the server (it only needs to know 
- * whether it's using protobufs (TODO: or json)).
+ * of the data sent to the server (it only needs to know 
+ * whether it's using protobufs)).
  * 
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Michael Rochlin
@@ -324,9 +324,11 @@ public class TestClient {
         ClientUser user = users.get(uname);
 
         if (!user.isAllowsUnsignedChanges()) {
+            System.out.println("Allowing unsigned key changes for user "+uname);
             user.allowUnsignedChanges();
         }
         else {
+            System.out.println("Disallowing unsigned key changes for user "+uname);
             user.disallowUnsignedChanges();
         }
 

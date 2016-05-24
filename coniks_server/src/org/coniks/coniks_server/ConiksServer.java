@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -79,9 +79,8 @@ public class ConiksServer{
     // Must be passed in as args to the server!
     private static String configFileName;
     private static String logPath;
-    private static int initNumUsers;
     private static boolean isFullOp;
-    private static final int NUM_ARGS = 4; // ha, don't forget to set this to the right number
+    private static final int NUM_ARGS = 3; // ha, don't forget to set this to the right number
 
     private static int providerID; // meant to be SP ID to identify different SP's quickly
     private static Timer epochTimer = new Timer("epoch timer", false); // may wish to run as daemon later
@@ -103,8 +102,6 @@ public class ConiksServer{
 	    new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>(
 		16384, new ServerUtils.PrefixComparator());
 
-        serverLog.log("Beginning initNamespace()");
-
         // At this point, if we're using a DB, we want to check if we already have
         // a commitment history stored in the DB
         // if so, retrieve the latest commitment and root node stored in the DB
@@ -116,7 +113,7 @@ public class ConiksServer{
         return initRoot;
     }
     
-    /** Sets up several configurations and begins listening for
+    /** Configures the server and begins listening for
      * incoming connections from CONIKS clients.
      *<p>
      * Usage:
@@ -125,12 +122,11 @@ public class ConiksServer{
     public static void main(String[] args){
         
         if (args.length != NUM_ARGS) {
-            System.out.println("Need "+(NUM_ARGS-1)+" arguments: CONIKS_SERVERCONFIG, CONIKS_SERVERLOGS, and CONIKS_INIT_SIZE");
+            System.out.println("Need "+(NUM_ARGS-1)+" arguments: CONIKS_SERVERCONFIG, and CONIKS_SERVERLOGS");
             System.out.println("The run script may expect these to be passed as env vars, make sure to export these before running the run script again.");
             System.exit(-1);
         }
 
-        initNumUsers = 0;
         File configFile = null;
         try {
             configFileName = args[0];
@@ -142,10 +138,8 @@ public class ConiksServer{
             if (!configFile.exists() || !logDir.isDirectory()) {
                 throw new FileNotFoundException();
             }
-            
-            initNumUsers = Integer.parseInt(args[2]);
-
-            String opMode = args[3];
+  
+            String opMode = args[2];
             if (opMode.equalsIgnoreCase("full")) {
                 isFullOp = true;
             }
@@ -166,7 +160,7 @@ public class ConiksServer{
             System.exit(-1);
         }
         
-        // false indictaes an error, so exit
+        // false indicates an error, so exit
         if (!ServerConfig.readServerConfig(configFile, isFullOp)) {
             System.exit(-1);
         }

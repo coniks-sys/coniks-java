@@ -63,7 +63,7 @@ public class KeyOps{
      *@return the public key or null upon an error.
      */
     public static DSAPublicKey loadDSAPublicKeyFile (String uname) {
-        String filename = uname+".pub";
+        String filename = ClientConfig.USER_KEYS_PATH+"/"+uname+".pub";
         DSAPublicKey pubKey = null;
 
         FileInputStream fis = null;
@@ -107,7 +107,7 @@ public class KeyOps{
      */
     public static DSAPrivateKey loadDSAPrivateKeyFile(String uname){
 
-        String filename = uname+".pr";
+        String filename = ClientConfig.USER_KEYS_PATH+"/"+uname+".pr";
         DSAPrivateKey prKey = null;
 
         FileInputStream fis = null;
@@ -153,7 +153,11 @@ public class KeyOps{
      */
     public static boolean saveDSAPublicKeyFile (String uname, DSAPublicKey pubKey) {
         byte[] keyBytes = pubKey.getEncoded();
-        String filename = uname+".pub";
+        String filename = ClientConfig.USER_KEYS_PATH+"/"+uname+".pub";
+
+        // make the parent dir structure if it doesn't exist
+        File f = new File(filename);
+        f.getParentFile().mkdirs();
 
         FileOutputStream fos = null;
         boolean success = false;
@@ -181,7 +185,11 @@ public class KeyOps{
     public static boolean saveDSAPrivateKeyFile(String uname, DSAPrivateKey pr) {
 
         byte[] keyBytes = pr.getEncoded();
-        String filename = uname+".pr";
+        String filename = ClientConfig.USER_KEYS_PATH+"/"+uname+".pr";
+
+        // make the parent dir structure if it doesn't exist
+        File f = new File(filename);
+        f.getParentFile().mkdirs();
 
         FileOutputStream fos = null;
         boolean success = false;

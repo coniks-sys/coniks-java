@@ -41,12 +41,20 @@ CONIKS_SERVERCONFIG="config" #change this if using a different config file
 CONIKS_SERVERLOGS="logs" #change this if storing the logs somewhere else
 RUN_CONIKS="java $CLASSPATH $SERVER_BIN $CONIKS_SERVERCONFIG $CONIKS_SERVERLOGS"
 
-if [ -z "$1" ]; then
+function usage() {
     echo "Usage: $0 <start | test | stop | clean>"
     exit
+}
+
+if [ -z "$1" ]; then
+    usage
 fi
 
 CMD=$1
+
+if [ ! -d "$CONIKS_SERVERLOGS" ]; then
+        mkdir "$CONIKS_SERVERLOGS"
+    fi
 
 # start up the server in full mode if no other instances are running.
 if [ "$CMD" = "start" ]; then
@@ -56,10 +64,6 @@ if [ "$CMD" = "start" ]; then
         echo "An instance of $SERVER_BIN is already running."
         echo "Exiting."
         exit
-    fi
-    
-    if [ ! -d "$CONIKS_SERVERLOGS" ]; then
-        mkdir "$CONIKS_SERVERLOGS"
     fi
 
     echo "Starting up the CONIKS server in full mode."
@@ -78,10 +82,6 @@ elif [ "$CMD" = "test" ]; then
         echo "An instance of $SERVER_BIN is already running."
         echo "Exiting."
         exit
-    fi
-    
-    if [ ! -d "$CONIKS_SERVERLOGS" ]; then
-        mkdir "$CONIKS_SERVERLOGS"
     fi
 
     echo "Starting up the CONIKS server in testing mode."
@@ -120,5 +120,5 @@ elif [ "$CMD" = "clean" ]; then
     rm -rf "$CONIKS_SERVERLOGS/"*;
 
 else
-    echo "Usage: $0 <start | test | stop | clean>"
+    usage
 fi

@@ -64,6 +64,7 @@ import org.javatuples.Pair;
 /** Implements the message handling for the CONIKS server
  *
  * @author Marcela Melara (melara@cs.princeton.edu)
+ * @author Michael Rochlin
  *
  */
 public class RequestHandler extends Thread{
@@ -237,7 +238,7 @@ public class RequestHandler extends Thread{
             !changeReq.hasAllowsUnsignedKeychange() || !changeReq.hasAllowsPublicLookup()) {
             MsgHandlerLogger.log("Malformed uln change req");
         }
-        
+
         String username = changeReq.getName();
         
         UserLeafNode uln = DirectoryOps.findUser(username);
@@ -245,6 +246,14 @@ public class RequestHandler extends Thread{
         if(uln == null){
             ConiksServer.msgLog.error(username + " not found...");
             ServerMessaging.sendSimpleResponseProto(ServerErr.NAME_NOT_FOUND_ERR, clientSocket);
+            return;
+        }
+
+        // make sure the request has a signature if the user requires one
+        // wew assume the signature has been verified at this point
+        if (!uln.allowsUnsignedKeychange() && sig == null) {
+            MsgHandlerLogger.error("Required signature for "+username+" not found");
+            ServerMessaging.sendSimpleResponseProto(ServerErr.MALFORMED_CLIENT_MSG_ERR, clientSocket);
             return;
         }
         
@@ -290,7 +299,7 @@ public class RequestHandler extends Thread{
         // verify signature
         DSAPublicKey publicChangeKey = uln.getChangeKey();
         
-        byte[] reqMsg = changeReq.getNewBlob().getBytes();
+        byte[] reqMsg = changeReq.toByteArray();
         byte[] sig = ServerUtils.intListToByteArr(new ArrayList<Integer>(signedReq.getSigList()));
         if (!SignatureOps.verifySigFromDSA(reqMsg, sig, publicChangeKey)) {
             ConiksServer.msgLog.log("Failed to verify message");

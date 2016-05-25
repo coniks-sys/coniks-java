@@ -54,12 +54,8 @@ import org.coniks.coniks_common.UtilProtos.Commitment;
 import org.coniks.coniks_common.UtilProtos.ServerResp;
 import org.coniks.coniks_common.UtilProtos.*;
 
-import java.security.*;
 import java.security.spec.*;
 import java.security.interfaces.*;
-import javax.crypto.*;
-import java.math.BigInteger;
-import java.util.Arrays;
 
 /** Implements all functions for exchanging CONIKS messages with a CONIKS
  * server.
@@ -228,7 +224,7 @@ public class ClientMessaging {
         {@code allowsUnsignedKeychange} {@code allowsPublicLookup}
         The blob and changeKey fields may be null if no change is requested
     */
-    private static ULNChangeReq buildULNChangeReqMsgProto(String username,
+    public static ULNChangeReq buildULNChangeReqMsgProto(String username,
                                                           String blob,
                                                           DSAPublicKey dsa,
                                                           boolean allowsUnsignedKeychange,
@@ -255,8 +251,6 @@ public class ClientMessaging {
 
         SignedULNChangeReq.Builder ulnChangeBuilder = SignedULNChangeReq.newBuilder();
         ulnChangeBuilder.setReq(changeReq);
-
-        ClientLogger.log("Signed ULNChange. Sig: " + Arrays.toString(sig));
         ulnChangeBuilder.addAllSig(ClientUtils.byteArrToIntList(sig));
        
         return ulnChangeBuilder.build();

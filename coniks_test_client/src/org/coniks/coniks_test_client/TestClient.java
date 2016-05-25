@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -44,8 +44,7 @@ import java.io.FileNotFoundException;
 import java.lang.NumberFormatException;
 
 import com.google.protobuf.*;
-import org.coniks.coniks_common.C2SProtos.RegistrationResp;
-import org.coniks.coniks_common.C2SProtos.AuthPath;
+import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.ServerResp;
 import org.coniks.coniks_common.ServerErr;
 
@@ -226,9 +225,6 @@ public class TestClient {
         // ugh, maybe this isn't the best. 
         // we're testing the signing, mostly, so the key data doesn't really matter right now
         String newKeyData = user.getKeyData()+changeCtr;
-        user.setKeyData(newKeyData);
-
-        byte[] sig = null;
 
         DSAPrivateKey prKey = user.loadChangePrivKey();
 
@@ -237,8 +233,19 @@ public class TestClient {
             return ConsistencyErr.KEYSTORE_ERR;
         }
 
+        // update the change key for good measure
+        KeyPair newCk = KeyOps.generateDSAKeyPair();
+
+        // sign the whole key change request (including all unchanged data)
+        byte[] sig = null;
         try {
-            sig = SignatureOps.signDSA(newKeyData.getBytes(), prKey);
+            ULNChangeReq changeReq = ClientMessaging.buildULNChangeReqMsgProto(user.getUsername(), newKeyData, 
+                                                                               (DSAPublicKey)newCk.getPublic(), 
+                                                                               user.isAllowsUnsignedChanges(), 
+                                                                               user.isAllowsPublicVisibility());
+
+
+            sig = SignatureOps.signDSA(changeReq.toByteArray(), prKey);
         }
         catch (InvalidKeyException e) {
             ClientLogger.error(e.getMessage());
@@ -254,6 +261,13 @@ public class TestClient {
             ClientLogger.error("Couldn't get a signature for the new key data");
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
+
+        // now we can update the user's data internally
+        user.setKeyData(newKeyData);
+        user.saveChangeKeyPair(newCk);
+
+        // for good measure, cut the pointer to the key pair
+        newCk = null;
 
         ClientMessaging.sendSignedULNChangeReqProto(user, sig, server);
 
@@ -340,11 +354,19 @@ public class TestClient {
             return ConsistencyErr.KEYSTORE_ERR;
         }
         
-        byte[] sig = null;
+        // update the change key for good measure
+        KeyPair newCk = KeyOps.generateDSAKeyPair();
         
+        // sign the whole policy change request (including all unchanged data)
+        byte[] sig = null;
         try {
-            // TODO: sign actual policy change
-            sig = SignatureOps.signDSA(user.getKeyData().getBytes(), prKey);
+            ULNChangeReq changeReq = ClientMessaging.buildULNChangeReqMsgProto(user.getUsername(), user.getKeyData(), 
+                                                                               (DSAPublicKey)newCk.getPublic(), 
+                                                                               user.isAllowsUnsignedChanges(), 
+                                                                               user.isAllowsPublicVisibility());
+
+
+            sig = SignatureOps.signDSA(changeReq.toByteArray(), prKey);
         }
         catch (InvalidKeyException e) {
             ClientLogger.error(e.getMessage());
@@ -361,6 +383,12 @@ public class TestClient {
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
         
+        // now we can update the user's data internally
+        user.saveChangeKeyPair(newCk);
+
+        // for good measure, cut the pointer to the key pair
+        newCk = null;
+
         ClientMessaging.sendSignedULNChangeReqProto(user, sig, server);
 
         AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();

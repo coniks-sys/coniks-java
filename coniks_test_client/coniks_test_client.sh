@@ -41,29 +41,50 @@ CONIKS_CLIENTCONFIG="config"
 CONIKS_CLIENTLOGS="logs"
 RUN_CONIKS="java $CLASSPATH $CLIENT_BIN $CONIKS_CLIENTCONFIG $CONIKS_CLIENTLOGS"
 
-if [ "$#" -lt 1 ]; then
-    echo "Usage: $0 <server> [test]"
+function usage() {
+    echo "Usage: $0 <start <server> | test <server> | clean>"
     exit
+}
+
+if [ -z "$1" ]; then
+    usage
 fi
 
-SERVER=$1
+CMD=$1
 
- if [ ! -d "$CONIKS_CLIENTLOGS" ]; then
+if [ ! -d "$CONIKS_CLIENTLOGS" ]; then
         mkdir "$CONIKS_CLIENTLOGS"
+fi
+
+# start up the client in full mode
+if [ "$CMD" = "start" ]; then
+    if [ -z "$2" ]; then
+        usage
     fi
 
-if [ "$#" = 1 ]; then
+    SERVER=$2
     echo "Starting up the CONIKS test client in full mode."
     echo "All logs are in the $CONIKS_CLIENTLOGS directory."
 
     $RUN_CONIKS $SERVER "full"
 
-elif [ "$#" = 2 ]; then
+elif [ "$CMD" = "test" ]; then
+    if [ -z "$2" ]; then
+        usage
+    fi
+
+    SERVER=$2
     echo "Starting up the CONIKS test client in test mode."
     echo "All logs are in the $CONIKS_CLIENTLOGS directory."
 
-    $RUN_CONIKS $SERVER $2
+    $RUN_CONIKS $SERVER "test"
+
+# remove all logs in the LOG_PATH
+elif [ "$CMD" = "clean" ]; then
+    echo "Removing all logs in $CONIKS_CLIENTLOGS."
+
+    rm -rf "$CONIKS_CLIENTLOGS/"*;
 
 else
-    echo "Usage: $0 <server> [test]"
+    usage
 fi

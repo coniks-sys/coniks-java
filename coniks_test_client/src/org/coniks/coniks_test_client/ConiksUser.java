@@ -131,8 +131,14 @@ public class ConiksUser {
         keyData = newData;
     }
     
-    // TODO: mechanism for changing the key change public key
-    // signed changes, ratcheting?
+    /** Sets the user's change public key and saves the key to disk.
+     *
+     *@param changePk the DSA public key to set as the user's change key.
+     */
+    public void setChangePubKey(DSAPublicKey changePk) {
+        changePubKey = changePk;
+        KeyOps.saveDSAPublicKeyFile(username, changePk);
+    }
 
     /** Sets the unsigned key change flag to true
      */

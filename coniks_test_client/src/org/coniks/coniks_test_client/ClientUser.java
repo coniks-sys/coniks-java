@@ -74,4 +74,14 @@ public class ClientUser extends ConiksUser {
         changePrivKey = null;
     }
 
+    /** Saves the new change key pair to disk. This is called every time the client
+     * performs some mapping data change and updates the change key.
+     *
+     *@param kp the new change key pair to save.
+     */
+    public void saveChangeKeyPair (KeyPair kp) {
+        KeyOps.saveDSAPrivateKeyFile(username, (DSAPrivateKey)kp.getPrivate());
+        super.setChangePubKey((DSAPublicKey)kp.getPublic());
+    }
+
 }

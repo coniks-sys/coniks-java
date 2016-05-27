@@ -239,7 +239,8 @@ public class TestClient {
         // sign the whole key change request (including all unchanged data)
         byte[] sig = null;
         try {
-            ULNChangeReq changeReq = ClientMessaging.buildULNChangeReqMsgProto(user.getUsername(), newKeyData, 
+            ULNChangeReq changeReq = ClientMessaging.buildULNChangeReqMsgProto(user.getUsername(), 
+                                                                               newKeyData, 
                                                                                (DSAPublicKey)newCk.getPublic(), 
                                                                                user.isAllowsUnsignedChanges(), 
                                                                                user.isAllowsPublicVisibility());
@@ -266,10 +267,10 @@ public class TestClient {
         user.setKeyData(newKeyData);
         user.saveChangeKeyPair(newCk);
 
+        ClientMessaging.sendSignedULNChangeReqProto(user, sig, server);
+
         // for good measure, cut the pointer to the key pair
         newCk = null;
-
-        ClientMessaging.sendSignedULNChangeReqProto(user, sig, server);
 
         AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();
 
@@ -386,10 +387,10 @@ public class TestClient {
         // now we can update the user's data internally
         user.saveChangeKeyPair(newCk);
 
+        ClientMessaging.sendSignedULNChangeReqProto(user, sig, server);
+
         // for good measure, cut the pointer to the key pair
         newCk = null;
-
-        ClientMessaging.sendSignedULNChangeReqProto(user, sig, server);
 
         AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();
 

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -44,8 +44,7 @@ import java.io.FileNotFoundException;
 import java.lang.NumberFormatException;
 
 import com.google.protobuf.*;
-import org.coniks.coniks_common.C2SProtos.RegistrationResp;
-import org.coniks.coniks_common.C2SProtos.AuthPath;
+import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.ServerResp;
 import org.coniks.coniks_common.ServerErr;
 
@@ -53,8 +52,8 @@ import org.coniks.coniks_common.ServerErr;
  * that simply displays how each component of the
  * protocol works.
  * The client is completely agnostic to the underlying format
- * of the messages sent to the server (it only needs to know 
- * whether it's using protobufs (TODO: or json)).
+ * of the data sent to the server (it only needs to know 
+ * whether it's using protobufs)).
  * 
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Michael Rochlin
@@ -68,12 +67,13 @@ public class TestClient {
     private static boolean isFullOp;
     private static final int NUM_ARGS = 4; // ha, don't forget to set this to the right number
 
-    // since we're only creating dummy users, use this 
-    // DSA-looking string as the test public key
-    private static final String FAKE_PK_BASE = "(dsa \n (p #7712ECAF91762ED4E46076D846624D2A71C67A991D1FEA059593163C2B19690B1A5CA3C603F52A62D73BB91D521BA55682D38E3543CC34E384420AA32CFF440A90D28A6F54C586BB856460969C658B20ABF65A767063FE94A5DDBC2D0D5D1FD154116AE7039CC4E482DCF1245A9E4987EB6C91B32834B49052284027#)\n (q #00B84E385FA6263B26E9F46BF90E78684C245D5B35#)\n (g #77F6AA02740EF115FDA233646AAF479367B34090AEC0D62BA3E37F793D5CB995418E4F3F57F31612561A4BEA41FAC3EE05679D90D2F79A581905E432B85F4C109164EB7846DC9C3669B013D67063747ABCC4B07EAA4AC44D9DE9FC2A349859994DB683DFC7784D0F1DF1DA25014A40D8617E3EC94D8DB8FBBBC37A5C5AAEE5DC#)\n (y #4B41A8AA7B6F23F740DEF994D1A6582E00E4B821F65AC30BDC6710CD6111FA24DE70EACE6F4A92A84038D4B928D79F6A0DF35F729B861A6713BECC934309DE0822B8C9D2A6D3C0A4F0D0FB28A77B0393D72568D72EE60C73B2C5F6E4E1A1347EDC20AC449EFF250AC1C251E16403A610DB9EB90791E63207601714A786792835#)";
+    // since we're not using the public key for actual encrypted communication, use whatever string
+    private static final String FAKE_PK_DATA = "fake key data";
 
     /** List of coniks users - for now used for testing */
     private static HashMap<String,ClientUser> users;    
+
+    private static int changeCtr = 0; // this is just used to change the key data
     
     /** Sets the default truststore according to the {@link ClientConfig}.
      * This is needed to set up SSL connections with a CONIKS server.
@@ -131,14 +131,14 @@ public class TestClient {
      *@param server the CONIKS key server with which to register the name
      *@return whether the registration succeeded or an error code
      */
-    public static int register (String uname, String server) {
+    private static int register (String uname, String server) {
         KeyPair kp = KeyOps.generateDSAKeyPair();
-        ClientUser user = new ClientUser(uname, kp);
+        String pk = uname+" "+FAKE_PK_DATA;
+
+        ClientUser user = new ClientUser(uname, pk, kp);
         users.put(uname, user);
 
-        String pk = user.getPubKey().getY().toString();
-
-        ClientMessaging.sendRegistrationProto(uname, pk, server);
+        ClientMessaging.sendRegistrationProto(user, server);
         
         AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();
 
@@ -164,7 +164,7 @@ public class TestClient {
      *@param server the CONIKS key server at which to lookup the key
      *@return whether the lookup succeeded or an error code
      */
-    public static int lookup (String uname, String server) {
+    private static int lookup (String uname, String server) {
         long epoch = System.currentTimeMillis();
 
         ClientMessaging.sendKeyLookupProto(uname, epoch, server);
@@ -180,8 +180,11 @@ public class TestClient {
         else if (serverMsg instanceof AuthPath) {
             AuthPath authPath = (AuthPath)serverMsg;
 
+            // TODO: temp
+            ConiksUser user = users.get(uname);
+
             // check if the key we got is the same as the stored key
-            int result = ConsistencyChecks.verifyPubKeyProto(uname, authPath);
+            int result = ConsistencyChecks.verifyPubKeyProto(user, authPath);
 
             if (result == ConsistencyErr.CHECK_PASSED) {
 
@@ -212,37 +215,62 @@ public class TestClient {
      *@param server the CONIKS key server
      *@return whether the key change succeeded or an error code
      */
-    public static int signedKeyChange(String uname, String server) {
+    private static int signedKeyChange(String uname, String server) {
         ClientUser user = users.get(uname);
 
         if (user.isAllowsUnsignedChanges()) {
             System.out.println("user "+uname+" allows unsigned key changes");
         }
 
-        DSAPrivateKey prKey = user.getPrivKey();
+        // ugh, maybe this isn't the best. 
+        // we're testing the signing, mostly, so the key data doesn't really matter right now
+        String newKeyData = user.getKeyData()+changeCtr;
+
+        DSAPrivateKey prKey = user.loadChangePrivKey();
 
         if (prKey == null) {
             System.out.println("no private key for "+uname);
             return ConsistencyErr.KEYSTORE_ERR;
         }
 
-        KeyPair kp = KeyOps.generateDSAKeyPair();
-        // this is just for testing, we're not actually using the key for encryption
-        // so for now it's ok to just print it
-        String newBlob = ((DSAPublicKey)kp.getPublic()).getY().toString();
+        // update the change key for good measure
+        KeyPair newCk = KeyOps.generateDSAKeyPair();
 
+        // sign the whole key change request (including all unchanged data)
         byte[] sig = null;
-
         try {
-            sig = SignatureOps.signDSA(newBlob.getBytes(), prKey);
+            ULNChangeReq changeReq = ClientMessaging.buildULNChangeReqMsgProto(user.getUsername(), 
+                                                                               newKeyData, 
+                                                                               (DSAPublicKey)newCk.getPublic(), 
+                                                                               user.isAllowsUnsignedChanges(), 
+                                                                               user.isAllowsPublicVisibility());
+
+
+            sig = SignatureOps.signDSA(changeReq.toByteArray(), prKey);
         }
         catch (InvalidKeyException e) {
             ClientLogger.error(e.getMessage());
+            user.unloadChangePrivKey();
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
 
-        ClientMessaging.sendSignedULNChangeReqProto(uname, newBlob, (DSAPublicKey) kp.getPublic(),
-                                                    user.isAllowsUnsignedChanges(), true, sig, server);
+        // we're done using the private key so clear its memory
+        user.unloadChangePrivKey();
+
+         // double check that we actually got a signature
+        if (sig == null) {
+            ClientLogger.error("Couldn't get a signature for the new key data");
+            return ClientUtils.INTERNAL_CLIENT_ERR;
+        }
+
+        // now we can update the user's data internally
+        user.setKeyData(newKeyData);
+        user.saveChangeKeyPair(newCk);
+
+        ClientMessaging.sendSignedULNChangeReqProto(user, sig, server);
+
+        // for good measure, cut the pointer to the key pair
+        newCk = null;
 
         AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();
 
@@ -253,12 +281,10 @@ public class TestClient {
             return getServerErr((ServerResp)serverMsg);
         }
         else {
-            if (KeyOps.saveDSAKeyPair(uname, kp)) {
-                return ConsistencyErr.CHECK_PASSED;
-            }
-            else {
-                return ConsistencyErr.KEYSTORE_ERR;
-            }
+            // TODO: verify registration resp and save the new key data to disk
+            changeCtr++;
+            
+            return ConsistencyErr.CHECK_PASSED;
         }
 
     }
@@ -271,7 +297,7 @@ public class TestClient {
      *@param server the CONIKS key server
      *@return whether the key change succeeded or an error code
      */
-    public static int unsignedKeyChange(String uname, String server) {
+    private static int unsignedKeyChange(String uname, String server) {
         ClientUser user = users.get(uname);
 
         if (!user.isAllowsUnsignedChanges()) {
@@ -279,13 +305,12 @@ public class TestClient {
             return ConsistencyErr.DISALLOWED_OP_ERR;
         }
 
-        KeyPair kp = KeyOps.generateDSAKeyPair();
-        // this is just for testing, we're not actually using the key for encryption
-        // so for now it's ok to just print it
-        String newBlob = ((DSAPublicKey)kp.getPublic()).getY().toString();
+        // ugh, maybe this isn't the best. 
+        // we're testing the signing, mostly, so the key data doesn't really matter right now
+        String newKeyData = user.getKeyData()+changeCtr;
+        user.setKeyData(newKeyData);
 
-        ClientMessaging.sendULNChangeReqProto(uname, newBlob, (DSAPublicKey) kp.getPublic(),
-                                                 user.isAllowsUnsignedChanges(), true, server);
+        ClientMessaging.sendULNChangeReqProto(user, server);
 
         AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();
 
@@ -296,75 +321,76 @@ public class TestClient {
             return getServerErr((ServerResp)serverMsg);
         }
         else {
-            if (KeyOps.saveDSAKeyPair(uname, kp)) {
-                return ConsistencyErr.CHECK_PASSED;
-            }
-            else {
-                return ConsistencyErr.KEYSTORE_ERR;
-            }
+            // TODO: check the registration resp and save the new key data to disk
+            changeCtr++;
+            
+            return ConsistencyErr.CHECK_PASSED;
         }
-
     }
 
     /** Changes a user's key change policy, signs the change if required
      * and sends the new policy to the server.
      *
      *@param uname the username of the client user whose key change policy to change
-     *@param allowUnsigned whether the client user wants to allow unsigned changes
      *@param server the CONIKS key server
      *@return whether the key change succeeded or an error code
      */
-    public static int changeKeyChangePolicy(String uname, boolean allowUnsigned, 
-                                            String server) {
+    private static int changeKeyChangePolicy(String uname, String server) {
         ClientUser user = users.get(uname);
 
-        // if we're not actually changing the policy, just return
-        if (user.isAllowsUnsignedChanges() == allowUnsigned) {
-            return ConsistencyErr.CHECK_PASSED;
-        }
-
         if (!user.isAllowsUnsignedChanges()) {
+            System.out.println("Allowing unsigned key changes for user "+uname);
             user.allowUnsignedChanges();
         }
         else {
+            System.out.println("Disallowing unsigned key changes for user "+uname);
             user.disallowUnsignedChanges();
         }
 
         // default is to always sign the changes no matter what
-        DSAPrivateKey prKey = user.getPrivKey();
-        
+        DSAPrivateKey prKey = user.loadChangePrivKey();
+
         if (prKey == null) {
+            System.out.println("no private key for "+uname);
             return ConsistencyErr.KEYSTORE_ERR;
         }
-               
-        String newBlob = user.isAllowsUnsignedChanges()+"";
         
+        // update the change key for good measure
+        KeyPair newCk = KeyOps.generateDSAKeyPair();
+        
+        // sign the whole policy change request (including all unchanged data)
         byte[] sig = null;
-        
         try {
-            sig = SignatureOps.signDSA(newBlob.getBytes(), prKey);
+            ULNChangeReq changeReq = ClientMessaging.buildULNChangeReqMsgProto(user.getUsername(), user.getKeyData(), 
+                                                                               (DSAPublicKey)newCk.getPublic(), 
+                                                                               user.isAllowsUnsignedChanges(), 
+                                                                               user.isAllowsPublicVisibility());
+
+
+            sig = SignatureOps.signDSA(changeReq.toByteArray(), prKey);
         }
         catch (InvalidKeyException e) {
             ClientLogger.error(e.getMessage());
+            user.unloadChangePrivKey();
+            return ClientUtils.INTERNAL_CLIENT_ERR;
+        }
+
+        // we're done using the private key so clear its memory
+        user.unloadChangePrivKey();
+
+        // double check that we actually got a signature
+        if (sig == null) {
+            ClientLogger.error("Couldn't get a signature for the new policy");
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
         
-        DSAPublicKey pubKey = user.getPubKey();
-        
-        if (pubKey == null) {
-            // load the key into memory
-            user.loadPubKey();
-            
-            pubKey = user.getPubKey();
-            
-            if (pubKey == null) {
-                // alright, key is still null, return an error
-                return ConsistencyErr.KEYSTORE_ERR;
-            }
-        }
-        
-        ClientMessaging.sendSignedULNChangeReqProto(uname, newBlob, pubKey,
-                                                    user.isAllowsUnsignedChanges(), true, sig, server);
+        // now we can update the user's data internally
+        user.saveChangeKeyPair(newCk);
+
+        ClientMessaging.sendSignedULNChangeReqProto(user, sig, server);
+
+        // for good measure, cut the pointer to the key pair
+        newCk = null;
 
         AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();
 
@@ -375,6 +401,7 @@ public class TestClient {
             return getServerErr((ServerResp)serverMsg);
         }
         else {
+            // TODO: save the new policy to disk
             return ConsistencyErr.CHECK_PASSED;
         }
 
@@ -433,6 +460,9 @@ public class TestClient {
             printErr("Some other server error occurred. Current user: "+uname);
             break;
         case ConsistencyErr.BAD_MAPPING_ERR:
+            printErr("Mapping inconsistent with tree root for user "+uname+".");
+            break;
+        case ConsistencyErr.UNEXPECTED_KEY_ERR:
             printErr("Unexpected key for user "+uname+".");
             break;
         case ConsistencyErr.BAD_STR_ERR:
@@ -444,8 +474,11 @@ public class TestClient {
         case ConsistencyErr.KEYSTORE_ERR:
             printErr("Could not find the private or public key. Current user: "+uname);
             break;
+        case ConsistencyErr.DISALLOWED_OP_ERR:
+            printErr("Client "+uname+" tried to perform a forbidden operation");
+            break;
         default:
-            printErr("Some unknown server error occurred.");
+            printErr("Some unknown server error occurred: "+err);
             break;                
         }
 
@@ -517,7 +550,7 @@ public class TestClient {
                 error = unsignedKeyChange(uname, server);
             }
             else if (op.equalsIgnoreCase("POLICY")) {
-                error = changeKeyChangePolicy(uname, false, server);
+                error = changeKeyChangePolicy(uname, server);
             }
         
             // if we got an error, print a new line so the error msg doesn't

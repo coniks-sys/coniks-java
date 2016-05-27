@@ -62,8 +62,8 @@ public class KeyOps{
      *@param uname the username for which to load the public key
      *@return the public key or null upon an error.
      */
-    public static DSAPublicKey loadDSAPublicKey (String uname) {
-        String filename = uname+".pub";
+    public static DSAPublicKey loadDSAPublicKeyFile (String uname) {
+        String filename = ClientConfig.USER_KEYS_PATH+"/"+uname+".pub";
         DSAPublicKey pubKey = null;
 
         FileInputStream fis = null;
@@ -107,7 +107,7 @@ public class KeyOps{
      */
     public static DSAPrivateKey loadDSAPrivateKeyFile(String uname){
 
-        String filename = uname+".pr";
+        String filename = ClientConfig.USER_KEYS_PATH+"/"+uname+".pr";
         DSAPrivateKey prKey = null;
 
         FileInputStream fis = null;
@@ -151,9 +151,13 @@ public class KeyOps{
      *@param pubKey the public key to store for this user
      *@return whether the save succeeded
      */
-    public static boolean saveDSAPublicKey (String uname, DSAPublicKey pubKey) {
+    public static boolean saveDSAPublicKeyFile (String uname, DSAPublicKey pubKey) {
         byte[] keyBytes = pubKey.getEncoded();
-        String filename = uname+".pub";
+        String filename = ClientConfig.USER_KEYS_PATH+"/"+uname+".pub";
+
+        // make the parent dir structure if it doesn't exist
+        File f = new File(filename);
+        f.getParentFile().mkdirs();
 
         FileOutputStream fos = null;
         boolean success = false;
@@ -181,7 +185,11 @@ public class KeyOps{
     public static boolean saveDSAPrivateKeyFile(String uname, DSAPrivateKey pr) {
 
         byte[] keyBytes = pr.getEncoded();
-        String filename = uname+".pr";
+        String filename = ClientConfig.USER_KEYS_PATH+"/"+uname+".pr";
+
+        // make the parent dir structure if it doesn't exist
+        File f = new File(filename);
+        f.getParentFile().mkdirs();
 
         FileOutputStream fos = null;
         boolean success = false;
@@ -208,12 +216,12 @@ public class KeyOps{
      *@param kp the key pair to be saved
      *@param whether the save succeeded
      */
-    public static boolean saveDSAKeyPair(String uname, KeyPair kp) {
+    public static boolean saveDSAKeyPairFile(String uname, KeyPair kp) {
         
         boolean success = false;
 
         if (saveDSAPrivateKeyFile(uname, (DSAPrivateKey)kp.getPrivate())) {
-            success = saveDSAPublicKey(uname, (DSAPublicKey)kp.getPublic());
+            success = saveDSAPublicKeyFile(uname, (DSAPublicKey)kp.getPublic());
         }
 
         return success;

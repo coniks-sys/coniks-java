@@ -41,19 +41,8 @@ import java.util.ArrayList;
 import com.google.protobuf.*;
 import org.javatuples.*;
 
-import org.coniks.coniks_common.MsgType;
-import org.coniks.coniks_common.ServerErr;
-import org.coniks.coniks_common.CommonMessaging;
-import org.coniks.coniks_common.C2SProtos.Registration;
-import org.coniks.coniks_common.C2SProtos.CommitmentReq;
-import org.coniks.coniks_common.C2SProtos.KeyLookup;
-import org.coniks.coniks_common.C2SProtos.RegistrationResp;
-import org.coniks.coniks_common.C2SProtos.AuthPath;
+import org.coniks.coniks_common.*;
 import org.coniks.coniks_common.C2SProtos.*;
-
-import org.coniks.coniks_common.UtilProtos.Hash;
-import org.coniks.coniks_common.UtilProtos.Commitment;
-import org.coniks.coniks_common.UtilProtos.ServerResp;
 import org.coniks.coniks_common.UtilProtos.*;
 
 public class ServerMessaging {
@@ -202,7 +191,8 @@ public class ServerMessaging {
             if (msgType == MsgType.REGISTRATION){
                 Registration reg = Registration.parseDelimitedFrom(din);
                 
-                if(!reg.hasBlob()){
+                if(!reg.hasBlob() || !reg.hasChangeKey() || !reg.hasAllowsUnsignedKeychange()
+                   || !reg.hasAllowsPublicLookup()) {
                     MsgHandlerLogger.log("Malformed registration message");
                 }
                 else {
@@ -232,7 +222,8 @@ public class ServerMessaging {
             }
             else if (msgType == MsgType.ULNCHANGE_REQ) {
                 ULNChangeReq ulnChange = ULNChangeReq.parseDelimitedFrom(din);
-                if (!ulnChange.hasName()) {
+                if (!ulnChange.hasName() || !ulnChange.hasNewBlob() || !ulnChange.hasNewChangeKey() ||
+                    !ulnChange.hasAllowsUnsignedKeychange() || !ulnChange.hasAllowsPublicLookup()) {
                     MsgHandlerLogger.log("Malformed uln change req");
                 }
                 else {

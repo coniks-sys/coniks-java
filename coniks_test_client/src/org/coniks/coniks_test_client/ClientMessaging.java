@@ -54,12 +54,8 @@ import org.coniks.coniks_common.UtilProtos.Commitment;
 import org.coniks.coniks_common.UtilProtos.ServerResp;
 import org.coniks.coniks_common.UtilProtos.*;
 
-import java.security.*;
 import java.security.spec.*;
 import java.security.interfaces.*;
-import javax.crypto.*;
-import java.math.BigInteger;
-import java.util.Arrays;
 
 /** Implements all functions for exchanging CONIKS messages with a CONIKS
  * server.
@@ -86,14 +82,15 @@ public class ClientMessaging {
         isFullOp = isFull;
     }
 
-    /** Sends a Registration protobuf message with the given
-        {@code username} and {@code publicKey} to
-        to the {@code server}.
+    /** Sends a Registration protobuf message for the given
+        user to the {@code server}.
     */
-    public static void sendRegistrationProto (String username, String publicKey,
+    public static void sendRegistrationProto (ClientUser user,
                                               String server) {
-      
-        Registration reg = buildRegistrationMsgProto(username, publicKey);
+        
+        Registration reg = buildRegistrationMsgProto(user.getUsername(), user.getKeyData(), 
+                                                     user.getChangePubKey(), user.isAllowsUnsignedChanges(),
+                                                     user.isAllowsPublicVisibility());
         sendMsgProto(MsgType.REGISTRATION, reg, server);
 
     }
@@ -126,26 +123,33 @@ public class ClientMessaging {
     }
 
     /** Sends a ULNChangeReq protobuf message with all the arguments */
-    public static void sendULNChangeReqProto(String username, 
-                                             String newBlob, DSAPublicKey newChangeKey,
-                                             boolean allowsUnsignedKeychange, 
-                                             boolean allowsPublicLookup, String server) {
-        ULNChangeReq changeReq = buildULNChangeReqMsgProto(
-                                                           username, newBlob, newChangeKey, 
-                                                           allowsUnsignedKeychange, 
-                                                           allowsPublicLookup);
+    public static void sendULNChangeReqProto(ClientUser user, String server) {
+        
+        ULNChangeReq changeReq = buildULNChangeReqMsgProto(user.getUsername(), user.getKeyData(),
+                                                           user.getChangePubKey(), user.isAllowsUnsignedChanges(), 
+                                                           user.isAllowsPublicVisibility());
         sendMsgProto(MsgType.ULNCHANGE_REQ, changeReq, server);
     }
 
     /** Sends a SignedULNChangeReq protobuf with all the arguments and signed with {@code prk} */
-    public static void sendSignedULNChangeReqProto(String username, String newBlob, 
-                                                   DSAPublicKey newChangeKey,
-                                                   boolean allowsUnsignedKeychange, 
-                                                   boolean allowsPublicLookup,
+    public static void sendSignedULNChangeReqProto(ClientUser user,
                                                    byte[] sig,
                                                    String server) {
-        ULNChangeReq changeReq = buildULNChangeReqMsgProto(username, newBlob, newChangeKey, 
-                                                           allowsUnsignedKeychange, allowsPublicLookup);
+        DSAPublicKey changePk = user.getChangePubKey();
+
+        // let's not assume the key is in memory
+        if (changePk == null) {
+            user.loadChangePubKey();
+
+            // make sure we actually got a key from disk
+            if (user.getChangePubKey() == null) {
+                ClientLogger.error("ClientMessaging: Could not load change public key");
+            }
+        }
+
+        ULNChangeReq changeReq = buildULNChangeReqMsgProto(user.getUsername(),
+                                                           user.getKeyData(), changePk, 
+                                                           user.isAllowsUnsignedChanges(), user.isAllowsPublicVisibility());
         SignedULNChangeReq signed = buildSignedULNChangeReqMsgProto(changeReq, sig);
         sendMsgProto(MsgType.SIGNED_ULNCHANGE_REQ, signed, server);
     }
@@ -174,12 +178,19 @@ public class ClientMessaging {
     }
 
     /** Builds the Registration protobuf message with a given
-        {@code username} and {@code publicKey}.
+        {@code username}, {@code publicKey} blob, {@code changeKey}, and unsigned key
+        changes flag.
     */
-    private static Registration buildRegistrationMsgProto(String username, String publicKey) {
+    private static Registration buildRegistrationMsgProto(String username, String keyData,
+                                                          DSAPublicKey changeKey, boolean allowsUnsignedKeyChange,
+                                                          boolean allowsPublicVisibility) {
         Registration.Builder regBuild = Registration.newBuilder();
         regBuild.setName(username);
-        regBuild.setBlob(publicKey);
+        regBuild.setBlob(keyData);
+        DSAPublicKeyProto ckProto = ClientUtils.buildDSAPublicKeyProto(changeKey);
+        regBuild.setChangeKey(ckProto);
+        regBuild.setAllowsUnsignedKeychange(allowsUnsignedKeyChange);
+        regBuild.setAllowsPublicLookup(allowsPublicVisibility);
         return regBuild.build();
     }
 
@@ -213,7 +224,7 @@ public class ClientMessaging {
         {@code allowsUnsignedKeychange} {@code allowsPublicLookup}
         The blob and changeKey fields may be null if no change is requested
     */
-    private static ULNChangeReq buildULNChangeReqMsgProto(String username,
+    public static ULNChangeReq buildULNChangeReqMsgProto(String username,
                                                           String blob,
                                                           DSAPublicKey dsa,
                                                           boolean allowsUnsignedKeychange,
@@ -235,12 +246,11 @@ public class ClientMessaging {
         {@code changeReq} is a ULNChangeReq that was built previously 
         {@code sig}.
     */
-    private static SignedULNChangeReq buildSignedULNChangeReqMsgProto(ULNChangeReq changeReq, byte[] sig) {
+    private static SignedULNChangeReq buildSignedULNChangeReqMsgProto(ULNChangeReq changeReq,
+                                                                      byte[] sig) {
 
         SignedULNChangeReq.Builder ulnChangeBuilder = SignedULNChangeReq.newBuilder();
         ulnChangeBuilder.setReq(changeReq);
-
-        ClientLogger.log("Signed ULNChange. Sig: " + Arrays.toString(sig));
         ulnChangeBuilder.addAllSig(ClientUtils.byteArrToIntList(sig));
        
         return ulnChangeBuilder.build();

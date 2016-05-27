@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -79,9 +79,8 @@ public class ConiksServer{
     // Must be passed in as args to the server!
     private static String configFileName;
     private static String logPath;
-    private static int initNumUsers;
     private static boolean isFullOp;
-    private static final int NUM_ARGS = 4; // ha, don't forget to set this to the right number
+    private static final int NUM_ARGS = 3; // ha, don't forget to set this to the right number
 
     private static int providerID; // meant to be SP ID to identify different SP's quickly
     private static Timer epochTimer = new Timer("epoch timer", false); // may wish to run as daemon later
@@ -103,44 +102,18 @@ public class ConiksServer{
 	    new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>(
 		16384, new ServerUtils.PrefixComparator());
 
-        serverLog.log("Beginning initNamespace()");
-
         // At this point, if we're using a DB, we want to check if we already have
         // a commitment history stored in the DB
         // if so, retrieve the latest commitment and root node stored in the DB
-     
-        // for demo purposes we're just going to create a bunch of dummy users 	
-        long handled = 0;
-        long size = initNumUsers;
-        long batchSize = size/10; // unused right now, but it's here for future versions
         
-        RootNode initRoot = null;    
-        // add <size> dummy users
-        for (int i = 0 ; i < size; i++){
-            String userId = String.format("test-%d", i);
-            String pubKey = "(dsa  (p #test-10000007712ECAF91762ED4E46076D846624D2A71C67A991D1FEA059593163C2B19690B1A5CA3C603F52A62D73BB91D521BA55682D38E3543CC34E384420AA32CFF440A90D28A6F54C586BB856460969C658B20ABF65A767063FE94A5DDBC2D0D5D1FD154116AE7039CC4E482DCF1245A9E4987EB6C91B32834B49052284027#) (q #00B84E385FA6263B26E9F46BF90E78684C245D5B35#) (g #77F6AA02740EF115FDA233646AAF479367B34090AEC0D62BA3E37F793D5CB995418E4F3F57F31612561A4BEA41FAC3EE05679D90D2F79A581905E432B85F4C109164EB7846DC9C3669B013D67063747ABCC4B07EAA4AC44D9DE9FC2A349859994DB683DFC7784D0F1DF1DA25014A40D8617E3EC94D8DB8FBBBC37A5C5AAEE5DC#) (y #4B41A8AA7B6F23F740DEF994D1A6582E00E4B821F65AC30BDC6710CD6111FA24DE70EACE6F4A92A84038D4B928D79F6A0DF35F729B861A6713BECC934309DE0822B8C9D2A6D3C0A4F0D0FB28A77B0393D72568D72EE60C73B2C5F6E4E1A1347EDC20AC449EFF250AC1C251E16403A610DB9EB90791E63207601714A78679283))";
-            long epochAdded = initEpoch;
-            byte[] index = ServerUtils.unameToIndex(userId);
-            
-            UserLeafNode uln = new UserLeafNode(userId, pubKey, epochAdded, 0, index);
-            initUsers.add(Triplet.with(index, uln, (Operation)new Register()));
-            
-        }
-        initRoot = TreeBuilder.copyExtendTree(null, initUsers);
+        RootNode initRoot = TreeBuilder.copyExtendTree(null, initUsers);
         
         initUsers.clear();
-
-        if (isFullOp) {
-            serverLog.log("Directory initialized with "+size+" dummy users.");
-        }
-        else {
-            ServerUtils.printStatusMsg(false, "Directory initialized with "+size+" dummy users.");
-        }
 
         return initRoot;
     }
     
-    /** Sets up several configurations and begins listening for
+    /** Configures the server and begins listening for
      * incoming connections from CONIKS clients.
      *<p>
      * Usage:
@@ -149,12 +122,11 @@ public class ConiksServer{
     public static void main(String[] args){
         
         if (args.length != NUM_ARGS) {
-            System.out.println("Need "+(NUM_ARGS-1)+" arguments: CONIKS_SERVERCONFIG, CONIKS_SERVERLOGS, and CONIKS_INIT_SIZE");
+            System.out.println("Need "+(NUM_ARGS-1)+" arguments: CONIKS_SERVERCONFIG, and CONIKS_SERVERLOGS");
             System.out.println("The run script may expect these to be passed as env vars, make sure to export these before running the run script again.");
             System.exit(-1);
         }
 
-        initNumUsers = 0;
         File configFile = null;
         try {
             configFileName = args[0];
@@ -166,10 +138,8 @@ public class ConiksServer{
             if (!configFile.exists() || !logDir.isDirectory()) {
                 throw new FileNotFoundException();
             }
-            
-            initNumUsers = Integer.parseInt(args[2]);
-
-            String opMode = args[3];
+  
+            String opMode = args[2];
             if (opMode.equalsIgnoreCase("full")) {
                 isFullOp = true;
             }
@@ -190,7 +160,7 @@ public class ConiksServer{
             System.exit(-1);
         }
         
-        // false indictaes an error, so exit
+        // false indicates an error, so exit
         if (!ServerConfig.readServerConfig(configFile, isFullOp)) {
             System.exit(-1);
         }
@@ -277,6 +247,14 @@ public class ConiksServer{
                 }
                 // let's not quite bail here
                 throw new UnsupportedOperationException("Next STR was null or malformed");
+            }
+
+            // we're here so the update went well
+            if (isFullOp) {
+                serverLog.log("Directory update successful. Next epoch: "+nextEpoch);
+            }
+            else {
+                ServerUtils.printStatusMsg(false, "Directory update successful. Next epoch: "+nextEpoch);
             }
         }
         

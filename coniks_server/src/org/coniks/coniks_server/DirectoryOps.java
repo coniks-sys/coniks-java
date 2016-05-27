@@ -40,6 +40,12 @@ import java.util.PriorityQueue;
 
 import org.javatuples.*;
 
+/** Implements the high-level key directory-related operations performed by a
+ * CONIKS server.
+ *
+ *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin
+ */
 public class DirectoryOps {
 
     // keeps all the operations pending to be inserted into the directory
@@ -50,24 +56,42 @@ public class DirectoryOps {
     // this is a counter to be used to sort the uln changes so they happen in-order for the same person
     private static long ulnCounter = 0;
 
-    /** Adds a new registration with {@code uname} and {@code pk}
-     * to the pending queue.
+    /** Registers a new name-to-key mapping in the key directory. Adds this registration
+     * operation to the queue of pending operations, which are handled once per epoch.
+     *
+     *@param uname the username to register
+     *@param pk the public key data to map to the registered name
+     *@param ck the DSA public key used for key changes
+     *@param allowsUnsignedChanges flag indicating the user's key change policy
+     *@param allowsPublicVisibility flag indicating the user's key visibility policy
      */
-    public static synchronized void register(String uname, String pk){            
+    public static synchronized void register(String uname, String pk, DSAPublicKey ck,
+                                             boolean allowsUnsignedChanges, boolean allowsPublicVisibility){            
         byte[] index = ServerUtils.unameToIndex(uname);
-        UserLeafNode uln = new UserLeafNode(uname, pk, ServerHistory.nextEpoch(), 0, true, true, null, index);
+        UserLeafNode uln = new UserLeafNode(uname, pk, ServerHistory.nextEpoch(), 0,
+                                            allowsUnsignedChanges, allowsPublicVisibility, ck, index);
         pendingQueue.add(Triplet.with(index, uln, (Operation)new Register()));
     }
 
-     /** Adds a new mapping change for {@code uname} with {@code pk}
-     * to the pending queue.
+    /** Changes an existing name-to-key mapping in the key directory. Adds this mapping change
+     * operation to the queue of pending operations, which are handled once per epoch.
+     *
+     *@param uname the username
+     *@param newKey the new public key data to be mapped to the registered name
+     *@param ck the DSA public key used for key changes
+     *@param allowsUnsignedChanges flag indicating the user's key change policy
+     *@param allowsPublicVisibility flag indicating the user's key visibility policy
+     *@param msg the mapping change message required for signed changes
+     *@param sig the signature on {@code msg} required for signed changes
      */
-    public static synchronized void mappingChange(String uname, String newKey, DSAPublicKey kPrime, 
-        boolean allowsUnsignedKC, boolean allowsPublicLookup, 
-        byte[] msg, byte[] sig) {
+    public static synchronized void mappingChange(String uname, String newKey, DSAPublicKey ck, 
+                                                  boolean allowsUnsignedChanges, boolean allowsPublicVisibility,
+                                                  byte[] msg, byte[] sig) {
         byte[] index = ServerUtils.unameToIndex(uname);
-        UserLeafNode uln = new UserLeafNode(uname, newKey, ServerHistory.nextEpoch(), 0, true, true, kPrime, index);
-        KeyChange change = new KeyChange(newKey, kPrime, allowsUnsignedKC, allowsPublicLookup, msg, sig, ServerHistory.nextEpoch(), 0);
+        UserLeafNode uln = new UserLeafNode(uname, newKey, ServerHistory.nextEpoch(), 0,
+                                            allowsUnsignedChanges, allowsPublicVisibility, ck, index);
+        KeyChange change = new KeyChange(newKey, ck, allowsUnsignedChanges, allowsPublicVisibility,
+                                         msg, sig, ServerHistory.nextEpoch(), 0);
         pendingQueue.add(Triplet.with(index, uln, (Operation)change));
     }
 
@@ -82,7 +106,7 @@ public class DirectoryOps {
         return getUlnFromTree(uname, root);
     }
 
-     /** Searches for the username {@code uname} in the key directory.
+     /** Searches for the username {@code uname} in the key directory at epoch {@code ep}.
      *
      *@return the user's entry in the directory or null if the name can't be found.
      */
@@ -93,9 +117,11 @@ public class DirectoryOps {
         return getUlnFromTree(uname, root);
     }
 
-    /** Goes through the pending queue and updates the key directory
-     * according to the pending operations.
+    /** Updates the key directory by handling all current pending registration and 
+     * mapping change operations.
      * This function is called at the beginning of the new epoch.
+     *
+     *@return the tree root for the updated directory, or null in case of an error.
      */
     public static synchronized RootNode updateDirectory() {
   

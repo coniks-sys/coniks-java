@@ -64,6 +64,7 @@ import org.javatuples.Pair;
 /** Implements the message handling for the CONIKS server
  *
  * @author Marcela Melara (melara@cs.princeton.edu)
+ * @author Michael Rochlin
  *
  */
 public class RequestHandler extends Thread{
@@ -128,9 +129,11 @@ public class RequestHandler extends Thread{
     private void handleRegistrationProto(Registration reg) 
         throws IOException{
         ConiksServer.msgLog.log("Handling registration message... ");
-        
-        if(!reg.hasBlob()){
-            ConiksServer.msgLog.log("Malformed registration message");
+
+        // I suppose we want to check the input again just in case
+        if(!reg.hasBlob() || !reg.hasChangeKey() || !reg.hasAllowsUnsignedKeychange()
+           || !reg.hasAllowsPublicLookup()){
+            ConiksServer.msgLog.log("req handler: Malformed registration message");
             ServerMessaging.sendSimpleResponseProto(ServerErr.MALFORMED_CLIENT_MSG_ERR, 
                                                clientSocket);
             return;
@@ -152,9 +155,15 @@ public class RequestHandler extends Thread{
         this.regEpoch = ServerHistory.nextEpoch();
         
         // If using a DB, insert the new user
+
+        // convert the DSA Key proto back to a Java DSA public key
+        DSAPublicKeyProto ckProto = reg.getChangeKey();
+
+        DSAPublicKey ck = KeyOps.makeDSAPublicKeyFromProto(ckProto);
         
         // we register the user in the pendingQueue
-        DirectoryOps.register(name, reg.getBlob());
+        DirectoryOps.register(name, reg.getBlob(), ck, reg.getAllowsUnsignedKeychange(),
+                              reg.getAllowsPublicLookup());
         
         ServerMessaging.sendRegistrationRespProto(regEpoch, 
                                                   ServerConfig.EPOCH_INTERVAL, clientSocket);
@@ -224,7 +233,12 @@ public class RequestHandler extends Thread{
     // Handles a proto that might have a sig
     private synchronized void handleULNChangeProto(ULNChangeReq changeReq, byte[] sig)
         throws IOException{
-        
+
+        if (!changeReq.hasName() || !changeReq.hasNewBlob() || !changeReq.hasNewChangeKey() ||
+            !changeReq.hasAllowsUnsignedKeychange() || !changeReq.hasAllowsPublicLookup()) {
+            MsgHandlerLogger.log("Malformed uln change req");
+        }
+
         String username = changeReq.getName();
         
         UserLeafNode uln = DirectoryOps.findUser(username);
@@ -234,13 +248,21 @@ public class RequestHandler extends Thread{
             ServerMessaging.sendSimpleResponseProto(ServerErr.NAME_NOT_FOUND_ERR, clientSocket);
             return;
         }
+
+        // make sure the request has a signature if the user requires one
+        // wew assume the signature has been verified at this point
+        if (!uln.allowsUnsignedKeychange() && sig == null) {
+            MsgHandlerLogger.error("Required signature for "+username+" not found");
+            ServerMessaging.sendSimpleResponseProto(ServerErr.MALFORMED_CLIENT_MSG_ERR, clientSocket);
+            return;
+        }
         
         boolean allowsUnsignedKC = changeReq.hasAllowsUnsignedKeychange() ? changeReq.getAllowsUnsignedKeychange() : uln.allowsUnsignedKeychange();
         boolean allowsPublicLookup = changeReq.hasAllowsPublicLookup() ? changeReq.getAllowsPublicLookup() : uln.allowsPublicLookups();
         String newBlob = changeReq.hasNewBlob() ? changeReq.getNewBlob() : uln.getPublicKey();
-        DSAPublicKey newChangeKey = changeReq.hasNewChangeKey() ? SignatureOps.makeDSAPublicKeyFromParams(changeReq.getNewChangeKey()) : uln.getChangeKey();
+        DSAPublicKey newChangeKey = changeReq.hasNewChangeKey() ? KeyOps.makeDSAPublicKeyFromProto(changeReq.getNewChangeKey()) : uln.getChangeKey();
         
-        DirectoryOps.mappingChange(username, newBlob, newChangeKey, allowsUnsignedKC, allowsPublicLookup, changeReq.toByteArray(), sig);
+        DirectoryOps.mappingChange(username, newBlob, newChangeKey, allowsUnsignedKC, allowsPublicLookup, newBlob.getBytes(), sig);
         ConiksServer.serverLog.log("ulnChange: " + Arrays.toString(changeReq.toByteArray()));
 
         // If using a DB, insert the new user
@@ -257,6 +279,11 @@ public class RequestHandler extends Thread{
         throws IOException{
         
         ULNChangeReq changeReq = signedReq.getReq();
+
+        if (!changeReq.hasName() || !changeReq.hasNewBlob() || !changeReq.hasNewChangeKey() ||
+            !changeReq.hasAllowsUnsignedKeychange() || !changeReq.hasAllowsPublicLookup()) {
+            MsgHandlerLogger.log("Malformed uln change req");
+        }
         
         String username = changeReq.getName(); 
         

@@ -35,12 +35,14 @@ keytool -import -alias <alias> -file <certificate file> -keystore <truststore na
 The alias must match the alias used when generating the cert for the server. You will be asked to
 enter a password for each truststore. Make sure to remember this password.
 - Set all of the configurations in the config file:
-Defaults are already set, except for the absolute path to the keystore generated in the 
+Defaults for the port number and user keys directory are already set, 
+except for the absolute path to the keystore generated in the 
 previous step along with its password. You'll have to set these using the format
 described below.
 You may write your own config file, but it must follow the following format:
 ```
 <port number> (must be the same in the CONIKS server config)
+<user keys dir>
 ```
 - Set all of the configs in the run script *coniks_test_client.sh*:
 Defaults are already set, but you may change the following variables:
@@ -51,10 +53,14 @@ Defaults are already set, but you may change the following variables:
 ###Running
 We provide a run script for the CONIKS test client *coniks_test_client.sh*, which allows you to run
 the test client in full operation mode and test mode.
-- Run in full operation mode:
-```./coniks_test_client.sh <server hostname>```
-- Run in test mode:
-```./coniks_test_client.sh <server hostname> test```
+
+The run script supports three commands: 
+- ```start <server hostname>```: start the client in full operation mode, connecting it to the given server.
+- ```test <server hostname>```: start the client in test mode, connecting it to the given server.
+- ```clean```: remove all logs written by the client.
+For example, to start the client in full operation mode, connecitng it to a server on the local machine, use
+```./coniks_test_client.sh start localhost```
+Analogously to test the client, and remove the logs (takes no second argument).
 
 Once running, the client prompts you to enter an operation, the number of users for which to
 perform the operation and the first dummy user for which to run the operation. Dummy users are
@@ -71,6 +77,9 @@ Supported operations:
 Some examples:
 - REGISTER 10 10: registers 10 new users, identified as dummy users 10 through 19.
 - LOOKUP 1 18: looks up the key for dummy user 18.
+- SIGNED 10 10: performs a signed key data change for users 10 through 19.
+- UNSIGNED 10 10: performs an unsigned key data change for users 10 throught 19.
+- POLICY 1 18: changes the key change policy for user 18.
 
 ## Test Client Installation on a Remote Machine
 You may want to install the test client on a remote machine.

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2016, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -62,6 +62,8 @@ public class ClientUser extends ConiksUser {
 
     /** Loads the user's key change private key from disk. The caller should free
      * the key's memory after use.
+     *
+     *@return the user's DSA private change key or {@code null} in case of an error.
      */
     public DSAPrivateKey loadChangePrivKey() {
         changePrivKey = KeyOps.loadDSAPrivateKeyFile(username);

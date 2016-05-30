@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2016, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -45,9 +45,20 @@ import org.coniks.coniks_common.*;
 import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.*;
 
+/** Implements all of the messaging operations between the server and clients.
+ *
+ *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Aaron Blankstein
+ *@author Michael Rochlin
+ */
 public class ServerMessaging {
 
-    // send back a simple server response based on the result of the request
+    /** Sends a simple server response protobuf based on the 
+     * result (often an error) of a client request.
+     *
+     *@param reqResult the result of the request 
+     *@param socket the client socket to which to send the message
+     */
     public static synchronized void sendSimpleResponseProto(int reqResult, Socket socket){
         MsgHandlerLogger.log("Sending simple server response... ");
         
@@ -56,7 +67,11 @@ public class ServerMessaging {
 
     }
     
-    // send back the commitment returned for the commitment request
+    /** Sends the signed tree root protobuf returned for a client's signed tree root request.
+     *
+     *@param str the signed tree root to send
+     *@param socket the client socket to which to send the message
+     */
     public static synchronized void sendCommitmentProto(SignedTreeRoot str, Socket socket){
         MsgHandlerLogger.log("Sending commitment response... ");
      
@@ -65,7 +80,12 @@ public class ServerMessaging {
         sendMsgProto(MsgType.COMMITMENT, comm, socket);
     }
     
-    // send back the initial epoch and epoch interval for the newly registered user, who will cache this info
+    /** Sends a basic registration response protobuf for a new name-to-key mapping
+     * registration.
+     *@param regEpoch the epoch at which the mapping will be registered in the directory
+     *@param epochInterval the frequency with which the server updates its directory.
+     *@param socket the client socket to which to send the message
+     */
     public static synchronized void sendRegistrationRespProto(long initEpoch, int epochInterval,
                                                               Socket socket){
         MsgHandlerLogger.log("Sending registration response... ");
@@ -74,7 +94,12 @@ public class ServerMessaging {
         sendMsgProto(MsgType.REGISTRATION_RESP, regResp, socket);
     }
     
-    // send back the authentication path based on the key lookup
+    /** Sends the authentication path protobuf returned for a client's key lookup.
+     *
+     *@param uln the key directory entry for which to send the authentication path
+     *@param root the key directory root for the authentication path
+     *@param socket the client socket to which to send the message
+     */
     public static synchronized void sendAuthPathProto(UserLeafNode uln, RootNode root, Socket socket){
         MsgHandlerLogger.log("Sending authentication path response... ");
   
@@ -176,6 +201,7 @@ public class ServerMessaging {
      * the message is correctly formatted for the expected message type.
      * The caller is responsible for handling the exact message type(s).
      *
+     *@param socket the client socket from which the message is coming
      *@return The specific protobuf message according to the message type
      * indicated by the client.
      */
@@ -253,11 +279,11 @@ public class ServerMessaging {
         // unexpected message type from the client
         return null;
     }
-    
 
     /* Functions for handling the lower-level communication with the client */
 
-    /** Listens for incoming requests. Uses an SSL connection if in full operating mode.
+    /** Listens for incoming requests. Uses an SSL connection if the server is running in 
+     * full operating mode.
      *
      *@param isFullOp indicates whether the client is operating in full mode 
      * or in testing mode
@@ -271,15 +297,15 @@ public class ServerMessaging {
             if (isFullOp) {
                 SSLServerSocketFactory sslSrvFact = 
                 (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
-                s =(SSLServerSocket)sslSrvFact.createServerSocket(ServerConfig.PORT);
+                s =(SSLServerSocket)sslSrvFact.createServerSocket(ServerConfig.getPort());
             }
             else {
-                s = new ServerSocket(ServerConfig.PORT);
+                s = new ServerSocket(ServerConfig.getPort());
 
-                System.out.println("Listening for connections on port "+ServerConfig.PORT+"...");
+                System.out.println("Listening for connections on port "+ServerConfig.getPort()+"...");
             }            
 
-            MsgHandlerLogger.log("Listening for connections on port "+ServerConfig.PORT+"...");
+            MsgHandlerLogger.log("Listening for connections on port "+ServerConfig.getPort()+"...");
             
             // loop to listen for requests
             while(true){

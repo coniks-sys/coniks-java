@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -43,14 +43,14 @@ import java.util.Scanner;
 import java.io.PrintWriter;
 import java.io.*;
 
-import org.coniks.coniks_common.*;
-import org.coniks.coniks_common.C2SProtos.*;
+import org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto;
 
-/** Implements all operations involving encryption keys
- * that a CONIKS server must perform.
+/** Implements all encryption-key related operations that a 
+ * CONIKS server must perform.
  * Current encryption/signing algorithm used: RSA with SHA-256.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin
  */
 public class KeyOps{
 
@@ -69,19 +69,19 @@ public class KeyOps{
             ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
             // get user password and file input stream
-            char[] ks_password = ServerConfig.KEYSTORE_PWD.toCharArray();
+            char[] ks_password = ServerConfig.getKeystorePassword().toCharArray();
             
             FileInputStream fis = null;
       
-            fis = new FileInputStream(ServerConfig.KEYSTORE_PATH);
+            fis = new FileInputStream(ServerConfig.getKeystorePath());
             ks.load(fis, ks_password);
 
-            if(ks.isKeyEntry(ServerConfig.NAME)){
+            if(ks.isKeyEntry(ServerConfig.getName())){
                 KeyStore.ProtectionParameter protParam = 
                     new KeyStore.PasswordProtection(ks_password);
 
                 KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry)
-                    ks.getEntry(ServerConfig.NAME, protParam);
+                    ks.getEntry(ServerConfig.getName(), protParam);
                 myPrivateKey = (RSAPrivateKey)pkEntry.getPrivateKey();
             }
             else{
@@ -122,11 +122,11 @@ public class KeyOps{
         try{
             ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
-            char[] ts_password = ServerConfig.TRUSTSTORE_PWD.toCharArray();
+            char[] ts_password = ServerConfig.getTruststorePassword().toCharArray();
             
             FileInputStream fis = null;
       
-            fis = new FileInputStream(ServerConfig.TRUSTSTORE_PATH);
+            fis = new FileInputStream(ServerConfig.getTruststorePath());
             ks.load(fis, ts_password);
 
             if(ks.isKeyEntry(keyOwner)){
@@ -161,8 +161,13 @@ public class KeyOps{
         return null;
     }
 
-    /** Makes a DSAPublicKey from the params */
-    public static DSAPublicKey makeDSAPublicKeyFromParams(BigInteger p, BigInteger q, BigInteger g, BigInteger y) {
+    /** Makes a {@link DSAPublicKey} from its {@code p}, {@code q},
+     * {@code g} and {@code y} parameters.
+     *
+     *@return the DSAPublicKey, or {@code null} in case of an error.
+     */
+    public static DSAPublicKey makeDSAPublicKeyFromParams(BigInteger p, BigInteger q,
+                                                          BigInteger g, BigInteger y) {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("DSA");
             KeySpec publicKeySpec = new DSAPublicKeySpec(y, p, q, g);
@@ -180,7 +185,11 @@ public class KeyOps{
         return null;
     }
 
-    // makes a DSA key from the DSAPublicKeyProto protobuf
+     /** Converts a {@link DSAPublicKeyProto} to a {@link DSAPublicKey}.
+     *
+     *@param pkProto the DSA public key protobuf to convert into a DSAPublicKey.
+     *@return the DSAPublicKey, or {@code null} in case of an error.
+     */
     public static DSAPublicKey makeDSAPublicKeyFromProto(DSAPublicKeyProto pkProto) {
         BigInteger p = new BigInteger(pkProto.getP());
         BigInteger q = new BigInteger(pkProto.getQ());

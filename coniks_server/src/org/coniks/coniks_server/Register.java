@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2016, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,8 @@
 
 package org.coniks.coniks_server;
 
-/** Implements a registration operation.
+/** Implements a name-to-key mapping registration 
+ * operation.
  *
  *@author Michael Rochlin
  */

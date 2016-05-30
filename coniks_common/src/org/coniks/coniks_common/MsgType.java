@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -56,9 +56,17 @@ public final class MsgType {
      */
     public static final int COMMITMENT_REQ = 1;
     
-    /** A data binding lookup request.
+    /** A data mapping lookup request.
      */
     public static final int KEY_LOOKUP = 2;
+
+     /** A generic user data change request.
+     */
+    public static final int ULNCHANGE_REQ = 8;
+
+    /** A digitally signed user data change request.
+     */
+    public static final int SIGNED_ULNCHANGE_REQ = 9;
     
     /** A simple server response message, usually indicating some
      * kind of error.
@@ -75,7 +83,7 @@ public final class MsgType {
     public static final int AUTH_PATH = 5;
 
     /** A registration response message containing the registration epoch.
-     * TODO: This will become a temporary binding in a future release.
+     * This will become a temporary binding in a future release.
      */
     public static final int REGISTRATION_RESP = 6;
 
@@ -85,9 +93,5 @@ public final class MsgType {
      * when helping to circumvent DOS attacks.
      */
     public static final int OBSERVED_STR_PUSH = 7;
-
-
-    public static final int ULNCHANGE_REQ = 8;
-    public static final int SIGNED_ULNCHANGE_REQ = 9;
 
 }

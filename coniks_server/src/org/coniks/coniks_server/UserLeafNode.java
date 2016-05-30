@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -38,10 +38,11 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
 
-/** Represents a leaf node containing a user's data binding interior node
+/** Represents a leaf node containing a user's entry in the CONIKS key directory
  *  in the CONIKS binary Merkle prefix tree.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Aaron Blankstein
  *@author Michael Rochlin
  */
 public class UserLeafNode extends LeafNode implements Serializable {
@@ -58,12 +59,6 @@ public class UserLeafNode extends LeafNode implements Serializable {
     byte[] signature; // The signature of the last msg
     DSAPublicKey changeKey; // The public DSA key for changing
     byte[] lastMsg; // The last msg
-
-    /** Constructs a user leaf node for the username {@code u}
-     * and the public key {@code pub} with the given
-     * epoch {@code ep}, its level {@code lvl} within the tree, and
-     * the lookup index {@code index} for the username.
-     */
 
     public UserLeafNode(String u, String blob, long e, int lvl){
         this(u,blob,e,lvl,true,true);
@@ -105,7 +100,6 @@ public class UserLeafNode extends LeafNode implements Serializable {
         this.index = index;
         this.signature = new byte[126]; // dummy array
         this.changeKey = changeKey;
-
     }
     
     public UserLeafNode(UserLeafNode uln) {
@@ -123,31 +117,8 @@ public class UserLeafNode extends LeafNode implements Serializable {
         this.changeKey = uln.changeKey;
         this.lastMsg = uln.lastMsg;
     }
-            
-    public void setPublicKey(String newKey) {
-        this.pubKey = newKey;
-    }
 
-    // These use the term "blob" instead
-    public String getBlob() {
-        return this.pubKey;
-    }
-    public void setBlob(String blob) {
-        this.pubKey = blob;
-    }
-    
-    public long getEpochChanged() {
-        return this.epochChanged;
-    }
-    public void setEpochChanged(long ep0) {
-        this.epochChanged = ep0;
-    }
-    
-    public void setAllowsUnsignedKeychange(boolean b) {
-        this.allowUnsignedKeychange = b;
-    }
-    
-    /** Gets the username contained in this UserLeafNode.
+     /** Gets the username contained in this UserLeafNode.
      *
      *@return The username as a {@code String}.
      */
@@ -160,6 +131,16 @@ public class UserLeafNode extends LeafNode implements Serializable {
      *@return The {@code String} representation of the public key.
      */
     public String getPublicKey(){
+        return this.pubKey;
+    }
+
+    /** Returns the public key data of this user leaf.
+     *<p>
+     * Same as {@link UserLeafNode#getPublicKey()}, but using the more generic
+     * key data terminology representing that the mapping may also contain other data.
+     *@return the public key data mapped in this leaf node
+     */
+    public String getKeyData() {
         return this.pubKey;
     }
     
@@ -190,33 +171,39 @@ public class UserLeafNode extends LeafNode implements Serializable {
         return this.allowPublicLookup;
     }
 
-    public void setAllowsPublicLookup(boolean b) {
-        this.allowPublicLookup = b;
+    /** Gets the last epoch at which this leaf node was changed.
+     *
+     *@return The epoch as a {@code long}.
+     */
+    public long getEpochChanged() {
+        return this.epochChanged;
     }
-    
+
+    /** Gets the DSA public key used to sign key data changes.
+     *
+     *@return the DSA public change key.
+     */
     public DSAPublicKey getChangeKey() {
         return this.changeKey;
     }
-    
-    public void setChangeKey(DSAPublicKey newKey) {
-        this.changeKey = newKey;
-    }
-    
-    public byte[] getSignature() {
-        return this.signature;
-    }
-    
-    public void setSignature(byte[] sig) {
-        this.signature = sig;
-    }
 
-    public void setLastMsg(byte[] msg) {
-        this.lastMsg = msg;
-    }
+    /** Gets the last key data change message.
+     *
+     *@return the last key data change message as a {@code byte[]}.
+     */
     public byte[] getLastMsg() {
         return this.lastMsg;
     }
-    
+
+    /** Gets the signature on the last key data change message.
+     * The caller must verify that this signature is valid for the last message in this leaf node.
+     *
+     *@return the signature as a {@code byte[]}.
+     */
+    public byte[] getSignature() {
+        return this.signature;
+    }
+
     /** Gets the lookup index for the username in this UserLeafNode.
      *
      *@return The lookup index as a {@code byte[]}.
@@ -224,6 +211,57 @@ public class UserLeafNode extends LeafNode implements Serializable {
     public byte[] getIndex() {
         return this.index;
     }
+    
+    /** Sets the leaf's public key to {@code newKey}.
+     */
+    public void setPublicKey(String newKey) {
+        this.pubKey = newKey;
+    }
+
+    /** Sets the key data in this leaf to {@code keyData}.
+     *<p>
+     * Same as {@link UserLeafNode#setPublicKey()}, but using the more generic
+     * key data terminology representing that the mapping may also contain other data.
+     */
+    public void setKeyData(String keyData) {
+        this.pubKey = keyData;
+    }
+
+    /** Sets the epoch at which the key data in this leaf was changed to {@code ep0}.
+     */
+    public void setEpochChanged(long ep0) {
+        this.epochChanged = ep0;
+    }
+
+    /** Sets the unsigned key data change policy flag to {@code b}.
+     */
+    public void setAllowsUnsignedKeychange(boolean b) {
+        this.allowUnsignedKeychange = b;
+    }
+
+    /** Sets the public lookup policy flag to {@code b}.
+     */
+    public void setAllowsPublicLookup(boolean b) {
+        this.allowPublicLookup = b;
+    }
+
+    /** Sets the DSA public change key to {@code newKey}.
+     */
+    public void setChangeKey(DSAPublicKey newKey) {
+        this.changeKey = newKey;
+    }
+
+    /** Sets the last key data change message to {@code msg}.
+     */
+    public void setLastMsg(byte[] msg) {
+        this.lastMsg = msg;
+    }
+    
+    /** Sets the signature on the last key data change message to {@code sig}.
+     */
+    public void setSignature(byte[] sig) {
+        this.signature = sig;
+    }   
 
     /** Sets the lookup index for the username in this UserLeafNode to
      * the {@code byte[]} {@code i}.
@@ -242,7 +280,10 @@ public class UserLeafNode extends LeafNode implements Serializable {
     public UserLeafNode clone(TreeNode parent){
 	
 	UserLeafNode cloneN = new UserLeafNode(this.username, this.pubKey,
-					       this.epochAdded, this.level, this.index);
+                                               this.epochAdded, this.level, this.allowUnsignedKeychange,
+                                               this.allowPublicLookup, this.changeKey, this.index);
+        cloneN.setSignature(this.signature);
+        cloneN.setLastMsg(this.lastMsg);        
 	cloneN.parent = parent;
 	
 	return cloneN;

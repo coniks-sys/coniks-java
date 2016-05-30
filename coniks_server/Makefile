@@ -51,19 +51,28 @@ PUBPATH=/path/to/server/on/remote
 #
 
 CLASSES = ./src/org/coniks/coniks_server/TreeBuilder.java \
+	./src/org/coniks/coniks_server/LeafNode.java \
 	./src/org/coniks/coniks_server/UserLeafNode.java \
+	./src/org/coniks/coniks_server/PaddingLeafNode.java \
 	./src/org/coniks/coniks_server/RootNode.java \
 	./src/org/coniks/coniks_server/InteriorNode.java \
 	./src/org/coniks/coniks_server/TreeNode.java \
 	./src/org/coniks/coniks_server/DirectoryOps.java \
 	./src/org/coniks/coniks_server/TransparencyOps.java \
-	./src/org/coniks/coniks_server/ServerMessaging.java \
 	./src/org/coniks/coniks_server/RequestHandler.java \
+	./src/org/coniks/coniks_server/ServerConfig.java \
+	./src/org/coniks/coniks_server/ServerHistory.java \
+	./src/org/coniks/coniks_server/ServerLogger.java \
+	./src/org/coniks/coniks_server/ServerMessaging.java \
 	./src/org/coniks/coniks_server/ServerUtils.java \
+	./src/org/coniks/coniks_server/SignatureOps.java \
+	./src/org/coniks/coniks_server/SignedTreeRoot.java \
 	./src/org/coniks/coniks_server/KeyOps.java \
+	./src/org/coniks/coniks_server/Operation.java \
+	./src/org/coniks/coniks_server/KeyChange.java \
+	./src/org/coniks/coniks_server/Register.java \
 	./src/org/coniks/coniks_server/MsgHandlerLogger.java \
 	./src/org/coniks/coniks_server/TimerLogger.java \
-	./src/org/coniks/coniks_server/ServerLogger.java \
 	./src/org/coniks/coniks_server/DebugLogger.java \
 	./src/org/coniks/coniks_server/ConiksServer.java
 

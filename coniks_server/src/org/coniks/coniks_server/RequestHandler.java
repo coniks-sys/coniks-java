@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2016, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,7 @@ import org.coniks.coniks_common.CommonMessaging;
 
 import org.javatuples.Pair;
 
-/** Implements the message handling for the CONIKS server
+/** Implements the request handler for the CONIKS server.
  *
  * @author Marcela Melara (melara@cs.princeton.edu)
  * @author Michael Rochlin
@@ -80,7 +80,7 @@ public class RequestHandler extends Thread{
         this.clientSocket = c;
     }
     
-    /** Receives the incoming protobuf message and passes it to the
+    /** Receives the incoming request as a protobuf message and passes it to the
      * appropriate message handler according to the message type.
      */
     public void run(){
@@ -119,7 +119,7 @@ public class RequestHandler extends Thread{
             
         }
         catch(IOException e){
-            ConiksServer.msgLog.error("Error connecting to client: "+e.getMessage());
+            MsgHandlerLogger.error("Error connecting to client: "+e.getMessage());
             e.printStackTrace();
         }
         
@@ -128,12 +128,12 @@ public class RequestHandler extends Thread{
     /* Message handlers */
     private void handleRegistrationProto(Registration reg) 
         throws IOException{
-        ConiksServer.msgLog.log("Handling registration message... ");
+        MsgHandlerLogger.log("Handling registration message... ");
 
         // I suppose we want to check the input again just in case
         if(!reg.hasBlob() || !reg.hasChangeKey() || !reg.hasAllowsUnsignedKeychange()
            || !reg.hasAllowsPublicLookup()){
-            ConiksServer.msgLog.log("req handler: Malformed registration message");
+            MsgHandlerLogger.log("req handler: Malformed registration message");
             ServerMessaging.sendSimpleResponseProto(ServerErr.MALFORMED_CLIENT_MSG_ERR, 
                                                clientSocket);
             return;
@@ -145,7 +145,7 @@ public class RequestHandler extends Thread{
         UserLeafNode uln = DirectoryOps.findUser(name);
         
         if (uln != null) {
-            ConiksServer.msgLog.error("Found: "+
+            MsgHandlerLogger.error("Found: "+
                          ServerUtils.bytesToHex(ServerUtils.unameToIndex(uln.getUsername()))+
                          "\n"+uln.getUsername()+" found when trying to insert "+name);
             ServerMessaging.sendSimpleResponseProto(ServerErr.NAME_EXISTS_ERR, clientSocket);
@@ -166,7 +166,7 @@ public class RequestHandler extends Thread{
                               reg.getAllowsPublicLookup());
         
         ServerMessaging.sendRegistrationRespProto(regEpoch, 
-                                                  ServerConfig.EPOCH_INTERVAL, clientSocket);
+                                                  ServerConfig.getEpochInterval(), clientSocket);
         
     }
     
@@ -181,7 +181,7 @@ public class RequestHandler extends Thread{
             epoch = curEpoch;
         }
         
-        ConiksServer.msgLog.log("Getting commitment for epoch "+epoch+"...");
+        MsgHandlerLogger.log("Getting commitment for epoch "+epoch+"...");
         
         CommitmentReq.CommitmentType commType = commReq.getType();
         
@@ -206,15 +206,15 @@ public class RequestHandler extends Thread{
         
         String username = lookup.getName();
         
-        ConiksServer.msgLog.log("Getting key for "+username+"... ");
+        MsgHandlerLogger.log("Getting key for "+username+"... ");
         
-        ConiksServer.msgLog.log("SHA256 of name: " + ServerUtils.bytesToHex(ServerUtils.unameToIndex(username)));
+        MsgHandlerLogger.log("SHA256 of name: " + ServerUtils.bytesToHex(ServerUtils.unameToIndex(username)));
         
         RootNode root = ServerHistory.getSTR(epoch).getRoot();
         UserLeafNode uln = DirectoryOps.findUserInEpoch(username, epoch);
         
         if(uln == null){
-            ConiksServer.msgLog.error(username + " not found...");
+            MsgHandlerLogger.error(username + " not found...");
             ServerMessaging.sendSimpleResponseProto(ServerErr.NAME_NOT_FOUND_ERR, clientSocket);
             return;
         }
@@ -244,7 +244,7 @@ public class RequestHandler extends Thread{
         UserLeafNode uln = DirectoryOps.findUser(username);
 
         if(uln == null){
-            ConiksServer.msgLog.error(username + " not found...");
+            MsgHandlerLogger.error(username + " not found...");
             ServerMessaging.sendSimpleResponseProto(ServerErr.NAME_NOT_FOUND_ERR, clientSocket);
             return;
         }
@@ -263,7 +263,7 @@ public class RequestHandler extends Thread{
         DSAPublicKey newChangeKey = changeReq.hasNewChangeKey() ? KeyOps.makeDSAPublicKeyFromProto(changeReq.getNewChangeKey()) : uln.getChangeKey();
         
         DirectoryOps.mappingChange(username, newBlob, newChangeKey, allowsUnsignedKC, allowsPublicLookup, newBlob.getBytes(), sig);
-        ConiksServer.serverLog.log("ulnChange: " + Arrays.toString(changeReq.toByteArray()));
+        ServerLogger.log("ulnChange: " + Arrays.toString(changeReq.toByteArray()));
 
         // If using a DB, insert the new user
         
@@ -271,7 +271,7 @@ public class RequestHandler extends Thread{
         // that the changes were actually comitted
         this.regEpoch = ServerHistory.nextEpoch();
         
-        ServerMessaging.sendRegistrationRespProto(regEpoch, ServerConfig.EPOCH_INTERVAL, clientSocket);
+        ServerMessaging.sendRegistrationRespProto(regEpoch, ServerConfig.getEpochInterval(), clientSocket);
     }
     
     /* Helper functions for ULN changes (with sig) */
@@ -291,7 +291,7 @@ public class RequestHandler extends Thread{
         UserLeafNode uln = DirectoryOps.findUser(username);  
 
         if(uln == null){
-            ConiksServer.msgLog.error(username + " not found...");
+            MsgHandlerLogger.error(username + " not found...");
             ServerMessaging.sendSimpleResponseProto(ServerErr.NAME_NOT_FOUND_ERR, clientSocket);
             return;
         }
@@ -302,8 +302,8 @@ public class RequestHandler extends Thread{
         byte[] reqMsg = changeReq.toByteArray();
         byte[] sig = ServerUtils.intListToByteArr(new ArrayList<Integer>(signedReq.getSigList()));
         if (!SignatureOps.verifySigFromDSA(reqMsg, sig, publicChangeKey)) {
-            ConiksServer.msgLog.log("Failed to verify message");
-            ConiksServer.msgLog.log("Failed sig said\n" + Arrays.toString(sig));
+            MsgHandlerLogger.log("Failed to verify message");
+            MsgHandlerLogger.log("Failed sig said\n" + Arrays.toString(sig));
             ServerMessaging.sendSimpleResponseProto(ServerErr.SIGNED_CHANGE_VERIF_ERR, clientSocket);
             return;
         }

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -47,12 +47,14 @@ import org.javatuples.*;
  * Current hashing algorithm used: SHA-256.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Aaron Blankstein
  *@author Michael Rochlin
  */
 public class TreeBuilder{
     
     private static int lastLevel;
-    
+
+    // inserts a new user leaf node into the tree
     private static void insertNode(byte[] key, UserLeafNode toAdd, RootNode root, Operation op){
         int curOffset = 0;
         // This code would be a lot more natural
@@ -213,12 +215,8 @@ public class TreeBuilder{
     	}
     }
 
-    /** Clones the previous epoch's tree {@code prevRoot} and 
-     * extends it with any new nodes in {@code pendingQ} 
-     * to add for the next epoch {@code epoch}.
-     *<p> 
-     * This is a useful wrapper for 
-     * {@link TreeBuilder#extendTree(PriorityQueue<Pair<byte[], UserLeafNode>>)}.
+    /** Clones a Merkle prefix tree {@code prevRoot} and 
+     * extends it with any new nodes in {@code pendingQ}.
      *
      *@return The {@link RootNode} for the next epoch's Merkle tree.
      */
@@ -233,7 +231,7 @@ public class TreeBuilder{
         }
         
         if(pendingQ == null) {
-            ConiksServer.serverLog.error("Trying to extend using null pending queue");
+            ServerLogger.error("Trying to extend using null pending queue");
             return null;
         }
         return extendTree(pendingQ, newRoot);

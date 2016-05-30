@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -56,6 +56,7 @@ import java.math.BigInteger;
  * client.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Aaron Blankstein
  *@author Michael Rochlin
  */
 public class ClientUtils{
@@ -277,7 +278,10 @@ public class ClientUtils{
 	return true;
     }
 
-    /** Converts the DSAPublicKey {@code pub} to a byte array in g-p-q-y order */
+    /** Converts a DSAPublicKey {@code pub} to a byte array.
+     *
+     *@return the DSA public key as a {@code byte[]}  in g-p-q-y order 
+     */
     public static byte[] convertDSAPubKey(DSAPublicKey pub){
         byte[] g = strToBytes(pub.getParams().getG().toString());
         byte[] p = strToBytes(pub.getParams().getP().toString());
@@ -295,7 +299,10 @@ public class ClientUtils{
         return arr.array();
     }
 
-    /** Converts the DSAPublicKeyProto {@code pub} to a byte array in g-p-q-y order */
+     /** Converts a DSAPublicKeyProto {@code pub} to a byte array.
+     *
+     *@return the DSA public key protobuf as a {@code byte[]}  in g-p-q-y order 
+     */
     public static byte[] convertDSAPubKey(DSAPublicKeyProto pub){
         byte[] g = strToBytes(pub.getG());
         byte[] p = strToBytes(pub.getP());
@@ -313,7 +320,10 @@ public class ClientUtils{
         return arr.array();
     }
 
-    /** Builds a DSAPublicKeyProto protobuf from the DSA public key {@code pub} */
+    /** Converts a DSAPublicKeyProto protobuf {@code pub} to a DSAPublicKey.
+     *
+     *@return the DSAPublicKeyProto
+     */
     public static DSAPublicKeyProto buildDSAPublicKeyProto(DSAPublicKey pub) {
         return buildDSAPublicKeyProto(pub.getParams().getP(),
                                       pub.getParams().getQ(),
@@ -322,7 +332,11 @@ public class ClientUtils{
 
     }
 
-    /** Builds a DSAPublicKeyProto protobuf from the DSA parameters */
+    /** Builds a DSAPublicKeyProto protobuf from a DSA publick key {@code p},
+     * {@code q}, {@code g} and {@code y} parameters.
+     *
+     *@return the DSAPublicKeyProto
+     */
     public static DSAPublicKeyProto buildDSAPublicKeyProto(BigInteger p, 
                                                             BigInteger q,
                                                             BigInteger g,
@@ -338,7 +352,7 @@ public class ClientUtils{
 
 
     /** Converts an AuthPath.UserLeafNode protobuf {@code uln} 
-     * to a byte[].
+     * to a {@code byte[]}.
      */
     public static byte[] ulnProtoToBytes(AuthPath.UserLeafNode uln){
         // TODO: add the generic blob of data and the change key fields
@@ -351,8 +365,6 @@ public class ClientUtils{
         byte[] ck = convertDSAPubKey(uln.getChangeKey());
         byte[] sig = ClientUtils.intListToByteArr(new ArrayList<Integer>(uln.getSignatureList()));
         byte[] lastMsg = ClientUtils.intListToByteArr(new ArrayList<Integer>(uln.getLastMsgList()));
-
-
 
         byte[] leafBytes = new byte[pubKey.length+usr.length+ep_add.length+auk.length+
                                     apl.length+ep_changed.length+ck.length+sig.length+lastMsg.length];
@@ -369,7 +381,6 @@ public class ClientUtils{
         arr.put(lastMsg);
 
         return arr.array();
-
 
     }
 

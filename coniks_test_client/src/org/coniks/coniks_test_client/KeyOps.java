@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2016, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -53,6 +53,7 @@ import org.coniks.coniks_common.CommonMessaging;
 /** Implements all operations involving encryption keys
  * that a CONIKS client must perform.
  *
+ *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Michael Rochlin
  */
 public class KeyOps{
@@ -63,7 +64,7 @@ public class KeyOps{
      *@return the public key or null upon an error.
      */
     public static DSAPublicKey loadDSAPublicKeyFile (String uname) {
-        String filename = ClientConfig.USER_KEYS_PATH+"/"+uname+".pub";
+        String filename = ClientConfig.getUserKeysPath()+"/"+uname+".pub";
         DSAPublicKey pubKey = null;
 
         FileInputStream fis = null;
@@ -107,7 +108,7 @@ public class KeyOps{
      */
     public static DSAPrivateKey loadDSAPrivateKeyFile(String uname){
 
-        String filename = ClientConfig.USER_KEYS_PATH+"/"+uname+".pr";
+        String filename = ClientConfig.getUserKeysPath()+"/"+uname+".pr";
         DSAPrivateKey prKey = null;
 
         FileInputStream fis = null;
@@ -153,7 +154,7 @@ public class KeyOps{
      */
     public static boolean saveDSAPublicKeyFile (String uname, DSAPublicKey pubKey) {
         byte[] keyBytes = pubKey.getEncoded();
-        String filename = ClientConfig.USER_KEYS_PATH+"/"+uname+".pub";
+        String filename = ClientConfig.getUserKeysPath()+"/"+uname+".pub";
 
         // make the parent dir structure if it doesn't exist
         File f = new File(filename);
@@ -185,7 +186,7 @@ public class KeyOps{
     public static boolean saveDSAPrivateKeyFile(String uname, DSAPrivateKey pr) {
 
         byte[] keyBytes = pr.getEncoded();
-        String filename = ClientConfig.USER_KEYS_PATH+"/"+uname+".pr";
+        String filename = ClientConfig.getUserKeysPath()+"/"+uname+".pr";
 
         // make the parent dir structure if it doesn't exist
         File f = new File(filename);
@@ -252,62 +253,6 @@ public class KeyOps{
 
         return kp;
 
-    }
-
-    /** This is a really bad function that takes a string we assume contains a DSA key in 
-        a poorly designed format, and returns the parameters if it can */
-    public static BigInteger[] getDSAParamsFromString(String s) {
-        // This method assumes that the key is written in a particular format
-        // If it isn't, it will just return null
-        // This should really only be used in testing
-        try {
-            int startp = s.indexOf('p');
-            if (startp < 0) return null;
-            int poundsym = s.indexOf('#', startp);
-            if (poundsym < 0) return null;
-            int poundsymend = s.indexOf('#', poundsym);
-            if (poundsymend < 0) return null;
-            int name_end = s.indexOf("-", poundsym);
-            if (name_end > 0) poundsym = name_end;
-            String ps = s.substring(poundsym + 1, poundsymend);
-            BigInteger p = new BigInteger(ps);
-
-            int startq = s.indexOf('q', poundsymend);
-            if (startq < 0) return null;
-            poundsym = s.indexOf('#', startq);
-            if (poundsym < 0) return null;
-            poundsymend = s.indexOf('#', poundsym);
-            if (poundsymend < 0) return null;
-            String qs = s.substring(poundsym + 1, poundsymend);
-            BigInteger q = new BigInteger(qs);
-
-            int startg = s.indexOf('g', poundsymend);
-            if (startg < 0) return null;
-            poundsym = s.indexOf('#', startg);
-            if (poundsym < 0) return null;
-            poundsymend = s.indexOf('#', poundsym);
-            if (poundsymend < 0) return null;
-            String gs = s.substring(poundsym + 1, poundsymend);
-            BigInteger g = new BigInteger(gs);
-
-            int starty = s.indexOf('y', poundsymend);
-            if (starty < 0) return null;
-            poundsym = s.indexOf('#', starty);
-            if (poundsym < 0) return null;
-            poundsymend = s.indexOf("))", poundsym);
-            if (poundsymend < 0) return null;
-            String ys = s.substring(poundsym + 1, poundsymend);
-            BigInteger y = new BigInteger(ys);
-
-            BigInteger[] arr = {p, q, g, y};
-            return arr;
-        }
-        catch (IndexOutOfBoundsException e) {
-            return null;
-        }
-        catch (NumberFormatException e) {
-            return null;
-        }
     }
 
 } // ends KeyOps class

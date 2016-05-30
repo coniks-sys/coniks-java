@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -48,21 +48,11 @@ public class TimerLogger {
 
     private static Logger logger;
 
-    private TimerLogger (String epochTimerLog) {
-        logger = Logger.getLogger("ConiksLogger-EpochTimer");
-        setup(epochTimerLog);
-    }
-
-    /** Generates a single instance of the epoch timer logger
-     * that writes the log at the location given by {@code epochTimerLog}.
+    /** Sets up a timer logger for the CONIKS server.
      *
-     *@return A new timer logger.
+     *@param epochTimerLog the file name for this logger.
      */
-    public static TimerLogger getInstance(String epochTimerLog) {
-        return new TimerLogger(epochTimerLog);
-    }
-
-    private static void setup (String epochTimerLog) {
+    public static void setup (String epochTimerLog) {
 
         // suppress the logging output to the console
         logger.setUseParentHandlers(false);

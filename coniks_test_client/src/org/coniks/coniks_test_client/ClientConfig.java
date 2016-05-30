@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -31,13 +31,6 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-/** Sets various configuration parameters 
- * for a {@link ConiksClient}.
- *
- *@author Marcela Melara (melara@cs.princeton.edu)
- *@author Michael Rochlin
- */
-
 package org.coniks.coniks_test_client;
 
 import java.util.Scanner;
@@ -45,6 +38,12 @@ import java.util.ArrayList;
 import java.io.File;
 import java.io.FileInputStream;
 
+/** Sets various configuration parameters 
+ * for a CONIKS client.
+ *
+ *@author Marcela Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin
+ */
 public class ClientConfig{
 
     private static final int PORT_IDX = 0;
@@ -56,24 +55,62 @@ public class ClientConfig{
 
     /** The port number on which the CONIKS server is listening
      */
-    public static int PORT = -1;
+    private static int PORT = -1;
 
     /** The path to the saved user keys */
-    public static String USER_KEYS_PATH = "";
+    private static String USER_KEYS_PATH = "";
 
     /** The path to the client's private DSA key */
-    public static String KEYSTORE_PATH = "";
+    private static String KEYSTORE_PATH = "";
 
     /** The password to the client's private DSA key */
-    public static String KEYSTORE_PWD = "";
+    private static String KEYSTORE_PWD = "";
 
     /** The path to the client's trusted certificate store
      */
-    public static String TRUSTSTORE_PATH = "";
+    private static String TRUSTSTORE_PATH = "";
     
     /** The password to the client's trusted certificate store
      */
-    public static String TRUSTSTORE_PWD = "";
+    private static String TRUSTSTORE_PWD = "";
+
+    /** Returns the {@code PORT} number at which the CONIKS server is listening.
+     */
+    public static int getPort() {
+        return PORT;
+    }
+
+    /** Returns the path to the client's stored user keys {@code USER_KEY_PATH}.
+     */
+    public static String getUserKeysPath() {
+        return USER_KEYS_PATH;
+    }
+
+    /** Returns the path to the client's keystore {@code KEYSTORE_PATH}.
+     * (Unused)
+     */
+    public static String getKeystorePath() {
+        return KEYSTORE_PATH;
+    }
+
+    /** Returns the password to the client's keystore {@code KEYSTORE_PWD}.
+     * (Unused)
+     */
+    public static String getKeystorePassword() {
+        return KEYSTORE_PWD;
+    }
+
+    /** Returns the path to the client's truststore {@code TRUSTSTORE_PATH}.
+     */
+    public static String getTruststorePath() {
+        return TRUSTSTORE_PATH;
+    }
+
+    /** Returns the password to the client's truststore {@code TRUSTSTORE_PWD}.
+     */
+    public static String getTruststorePassword() {
+        return TRUSTSTORE_PWD;
+    }
 
      /** Set a {@link ConiksClient}'s configuration according to the parameters in
      * {@code configFile}.

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,7 @@ import java.io.InvalidObjectException;
  * prefix tree.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Aaron Blankstein
  *@author Michael Rochlin
  */
 public class InteriorNode extends TreeNode implements Serializable {
@@ -147,8 +148,7 @@ public class InteriorNode extends TreeNode implements Serializable {
         this.hasLeaf = true;
     }
 
-    /** Clones (i.e. duplicates) this interior node from the current
-     * epoch {@code ep0} for the next epoch {@code ep1} with the
+    /** Clones (i.e. duplicates) this interior node with the
      * given {@code parent} tree node. It then recursively 
      * calls this function on the original interior node's two subtrees.
      *<p>

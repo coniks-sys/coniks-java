@@ -50,9 +50,9 @@ public class DebugLogger {
 
     /** Sets up a debug logger for the CONIKS server.
      *
-     *@param serverLog the file name for this logger.
+     *@param debugLog the file name for this logger.
      */
-    public static void setup (String serverLog) {
+    public static void setup (String debugLog) {
         logger = Logger.getLogger("ConiksLogger-Debug");
         
         // suppress the logging output to the console
@@ -61,7 +61,7 @@ public class DebugLogger {
         logger.setLevel(Level.INFO);
 
         try {
-             FileHandler handler = new FileHandler(serverLog, 
+             FileHandler handler = new FileHandler(debugLog, 
                                                   ServerUtils.MAX_BYTES_LOGGED_PER_FILE,
                                                   ServerUtils.MAX_NUM_LOG_FILES, true);
         

@@ -56,6 +56,7 @@ import org.coniks.coniks_common.ServerErr;
  * whether it's using protobufs)).
  * 
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Aaron Blankstein
  *@author Michael Rochlin
  */
 public class TestClient {
@@ -80,11 +81,11 @@ public class TestClient {
      */
     private static void setDefaultTruststore () {
         System.setProperty("javax.net.ssl.trustStore", 
-                           ClientConfig.TRUSTSTORE_PATH);
+                           ClientConfig.getTruststorePath());
         System.setProperty("javax.net.ssl.trustStorePassword",
-                           ClientConfig.TRUSTSTORE_PWD);
-        System.setProperty("javax.net.ssl.keyStore", ClientConfig.KEYSTORE_PATH);
-        System.setProperty("javax.net.ssl.keyStorePassword", ClientConfig.KEYSTORE_PWD);
+                           ClientConfig.getTruststorePassword());
+        System.setProperty("javax.net.ssl.keyStore", ClientConfig.getKeystorePath());
+        System.setProperty("javax.net.ssl.keyStorePassword", ClientConfig.getKeystorePassword());
     }
 
     /** Returns the server error code corresponding to the
@@ -614,7 +615,7 @@ public class TestClient {
         }
 
         // set up logging
-        ClientLogger.getInstance(logPath+"/client-%g");
+        ClientLogger.setup(logPath+"/client-%g");
 
         String cont = "y";
 

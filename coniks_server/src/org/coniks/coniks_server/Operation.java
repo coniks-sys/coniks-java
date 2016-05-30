@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2016, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,8 @@
 
 package org.coniks.coniks_server;
 
-/** This class is subclassed for all different kinds of operations 
+/** This abstract class is used to create the CONIKS name-to-key mapping-related
+ * operations.
  *
  *@author Michael Rochlin
 */

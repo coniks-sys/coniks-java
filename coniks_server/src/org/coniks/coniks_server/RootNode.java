@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -33,10 +33,11 @@
 
 package org.coniks.coniks_server;
 
-/** Represents a root node in the CONIKS binary Merkle
- * prefix tree.
+/** Represents a root node in the binary Merkle
+ * prefix tree underlying the CONIKS key directory.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Aaron Blankstein
  */
 public class RootNode extends InteriorNode{
 
@@ -58,8 +59,6 @@ public class RootNode extends InteriorNode{
      * with left and right subtrees {@code l} and {@code r}
      * and their corresponding hashes {@code lh} and {@code rh},
      * and the level in tree {@code lvl}.
-     *<p>
-     * This is the constructor used {@link RootNode#clone(long, long)}.
      */
     public RootNode(TreeNode l, TreeNode r, int lvl, byte[] lh, byte[] rh){
 	super(l, r, null, lvl, lh, rh, false);	
@@ -82,8 +81,7 @@ public class RootNode extends InteriorNode{
         this.rightHash= r;
     }
 
-     /** Clones (i.e. duplicates) this root node from the current
-     * epoch {@code ep0} for the next epoch {@code ep1}.
+    /** Clones (i.e. duplicates) this root node.
      * It then recursively 
      * calls this function on the original root node's two subtrees.
      *<p>

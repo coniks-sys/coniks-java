@@ -42,7 +42,6 @@ import org.javatuples.*;
 
 /** Implements the high-level key directory-related operations performed by a
  * CONIKS server.
- *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Michael Rochlin
  */
@@ -127,7 +126,7 @@ public class DirectoryOps {
   
         // this should never be the case
         if(ServerHistory.getCurSTR() == null){
-            ConiksServer.serverLog.error("Trying to update a server without a history.");
+            ServerLogger.error("Trying to update a server without a history.");
             return null;
         }
         

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -57,42 +57,99 @@ public class ServerConfig{
 
     /** The port number on which the CONIKS server is listening
      */
-    public static int PORT = -1;
+    private static int PORT = -1;
 
     /** A short name for the server (e.g. an alias used when
      * generating certificates for this server
      */
-    public static String NAME = "";
+    private static String NAME = "";
 
     /** The server's full hostname (can also be an IP address)
      */
-    public static String FULL_NAME = "";
+    private static String FULL_NAME = "";
 
     /** The time interval between epochs in milliseconds
      */
-    public static int EPOCH_INTERVAL = -1;
+    private static int EPOCH_INTERVAL = -1;
 
     /** The path to the server's private key store
      */
-    public static String KEYSTORE_PATH = "";
+    private static String KEYSTORE_PATH = "";
 
     /** The password to the server's private key store
      */
-    public static String KEYSTORE_PWD = "";
+    private static String KEYSTORE_PWD = "";
     
     /** The path to the server's trusted certificate store
      */
-    public static String TRUSTSTORE_PATH = "";
+    private static String TRUSTSTORE_PATH = "";
     
     /** The password to the server's trusted certificate store
      */
-    public static String TRUSTSTORE_PWD = "";
+    private static String TRUSTSTORE_PWD = "";
 
     /** The UNIX epoch time at which this instance of the server
      * was started up. This is used as the starting point for "counting" epochs.
      */
-    public static long STARTUP_TIME = -1;
+    private static long STARTUP_TIME = -1;
 
+    /** Returns the {@code PORT} number at which the server is listening.
+     */
+    public static int getPort() {
+        return PORT;
+    }
+
+    /** Returns the short server {@code NAME} used to refer to the server.
+     */
+    public static String getName() {
+        return NAME;
+    }
+
+    /** Returns the full server {@code NAME} used to address the server over the network.
+     */
+    public static String getFullName() {
+        return FULL_NAME;
+    }
+
+    /** Returns the {@code EPOCH_INTERVAL} used to indicate the frequence of CONIKS 
+     * directory updates.
+     */
+    public static int getEpochInterval() {
+        return EPOCH_INTERVAL;
+    }
+
+    /** Returns the path to the server's keystore {@code KEYSTORE_PATH}.
+     */
+    public static String getKeystorePath() {
+        return KEYSTORE_PATH;
+    }
+
+    /** Returns the password to the server's keystore {@code KEYSTORE_PWD}.
+     */
+    public static String getKeystorePassword() {
+        return KEYSTORE_PWD;
+    }
+
+    /** Returns the path to the server's truststore {@code TRUSTSTORE_PATH}.
+     */
+    public static String getTruststorePath() {
+        return TRUSTSTORE_PATH;
+    }
+
+    /** Returns the password to the server's truststore {@code TRUSTSTORE_PWD}.
+     */
+    public static String getTruststorePassword() {
+        return TRUSTSTORE_PWD;
+    }
+
+    /** Returns the server's {@code STARTUP_TIME}.
+     */
+    public static long getStartupTime() {
+        return STARTUP_TIME;
+    }
+
+    // no public setters since we don't want to change the config once its set
+    
     /** Set a {@link ConiksServer}'s configuration according to the parameters in
      * {@code configFile}.
      *
@@ -138,7 +195,7 @@ public class ServerConfig{
             return true;
         }
         catch (Exception e) {
-            ConiksServer.serverLog.error("ServerConfig: "+e.getMessage());
+            ServerLogger.error("ServerConfig: "+e.getMessage());
         }
 
         return false;

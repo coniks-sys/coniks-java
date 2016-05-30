@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
 
 package org.coniks.coniks_server;
 
-/** Represents an leaf node used for padding 
+/** Represents a leaf node used for padding 
  * in the CONIKS binary Merkle prefix tree.
  *<p>
  *Currently unused.

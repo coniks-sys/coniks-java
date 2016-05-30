@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2016, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -47,21 +47,11 @@ public class ClientLogger {
 
     private static Logger logger;
 
-    private ClientLogger (String clientLog) {
-        logger = Logger.getLogger("ConiksLogger-Client");
-        setup(clientLog);
-    }
-
-     /** Generates a single instance of the main client logger
-     * that writes the log at the location given by {@code clientLog}.
+    /** Sets up a logger for the CONIKS client.
      *
-     *@return A new client logger.
+     *@param clientLog the file name for this logger.
      */
-    public static ClientLogger getInstance(String clientLog) {
-        return new ClientLogger(clientLog);
-    }
-
-    private static void setup (String clientLog) {
+    public static void setup (String clientLog) {
 
         // suppress the logging output to the console
         logger.setUseParentHandlers(false);

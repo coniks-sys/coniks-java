@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -49,21 +49,11 @@ public class MsgHandlerLogger {
 
     private static Logger logger;
 
-    private MsgHandlerLogger (String msgHandlerLog) {
-        logger = Logger.getLogger("ConiksLogger-MsgHandler");
-        setup(msgHandlerLog);
-    }
-
-    /** Generates a single instance of the message handler logger
-     * that writes the log at the location given by {@code serverLog}.
+    /** Sets up a message handler logger for the CONIKS server.
      *
-     *@return A new message handler logger.
+     *@param msgHandlerLog the file name for this logger.
      */
-    public static MsgHandlerLogger getInstance(String msgHandlerLog) {
-        return new MsgHandlerLogger(msgHandlerLog);
-    }
-
-    private static void setup (String msgHandlerLog) {
+    public static void setup (String msgHandlerLog) {
 
         // suppress the logging output to the console
         logger.setUseParentHandlers(false);

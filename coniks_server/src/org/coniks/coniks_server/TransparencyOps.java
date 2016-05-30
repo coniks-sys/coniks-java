@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -53,6 +53,8 @@ import org.javatuples.*;
  * These allow a CONIKS client to perform the consistency checks.
  * 
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Aaron Blankstein
+ *@author Michael Rochlin
  */
 public class TransparencyOps{
 
@@ -106,7 +108,6 @@ public class TransparencyOps{
         AuthPath.Builder authPath = AuthPath.newBuilder();
 
         //first take care of setting the UserLeafNode
-        // TODO update for new uln version
         AuthPath.UserLeafNode.Builder ulnBuilder = AuthPath.UserLeafNode.newBuilder();
         ulnBuilder.setName(uln.getUsername());
         ulnBuilder.setPublickey(uln.getPublicKey());
@@ -156,7 +157,7 @@ public class TransparencyOps{
             byte[] prunedChildHash = new byte[ServerUtils.HASH_SIZE_BYTES];
 
 	    if (runner == null){
-		ConiksServer.serverLog.error("Null runner" + curOffset);
+		ServerLogger.error("Null runner" + curOffset);
 	    }
 
             if (runner instanceof RootNode) {
@@ -179,7 +180,7 @@ public class TransparencyOps{
                 Hash.Builder subtree = Hash.newBuilder();
                 ArrayList<Integer> subTreeHashList = ServerUtils.byteArrToIntList(prunedChildHash);
                 if(subTreeHashList.size() != ServerUtils.HASH_SIZE_BYTES){
-                    ConiksServer.serverLog.error("Bad length of pruned child hash: "+subTreeHashList.size());
+                    ServerLogger.error("Bad length of pruned child hash: "+subTreeHashList.size());
                     return null;
                 }
                 subtree.setLen(subTreeHashList.size());
@@ -209,7 +210,7 @@ public class TransparencyOps{
                 Hash.Builder subtree = Hash.newBuilder();
                 ArrayList<Integer> subTreeHashList = ServerUtils.byteArrToIntList(prunedChildHash);
                 if(subTreeHashList.size() != ServerUtils.HASH_SIZE_BYTES){
-                    ConiksServer.serverLog.error("Bad length of pruned child hash: "+subTreeHashList.size());
+                    ServerLogger.error("Bad length of pruned child hash: "+subTreeHashList.size());
                     return null;
                 }
                 subtree.setLen(subTreeHashList.size());
@@ -218,7 +219,7 @@ public class TransparencyOps{
                 interiorList.add(0, inBuilder.build());
 		
 		if (runner == null){
-		    ConiksServer.serverLog.error("such sadness...");
+		    ServerLogger.error("such sadness...");
 		}
 
                 curOffset++;
@@ -242,7 +243,7 @@ public class TransparencyOps{
          ArrayList<Integer> hashList = ServerUtils.byteArrToIntList(hashBytes);
          
          if(hashList.size() != ServerUtils.HASH_SIZE_BYTES){
-            ConiksServer.serverLog.error("Bad length of "+name+": "+hashList.size());
+            ServerLogger.error("Bad length of "+name+": "+hashList.size());
             return null;
         }
 

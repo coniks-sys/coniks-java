@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2016, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -50,12 +50,12 @@ public class SignedTreeRoot {
     byte[] sig;
     SignedTreeRoot prev;
 
-        /** Constructs a signed tree root containing the RootNode
-         * {@code r}, the signature {@code sig}, the previous epoch
-         * {@code prevEp}, the hash of the previous STR {@code prevHash},
-         * the signature {@code sig}, and the previous STR in the chain 
-         {@code p} for epoch {@code ep}.
-         */
+    /** Constructs a signed tree root containing the RootNode
+     * {@code r}, the signature {@code sig}, the previous epoch
+     * {@code prevEp}, the hash of the previous STR {@code prevHash},
+     * the signature {@code sig}, and the previous STR in the chain 
+     {@code p} for epoch {@code ep}.
+    */
     public SignedTreeRoot(RootNode r, long ep, long prevEp, 
                           byte[] prevHash, byte[] sig, SignedTreeRoot p){
 	    this.root = r;

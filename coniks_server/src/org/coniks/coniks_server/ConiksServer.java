@@ -72,6 +72,7 @@ import java.util.Arrays;
  * and signed tree root (STR) generation.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Aaron Blankstein
  *@author Michael Rochlin
  */
 public class ConiksServer{
@@ -86,11 +87,6 @@ public class ConiksServer{
     private static Timer epochTimer = new Timer("epoch timer", false); // may wish to run as daemon later
 
     private static long initEpoch;
-
-    // logs are useful
-    public static MsgHandlerLogger msgLog = null;
-    private static TimerLogger timerLog = null;
-    public static ServerLogger serverLog = null;
 
     /** Initialize the directory: get the latest root node from the 
      * database (if using one) and update the directory internally (i.e. build the hash tree)
@@ -166,18 +162,18 @@ public class ConiksServer{
         }
         
         // set some more configs
-        initEpoch = ServerConfig.STARTUP_TIME;
-        msgLog = MsgHandlerLogger.getInstance(logPath+"/msg-handler-%g");
-        timerLog = TimerLogger.getInstance(logPath+"/epoch-timer-%g");
-        serverLog = ServerLogger.getInstance(logPath+"/server-%g");
+        initEpoch = ServerConfig.getStartupTime();
+        MsgHandlerLogger.setup(logPath+"/msg-handler-%g");
+        TimerLogger.setup(logPath+"/epoch-timer-%g");
+        ServerLogger.setup(logPath+"/server-%g");
 
-        System.setProperty("javax.net.ssl.keyStore", ServerConfig.KEYSTORE_PATH);
-        System.setProperty("javax.net.ssl.keyStorePassword", ServerConfig.KEYSTORE_PWD);
+        System.setProperty("javax.net.ssl.keyStore", ServerConfig.getKeystorePath());
+        System.setProperty("javax.net.ssl.keyStorePassword", ServerConfig.getKeystorePassword());
 
         // this is needed to set up the SSL connection
         if (isFullOp) {
-            System.setProperty("javax.net.ssl.trustStore", ServerConfig.TRUSTSTORE_PATH);
-            System.setProperty("javax.net.ssl.trustStorePassword", ServerConfig.TRUSTSTORE_PWD);
+            System.setProperty("javax.net.ssl.trustStore", ServerConfig.getTruststorePath());
+            System.setProperty("javax.net.ssl.trustStorePassword", ServerConfig.getTruststorePassword());
         }
 
         RootNode initRoot = initDirectory(); // initializes the directory
@@ -185,7 +181,7 @@ public class ConiksServer{
         // check that we got a good first tree
         if(initRoot == null) {
             if (isFullOp) {
-                serverLog.error("An error occured while trying to build the initial tree");
+                ServerLogger.error("An error occured while trying to build the initial tree");
             }
             else {
                 ServerUtils.printStatusMsg(true, "An error occured while trying to build the initial tree");
@@ -205,8 +201,8 @@ public class ConiksServer{
         
     	ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleWithFixedDelay(epochSnapshotTaker, 
-    					 ServerConfig.EPOCH_INTERVAL, 
-    					 ServerConfig.EPOCH_INTERVAL,
+    					 ServerConfig.getEpochInterval(), 
+    					 ServerConfig.getEpochInterval(),
     					 TimeUnit.MILLISECONDS);
 
         ServerMessaging.listenForRequests(isFullOp);
@@ -218,13 +214,13 @@ public class ConiksServer{
     private static class EpochTimerTask implements Runnable {
 
         public void run() {
-	    timerLog.log("Timer task started.");
+	    TimerLogger.log("Timer task started.");
             RootNode nextRoot = DirectoryOps.updateDirectory();
 
             // check that we got a good first tree
             if(nextRoot == null) {
                 if (isFullOp) {
-                    serverLog.error("An error occured while trying to update the tree");
+                    ServerLogger.error("An error occured while trying to update the tree");
                 }
                 else {
                     ServerUtils.printStatusMsg(true, "An error occured while trying to update the tree");
@@ -240,7 +236,7 @@ public class ConiksServer{
 
             if (!ServerHistory.updateHistory(nextSTR)) {
                 if (isFullOp) {
-                    serverLog.error("An error occured while trying to update the tree");
+                    ServerLogger.error("An error occured while trying to update the tree");
                 }
                 else {
                     ServerUtils.printStatusMsg(true, "An error occured while trying to update the tree");
@@ -251,7 +247,7 @@ public class ConiksServer{
 
             // we're here so the update went well
             if (isFullOp) {
-                serverLog.log("Directory update successful. Next epoch: "+nextEpoch);
+                ServerLogger.log("Directory update successful. Next epoch: "+nextEpoch);
             }
             else {
                 ServerUtils.printStatusMsg(false, "Directory update successful. Next epoch: "+nextEpoch);

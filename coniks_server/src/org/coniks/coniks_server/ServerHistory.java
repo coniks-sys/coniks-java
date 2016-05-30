@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2016, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,7 @@ public class ServerHistory {
     public static synchronized boolean initHistory(RootNode root, long ep,
                                                 long prevEp, byte[] prevStrHash) {
         if (curSTR != null) {
-            ConiksServer.serverLog.error("Trying to override existing history");
+            ServerLogger.error("Trying to override existing history");
             return false;
         }
 
@@ -69,7 +69,7 @@ public class ServerHistory {
 
         // want to make sure we didn't get a null STR
         if (curSTR == null) {
-            ConiksServer.serverLog.error("Got a null STR from the init");
+            ServerLogger.error("Got a null STR from the init");
             return false;
         }
 
@@ -88,12 +88,12 @@ public class ServerHistory {
         
         // sanity check the input
         if (newSTR == null) {
-            ConiksServer.serverLog.error("Got null STR");
+            ServerLogger.error("Got null STR");
             return false;
         }
 
         if (newSTR.getEpoch() < nextEpoch()) {
-            ConiksServer.serverLog.error("Next epoch's STR has bad epoch");
+            ServerLogger.error("Next epoch's STR has bad epoch");
             return false;
         }
 
@@ -166,7 +166,7 @@ public class ServerHistory {
      *@return the next epoch time.
      */
     public static synchronized long nextEpoch() {
-        return  curSTR.getEpoch()+ServerConfig.EPOCH_INTERVAL;
+        return  curSTR.getEpoch()+ServerConfig.getEpochInterval();
     }
 
 }

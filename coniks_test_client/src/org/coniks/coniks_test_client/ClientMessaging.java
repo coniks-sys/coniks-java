@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2016, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -83,8 +83,8 @@ public class ClientMessaging {
     }
 
     /** Sends a Registration protobuf message for the given
-        user to the {@code server}.
-    */
+     * {@code user} to the {@code server}.
+     */
     public static void sendRegistrationProto (ClientUser user,
                                               String server) {
         
@@ -96,9 +96,9 @@ public class ClientMessaging {
     }
 
     /** Sends a KeyLookup protobuf message with the given
-        {@code username} and {@code epoch} to
-        to the {@code server}.
-    */
+     *   {@code username} and {@code epoch} to
+     *  to the {@code server}.
+     */
     public static void sendKeyLookupProto (String username, long epoch,
                                               String server) {
 
@@ -108,9 +108,10 @@ public class ClientMessaging {
     }
 
     /** Sends a CommitmentReq protobuf message requesting {@code provider}'s 
-        commitment for {@code epoch} from {@code server}.
-        If the server and provider are the same, {@code commitmentType} 
-        is {@code SELF}, otherwise it is {@code WITNESSED}.
+     *  signed tree root for {@code epoch} from {@code server}.
+     *  If the server and provider are the same, {@code commitmentType} 
+     *  is {@code SELF}, otherwise it is {@code WITNESSED}.
+     * (Unused)
     */
     public static void sendCommitmentReqProto (
                                                CommitmentReq.CommitmentType commitmentType, 
@@ -122,7 +123,9 @@ public class ClientMessaging {
 
     }
 
-    /** Sends a ULNChangeReq protobuf message with all the arguments */
+    /** Sends a ULNChangeReq protobuf message for the given {@code user}
+     * to the {@code server}.
+     */
     public static void sendULNChangeReqProto(ClientUser user, String server) {
         
         ULNChangeReq changeReq = buildULNChangeReqMsgProto(user.getUsername(), user.getKeyData(),
@@ -131,7 +134,10 @@ public class ClientMessaging {
         sendMsgProto(MsgType.ULNCHANGE_REQ, changeReq, server);
     }
 
-    /** Sends a SignedULNChangeReq protobuf with all the arguments and signed with {@code prk} */
+    /** Sends a SignedULNChangeReq protobuf for the given user {@code user}
+     * including the signature on the the change message {@code sig} to 
+     * the {@code server}.
+     */
     public static void sendSignedULNChangeReqProto(ClientUser user,
                                                    byte[] sig,
                                                    String server) {
@@ -220,9 +226,9 @@ public class ClientMessaging {
     }
 
     /** Builds the ULNChangeReq protobuf message with a given 
-        {@code username} {@code blob} {@code changeKey}
-        {@code allowsUnsignedKeychange} {@code allowsPublicLookup}
-        The blob and changeKey fields may be null if no change is requested
+     * {@code username} {@code blob} {@code changeKey}
+     * {@code allowsUnsignedKeychange} {@code allowsPublicLookup}
+     *  The blob and changeKey fields may be null if no change is requested
     */
     public static ULNChangeReq buildULNChangeReqMsgProto(String username,
                                                           String blob,
@@ -307,7 +313,7 @@ public class ClientMessaging {
     }
 
      /** Receives and parses a Commitment protobuf message
-     * from the server 
+     * from the server. (Unused)
      *
      *@return The AbstractMessage (either of type ServerResp or Commitment) 
      *upon success. {@code null} otherwise.
@@ -420,10 +426,10 @@ public class ClientMessaging {
         if (isFullOp) {
             SSLSocketFactory sslFact =
                 (SSLSocketFactory)SSLSocketFactory.getDefault();
-            sock = (SSLSocket)sslFact.createSocket(server, ClientConfig.PORT);
+            sock = (SSLSocket)sslFact.createSocket(server, ClientConfig.getPort());
         }
         else {
-            sock = new Socket(server, ClientConfig.PORT);
+            sock = new Socket(server, ClientConfig.getPort());
         }
         dout = new DataOutputStream(sock.getOutputStream());
         din = new DataInputStream(sock.getInputStream());

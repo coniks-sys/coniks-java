@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -54,6 +54,7 @@ import org.javatuples.Triplet;
  * server.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Aaron Blankstein
  *@author Michael Rochlin
  */
 public class ServerUtils{
@@ -333,6 +334,7 @@ public class ServerUtils{
     public static byte[] getUserLeafNodeBytes(UserLeafNode uln){
         byte[] pubKey = strToBytes(uln.getPublicKey());
 	byte[] usr = strToBytes(uln.getUsername());
+        byte[] ck = convertDSAPubKey(uln.getChangeKey());
         byte[] ep_add = longToBytes(uln.getEpochAdded());
         byte[] auk = new byte[]{(byte)(uln.allowsUnsignedKeychange() ? 0x01 : 0x00)};
         byte[] apl = new byte[]{(byte)(uln.allowsPublicLookups() ? 0x01 : 0x00)};
@@ -343,6 +345,7 @@ public class ServerUtils{
 	ByteBuffer arr = ByteBuffer.wrap(leafBytes);
 	arr.put(usr);
 	arr.put(pubKey);
+        arr.put(ck);
 	arr.put(ep_add);
 	arr.put(auk);
         arr.put(apl);
@@ -396,7 +399,7 @@ public class ServerUtils{
         byte[] rootBytes = getRootNodeBytes(rn);
 
         if (rootBytes == null) {
-            ConiksServer.serverLog.error("getSTRBytesForSig: Oops, couldn't get the root node bytes");
+            ServerLogger.error("getSTRBytesForSig: Oops, couldn't get the root node bytes");
             return null;
         }
 
@@ -425,7 +428,7 @@ public class ServerUtils{
         byte[] rootBytes = getRootNodeBytes(str.getRoot());
 
         if (rootBytes == null) {
-            ConiksServer.serverLog.error("getSTRBytes: Oops, couldn't get the root node bytes");
+            ServerLogger.error("getSTRBytes: Oops, couldn't get the root node bytes");
             return null;
         }
 
@@ -453,6 +456,7 @@ public class ServerUtils{
      * first 24 bits.
      *
      *@author Marcela S. Melara (melara@cs.princeton.edu)
+     *@author Michael Rochlin
      */
     public static class PrefixComparator implements Comparator<Triplet<byte[], UserLeafNode, Operation>> {	
         
@@ -491,7 +495,7 @@ public class ServerUtils{
                 return -1;
             }
             if (op1 instanceof KeyChange && op2 instanceof KeyChange) {
-                return (((KeyChange)op1).counter > ((KeyChange)op2).counter) ? 1 : -1;
+                return (((KeyChange)op1).getCounter() > ((KeyChange)op2).getCounter()) ? 1 : -1;
             }
             
 	    return 0;

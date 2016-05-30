@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2016, Princeton University.
+  Copyright (c) 2015-16, Princeton University.
   All rights reserved.
   
   Redistribution and use in source and binary forms, with or without
@@ -57,26 +57,10 @@ import java.io.ObjectOutputStream;
  */
 public class SignatureOps{
 
-    /** Makes a DSA PublicKey from the given parameters */
-    public static PublicKey makeDSAPublicKeyFromParams(BigInteger p, BigInteger q, BigInteger g, BigInteger y) {
-        try {
-            KeyFactory keyFactory = KeyFactory.getInstance("DSA");
-            KeySpec publicKeySpec = new DSAPublicKeySpec(y, p, q, g);
-            return keyFactory.generatePublic(publicKeySpec);
-        }
-        catch(InvalidParameterException e) {
-            ClientLogger.error("The given key is invalid.");
-        }
-        catch (InvalidKeySpecException e) {
-            ClientLogger.error("The given key params are invalid.");
-        }
-        catch(NoSuchAlgorithmException e){
-            ClientLogger.error("DSA is invalid for some reason.");
-        }
-        return null;
-    }
-
-    /** Verifies {@code msg} and the {@code sig} using the DSA PublicKey {@code pk} */
+    /** Verifies {@code msg} and the {@code sig} using the DSA PublicKey {@code pk} 
+     *
+     *@return {@code true} if the signature is valid, {@code false} otherwise.
+     */
     public static boolean verifySigFromDSA(byte[] msg, byte[] sig, PublicKey pk) {
         try {
             Signature verifyalg = Signature.getInstance("DSA");

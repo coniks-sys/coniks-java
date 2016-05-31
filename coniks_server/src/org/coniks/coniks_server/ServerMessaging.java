@@ -86,11 +86,11 @@ public class ServerMessaging {
      *@param epochInterval the frequency with which the server updates its directory.
      *@param socket the client socket to which to send the message
      */
-    public static synchronized void sendRegistrationRespProto(long initEpoch, int epochInterval,
+    public static synchronized void sendRegistrationRespProto(long regEpoch, int epochInterval,
                                                               Socket socket){
         MsgHandlerLogger.log("Sending registration response... ");
           
-        RegistrationResp regResp = buildRegistrationRespMsg(initEpoch, epochInterval);
+        RegistrationResp regResp = buildRegistrationRespMsg(regEpoch, epochInterval);
         sendMsgProto(MsgType.REGISTRATION_RESP, regResp, socket);
     }
     

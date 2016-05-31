@@ -57,7 +57,7 @@ public class ConiksUser {
      *
      *@param uname this user's username
      *@param data this user's key data
-     *@param changePubKey this user's change public key
+     *@param changePk this user's change public key
      */
     public ConiksUser (String uname, String data, DSAPublicKey changePk) {
         username = uname;

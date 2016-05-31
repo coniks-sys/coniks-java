@@ -64,7 +64,7 @@ public class ConsistencyChecks {
      * disk and checks if the retrieved key is consistent with the public key
      * received in the auth path.
      *
-     *@param uname the user whose public key to verify
+     *@param user the user whose public key to verify
      *@param authPath the auth path containing the received public key
      *@return whether the check succeeded
      */
@@ -133,7 +133,7 @@ public class ConsistencyChecks {
     /** Verifies that a given mapping is consistent with the server's STR
      * using the proof {@code authPath} and the STR {@code comm}.
      *
-     *@return A {@link utils.ConsistencyErr} error code. {@code NO_ERR} indicates
+     *@return A {@link ConsistencyErr} error code. {@code NO_ERR} indicates
      * that the verification passed.
      */
     public static int verifyMappingProto (AuthPath authPath, Commitment comm){

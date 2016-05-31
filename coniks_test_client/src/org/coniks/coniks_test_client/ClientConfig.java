@@ -112,7 +112,7 @@ public class ClientConfig{
         return TRUSTSTORE_PWD;
     }
 
-     /** Set a {@link ConiksClient}'s configuration according to the parameters in
+     /** Set a {@link TestClient}'s configuration according to the parameters in
      * {@code configFile}.
      *
      * The client has already checked that {@code configFile} exists, but the

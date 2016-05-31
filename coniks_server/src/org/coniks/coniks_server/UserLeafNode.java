@@ -220,7 +220,7 @@ public class UserLeafNode extends LeafNode implements Serializable {
 
     /** Sets the key data in this leaf to {@code keyData}.
      *<p>
-     * Same as {@link UserLeafNode#setPublicKey()}, but using the more generic
+     * Same as {@link UserLeafNode#setPublicKey(String)}, but using the more generic
      * key data terminology representing that the mapping may also contain other data.
      */
     public void setKeyData(String keyData) {

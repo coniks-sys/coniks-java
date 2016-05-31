@@ -123,7 +123,7 @@ public class ServerUtils{
 
     /** Generates the cryptographic hash of the {@code left} 
      * and {@code right} subtree hashes of a Merkle tree node.
-     * This is really just a wrapper around {@link ClientUtils#hash(byte[])}.
+     * This is really just a wrapper around {@link ServerUtils#hash(byte[])}.
      *
      *@return The hash as a {@code byte[]} or null in case of an error.
      */

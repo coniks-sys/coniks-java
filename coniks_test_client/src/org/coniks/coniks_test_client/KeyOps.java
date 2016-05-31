@@ -215,7 +215,7 @@ public class KeyOps{
      *
      *@param uname the username for which the key pair is to be saved
      *@param kp the key pair to be saved
-     *@param whether the save succeeded
+     *@return whether the save succeeded
      */
     public static boolean saveDSAKeyPairFile(String uname, KeyPair kp) {
         

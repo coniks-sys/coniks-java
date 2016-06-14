@@ -1,4 +1,4 @@
-This license applies to all parts of the CONIKS Server except the following:
+This license applies to all parts of the CONIKS Reference Implementation except the following:
 - The Protocol Buffers library, located in coniks_common/src/com/google/protobuf/
 This library is copyrighted by Google Inc.
 - The Javatuples typesafe representation of tuples in Java,

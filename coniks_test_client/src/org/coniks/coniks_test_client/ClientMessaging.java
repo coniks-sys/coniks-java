@@ -37,7 +37,9 @@ import javax.net.ssl.*;
 import java.net.*;
 import java.io.*;
 
-import com.google.protobuf.*;
+import com.google.protobuf.AbstractMessage;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import org.coniks.coniks_common.MsgType;
 import org.coniks.coniks_common.CommonMessaging;
@@ -257,7 +259,7 @@ public class ClientMessaging {
 
         SignedULNChangeReq.Builder ulnChangeBuilder = SignedULNChangeReq.newBuilder();
         ulnChangeBuilder.setReq(changeReq);
-        ulnChangeBuilder.addAllSig(ClientUtils.byteArrToIntList(sig));
+        ulnChangeBuilder.setSig(ByteString.copyFrom(sig));
        
         return ulnChangeBuilder.build();
     }

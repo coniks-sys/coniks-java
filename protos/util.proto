@@ -41,13 +41,13 @@ option java_outer_classname = "UtilProtos";
 message Hash{
         // check that len matches the Hash size in bytes defined in client/server
         optional int32 len = 1;  // need to check that len field is specified
-        repeated fixed32 hash = 2 [packed = true];
+        optional bytes hash = 2;
 }
 
 message Commitment{
         optional uint64 epoch = 1;  // this is actually the epoch date in milli seconds
         optional Hash root_hash = 2;  // need to check that root hash is included
-        repeated fixed32 signature = 3;
+        optional bytes signature = 3;
 }
 
 message ServerResp{

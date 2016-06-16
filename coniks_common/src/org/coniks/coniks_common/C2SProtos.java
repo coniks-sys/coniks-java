@@ -14,7 +14,6 @@
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
-
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
@@ -3189,17 +3188,13 @@ public final class C2SProtos {
     org.coniks.coniks_common.C2SProtos.ULNChangeReqOrBuilder getReqOrBuilder();
 
     /**
-     * <code>repeated fixed32 sig = 2 [packed = true];</code>
+     * <code>optional bytes sig = 2;</code>
      */
-    java.util.List<java.lang.Integer> getSigList();
+    boolean hasSig();
     /**
-     * <code>repeated fixed32 sig = 2 [packed = true];</code>
+     * <code>optional bytes sig = 2;</code>
      */
-    int getSigCount();
-    /**
-     * <code>repeated fixed32 sig = 2 [packed = true];</code>
-     */
-    int getSig(int index);
+    com.google.protobuf.ByteString getSig();
   }
   /**
    * Protobuf type {@code org.coniks.coniks_common.SignedULNChangeReq}
@@ -3266,25 +3261,9 @@ public final class C2SProtos {
               bitField0_ |= 0x00000001;
               break;
             }
-            case 21: {
-              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-                sig_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000002;
-              }
-              sig_.add(input.readFixed32());
-              break;
-            }
             case 18: {
-              int length = input.readRawVarint32();
-              int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002) && input.getBytesUntilLimit() > 0) {
-                sig_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000002;
-              }
-              while (input.getBytesUntilLimit() > 0) {
-                sig_.add(input.readFixed32());
-              }
-              input.popLimit(limit);
+              bitField0_ |= 0x00000002;
+              sig_ = input.readBytes();
               break;
             }
           }
@@ -3295,9 +3274,6 @@ public final class C2SProtos {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-          sig_ = java.util.Collections.unmodifiableList(sig_);
-        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -3373,31 +3349,23 @@ public final class C2SProtos {
     }
 
     public static final int SIG_FIELD_NUMBER = 2;
-    private java.util.List<java.lang.Integer> sig_;
+    private com.google.protobuf.ByteString sig_;
     /**
-     * <code>repeated fixed32 sig = 2 [packed = true];</code>
+     * <code>optional bytes sig = 2;</code>
      */
-    public java.util.List<java.lang.Integer>
-        getSigList() {
+    public boolean hasSig() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional bytes sig = 2;</code>
+     */
+    public com.google.protobuf.ByteString getSig() {
       return sig_;
     }
-    /**
-     * <code>repeated fixed32 sig = 2 [packed = true];</code>
-     */
-    public int getSigCount() {
-      return sig_.size();
-    }
-    /**
-     * <code>repeated fixed32 sig = 2 [packed = true];</code>
-     */
-    public int getSig(int index) {
-      return sig_.get(index);
-    }
-    private int sigMemoizedSerializedSize = -1;
 
     private void initFields() {
       req_ = org.coniks.coniks_common.C2SProtos.ULNChangeReq.getDefaultInstance();
-      sig_ = java.util.Collections.emptyList();
+      sig_ = com.google.protobuf.ByteString.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -3421,12 +3389,8 @@ public final class C2SProtos {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeMessage(1, req_);
       }
-      if (getSigList().size() > 0) {
-        output.writeRawVarint32(18);
-        output.writeRawVarint32(sigMemoizedSerializedSize);
-      }
-      for (int i = 0; i < sig_.size(); i++) {
-        output.writeFixed32NoTag(sig_.get(i));
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(2, sig_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -3441,16 +3405,9 @@ public final class C2SProtos {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, req_);
       }
-      {
-        int dataSize = 0;
-        dataSize = 4 * getSigList().size();
-        size += dataSize;
-        if (!getSigList().isEmpty()) {
-          size += 1;
-          size += com.google.protobuf.CodedOutputStream
-              .computeInt32SizeNoTag(dataSize);
-        }
-        sigMemoizedSerializedSize = dataSize;
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, sig_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -3576,7 +3533,7 @@ public final class C2SProtos {
           reqBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000001);
-        sig_ = java.util.Collections.emptyList();
+        sig_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
@@ -3614,9 +3571,8 @@ public final class C2SProtos {
         } else {
           result.req_ = reqBuilder_.build();
         }
-        if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          sig_ = java.util.Collections.unmodifiableList(sig_);
-          bitField0_ = (bitField0_ & ~0x00000002);
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
         }
         result.sig_ = sig_;
         result.bitField0_ = to_bitField0_;
@@ -3638,15 +3594,8 @@ public final class C2SProtos {
         if (other.hasReq()) {
           mergeReq(other.getReq());
         }
-        if (!other.sig_.isEmpty()) {
-          if (sig_.isEmpty()) {
-            sig_ = other.sig_;
-            bitField0_ = (bitField0_ & ~0x00000002);
-          } else {
-            ensureSigIsMutable();
-            sig_.addAll(other.sig_);
-          }
-          onChanged();
+        if (other.hasSig()) {
+          setSig(other.getSig());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -3860,68 +3809,37 @@ public final class C2SProtos {
         return reqBuilder_;
       }
 
-      private java.util.List<java.lang.Integer> sig_ = java.util.Collections.emptyList();
-      private void ensureSigIsMutable() {
-        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-          sig_ = new java.util.ArrayList<java.lang.Integer>(sig_);
-          bitField0_ |= 0x00000002;
-         }
+      private com.google.protobuf.ByteString sig_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes sig = 2;</code>
+       */
+      public boolean hasSig() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>repeated fixed32 sig = 2 [packed = true];</code>
+       * <code>optional bytes sig = 2;</code>
        */
-      public java.util.List<java.lang.Integer>
-          getSigList() {
-        return java.util.Collections.unmodifiableList(sig_);
+      public com.google.protobuf.ByteString getSig() {
+        return sig_;
       }
       /**
-       * <code>repeated fixed32 sig = 2 [packed = true];</code>
+       * <code>optional bytes sig = 2;</code>
        */
-      public int getSigCount() {
-        return sig_.size();
-      }
-      /**
-       * <code>repeated fixed32 sig = 2 [packed = true];</code>
-       */
-      public int getSig(int index) {
-        return sig_.get(index);
-      }
-      /**
-       * <code>repeated fixed32 sig = 2 [packed = true];</code>
-       */
-      public Builder setSig(
-          int index, int value) {
-        ensureSigIsMutable();
-        sig_.set(index, value);
+      public Builder setSig(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        sig_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>repeated fixed32 sig = 2 [packed = true];</code>
-       */
-      public Builder addSig(int value) {
-        ensureSigIsMutable();
-        sig_.add(value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated fixed32 sig = 2 [packed = true];</code>
-       */
-      public Builder addAllSig(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureSigIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, sig_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated fixed32 sig = 2 [packed = true];</code>
+       * <code>optional bytes sig = 2;</code>
        */
       public Builder clearSig() {
-        sig_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000002);
+        sig_ = getDefaultInstance().getSig();
         onChanged();
         return this;
       }
@@ -6246,23 +6164,19 @@ public final class C2SProtos {
       boolean getAllowsPublicLookup();
 
       /**
-       * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
+       * <code>optional bytes lookup_index = 7;</code>
        */
-      java.util.List<java.lang.Integer> getLookupIndexList();
+      boolean hasLookupIndex();
       /**
-       * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
+       * <code>optional bytes lookup_index = 7;</code>
        */
-      int getLookupIndexCount();
-      /**
-       * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
-       */
-      int getLookupIndex(int index);
+      com.google.protobuf.ByteString getLookupIndex();
 
       /**
        * <code>optional uint32 intlevels = 8;</code>
        *
        * <pre>
-       *repeated fixed32 signature = 7;
+       * needed so client can loop over interior nodes
        * </pre>
        */
       boolean hasIntlevels();
@@ -6270,23 +6184,19 @@ public final class C2SProtos {
        * <code>optional uint32 intlevels = 8;</code>
        *
        * <pre>
-       *repeated fixed32 signature = 7;
+       * needed so client can loop over interior nodes
        * </pre>
        */
       int getIntlevels();
 
       /**
-       * <code>repeated fixed32 signature = 9 [packed = true];</code>
+       * <code>optional bytes signature = 9;</code>
        */
-      java.util.List<java.lang.Integer> getSignatureList();
+      boolean hasSignature();
       /**
-       * <code>repeated fixed32 signature = 9 [packed = true];</code>
+       * <code>optional bytes signature = 9;</code>
        */
-      int getSignatureCount();
-      /**
-       * <code>repeated fixed32 signature = 9 [packed = true];</code>
-       */
-      int getSignature(int index);
+      com.google.protobuf.ByteString getSignature();
 
       /**
        * <code>optional .org.coniks.coniks_common.DSAPublicKeyProto changeKey = 10;</code>
@@ -6302,17 +6212,13 @@ public final class C2SProtos {
       org.coniks.coniks_common.C2SProtos.DSAPublicKeyProtoOrBuilder getChangeKeyOrBuilder();
 
       /**
-       * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
+       * <code>optional bytes lastMsg = 11;</code>
        */
-      java.util.List<java.lang.Integer> getLastMsgList();
+      boolean hasLastMsg();
       /**
-       * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
+       * <code>optional bytes lastMsg = 11;</code>
        */
-      int getLastMsgCount();
-      /**
-       * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
-       */
-      int getLastMsg(int index);
+      com.google.protobuf.ByteString getLastMsg();
     }
     /**
      * Protobuf type {@code org.coniks.coniks_common.AuthPath.UserLeafNode}
@@ -6402,56 +6308,24 @@ public final class C2SProtos {
                 allowsPublicLookup_ = input.readBool();
                 break;
               }
-              case 61: {
-                if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
-                  lookupIndex_ = new java.util.ArrayList<java.lang.Integer>();
-                  mutable_bitField0_ |= 0x00000040;
-                }
-                lookupIndex_.add(input.readFixed32());
-                break;
-              }
               case 58: {
-                int length = input.readRawVarint32();
-                int limit = input.pushLimit(length);
-                if (!((mutable_bitField0_ & 0x00000040) == 0x00000040) && input.getBytesUntilLimit() > 0) {
-                  lookupIndex_ = new java.util.ArrayList<java.lang.Integer>();
-                  mutable_bitField0_ |= 0x00000040;
-                }
-                while (input.getBytesUntilLimit() > 0) {
-                  lookupIndex_.add(input.readFixed32());
-                }
-                input.popLimit(limit);
+                bitField0_ |= 0x00000040;
+                lookupIndex_ = input.readBytes();
                 break;
               }
               case 64: {
-                bitField0_ |= 0x00000040;
+                bitField0_ |= 0x00000080;
                 intlevels_ = input.readUInt32();
                 break;
               }
-              case 77: {
-                if (!((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
-                  signature_ = new java.util.ArrayList<java.lang.Integer>();
-                  mutable_bitField0_ |= 0x00000100;
-                }
-                signature_.add(input.readFixed32());
-                break;
-              }
               case 74: {
-                int length = input.readRawVarint32();
-                int limit = input.pushLimit(length);
-                if (!((mutable_bitField0_ & 0x00000100) == 0x00000100) && input.getBytesUntilLimit() > 0) {
-                  signature_ = new java.util.ArrayList<java.lang.Integer>();
-                  mutable_bitField0_ |= 0x00000100;
-                }
-                while (input.getBytesUntilLimit() > 0) {
-                  signature_.add(input.readFixed32());
-                }
-                input.popLimit(limit);
+                bitField0_ |= 0x00000100;
+                signature_ = input.readBytes();
                 break;
               }
               case 82: {
                 org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.Builder subBuilder = null;
-                if (((bitField0_ & 0x00000080) == 0x00000080)) {
+                if (((bitField0_ & 0x00000200) == 0x00000200)) {
                   subBuilder = changeKey_.toBuilder();
                 }
                 changeKey_ = input.readMessage(org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.PARSER, extensionRegistry);
@@ -6459,28 +6333,12 @@ public final class C2SProtos {
                   subBuilder.mergeFrom(changeKey_);
                   changeKey_ = subBuilder.buildPartial();
                 }
-                bitField0_ |= 0x00000080;
-                break;
-              }
-              case 93: {
-                if (!((mutable_bitField0_ & 0x00000400) == 0x00000400)) {
-                  lastMsg_ = new java.util.ArrayList<java.lang.Integer>();
-                  mutable_bitField0_ |= 0x00000400;
-                }
-                lastMsg_.add(input.readFixed32());
+                bitField0_ |= 0x00000200;
                 break;
               }
               case 90: {
-                int length = input.readRawVarint32();
-                int limit = input.pushLimit(length);
-                if (!((mutable_bitField0_ & 0x00000400) == 0x00000400) && input.getBytesUntilLimit() > 0) {
-                  lastMsg_ = new java.util.ArrayList<java.lang.Integer>();
-                  mutable_bitField0_ |= 0x00000400;
-                }
-                while (input.getBytesUntilLimit() > 0) {
-                  lastMsg_.add(input.readFixed32());
-                }
-                input.popLimit(limit);
+                bitField0_ |= 0x00000400;
+                lastMsg_ = input.readBytes();
                 break;
               }
             }
@@ -6491,15 +6349,6 @@ public final class C2SProtos {
           throw new com.google.protobuf.InvalidProtocolBufferException(
               e.getMessage()).setUnfinishedMessage(this);
         } finally {
-          if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
-            lookupIndex_ = java.util.Collections.unmodifiableList(lookupIndex_);
-          }
-          if (((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
-            signature_ = java.util.Collections.unmodifiableList(signature_);
-          }
-          if (((mutable_bitField0_ & 0x00000400) == 0x00000400)) {
-            lastMsg_ = java.util.Collections.unmodifiableList(lastMsg_);
-          }
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
         }
@@ -6689,27 +6538,19 @@ public final class C2SProtos {
       }
 
       public static final int LOOKUP_INDEX_FIELD_NUMBER = 7;
-      private java.util.List<java.lang.Integer> lookupIndex_;
+      private com.google.protobuf.ByteString lookupIndex_;
       /**
-       * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
+       * <code>optional bytes lookup_index = 7;</code>
        */
-      public java.util.List<java.lang.Integer>
-          getLookupIndexList() {
+      public boolean hasLookupIndex() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional bytes lookup_index = 7;</code>
+       */
+      public com.google.protobuf.ByteString getLookupIndex() {
         return lookupIndex_;
       }
-      /**
-       * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
-       */
-      public int getLookupIndexCount() {
-        return lookupIndex_.size();
-      }
-      /**
-       * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
-       */
-      public int getLookupIndex(int index) {
-        return lookupIndex_.get(index);
-      }
-      private int lookupIndexMemoizedSerializedSize = -1;
 
       public static final int INTLEVELS_FIELD_NUMBER = 8;
       private int intlevels_;
@@ -6717,17 +6558,17 @@ public final class C2SProtos {
        * <code>optional uint32 intlevels = 8;</code>
        *
        * <pre>
-       *repeated fixed32 signature = 7;
+       * needed so client can loop over interior nodes
        * </pre>
        */
       public boolean hasIntlevels() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
        * <code>optional uint32 intlevels = 8;</code>
        *
        * <pre>
-       *repeated fixed32 signature = 7;
+       * needed so client can loop over interior nodes
        * </pre>
        */
       public int getIntlevels() {
@@ -6735,27 +6576,19 @@ public final class C2SProtos {
       }
 
       public static final int SIGNATURE_FIELD_NUMBER = 9;
-      private java.util.List<java.lang.Integer> signature_;
+      private com.google.protobuf.ByteString signature_;
       /**
-       * <code>repeated fixed32 signature = 9 [packed = true];</code>
+       * <code>optional bytes signature = 9;</code>
        */
-      public java.util.List<java.lang.Integer>
-          getSignatureList() {
+      public boolean hasSignature() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional bytes signature = 9;</code>
+       */
+      public com.google.protobuf.ByteString getSignature() {
         return signature_;
       }
-      /**
-       * <code>repeated fixed32 signature = 9 [packed = true];</code>
-       */
-      public int getSignatureCount() {
-        return signature_.size();
-      }
-      /**
-       * <code>repeated fixed32 signature = 9 [packed = true];</code>
-       */
-      public int getSignature(int index) {
-        return signature_.get(index);
-      }
-      private int signatureMemoizedSerializedSize = -1;
 
       public static final int CHANGEKEY_FIELD_NUMBER = 10;
       private org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto changeKey_;
@@ -6763,7 +6596,7 @@ public final class C2SProtos {
        * <code>optional .org.coniks.coniks_common.DSAPublicKeyProto changeKey = 10;</code>
        */
       public boolean hasChangeKey() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       /**
        * <code>optional .org.coniks.coniks_common.DSAPublicKeyProto changeKey = 10;</code>
@@ -6779,27 +6612,19 @@ public final class C2SProtos {
       }
 
       public static final int LASTMSG_FIELD_NUMBER = 11;
-      private java.util.List<java.lang.Integer> lastMsg_;
+      private com.google.protobuf.ByteString lastMsg_;
       /**
-       * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
+       * <code>optional bytes lastMsg = 11;</code>
        */
-      public java.util.List<java.lang.Integer>
-          getLastMsgList() {
+      public boolean hasLastMsg() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional bytes lastMsg = 11;</code>
+       */
+      public com.google.protobuf.ByteString getLastMsg() {
         return lastMsg_;
       }
-      /**
-       * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
-       */
-      public int getLastMsgCount() {
-        return lastMsg_.size();
-      }
-      /**
-       * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
-       */
-      public int getLastMsg(int index) {
-        return lastMsg_.get(index);
-      }
-      private int lastMsgMemoizedSerializedSize = -1;
 
       private void initFields() {
         name_ = "";
@@ -6808,11 +6633,11 @@ public final class C2SProtos {
         epochChanged_ = 0L;
         allowsUnsignedKeychange_ = false;
         allowsPublicLookup_ = false;
-        lookupIndex_ = java.util.Collections.emptyList();
+        lookupIndex_ = com.google.protobuf.ByteString.EMPTY;
         intlevels_ = 0;
-        signature_ = java.util.Collections.emptyList();
+        signature_ = com.google.protobuf.ByteString.EMPTY;
         changeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
-        lastMsg_ = java.util.Collections.emptyList();
+        lastMsg_ = com.google.protobuf.ByteString.EMPTY;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -6851,32 +6676,20 @@ public final class C2SProtos {
         if (((bitField0_ & 0x00000020) == 0x00000020)) {
           output.writeBool(6, allowsPublicLookup_);
         }
-        if (getLookupIndexList().size() > 0) {
-          output.writeRawVarint32(58);
-          output.writeRawVarint32(lookupIndexMemoizedSerializedSize);
-        }
-        for (int i = 0; i < lookupIndex_.size(); i++) {
-          output.writeFixed32NoTag(lookupIndex_.get(i));
-        }
         if (((bitField0_ & 0x00000040) == 0x00000040)) {
-          output.writeUInt32(8, intlevels_);
-        }
-        if (getSignatureList().size() > 0) {
-          output.writeRawVarint32(74);
-          output.writeRawVarint32(signatureMemoizedSerializedSize);
-        }
-        for (int i = 0; i < signature_.size(); i++) {
-          output.writeFixed32NoTag(signature_.get(i));
+          output.writeBytes(7, lookupIndex_);
         }
         if (((bitField0_ & 0x00000080) == 0x00000080)) {
+          output.writeUInt32(8, intlevels_);
+        }
+        if (((bitField0_ & 0x00000100) == 0x00000100)) {
+          output.writeBytes(9, signature_);
+        }
+        if (((bitField0_ & 0x00000200) == 0x00000200)) {
           output.writeMessage(10, changeKey_);
         }
-        if (getLastMsgList().size() > 0) {
-          output.writeRawVarint32(90);
-          output.writeRawVarint32(lastMsgMemoizedSerializedSize);
-        }
-        for (int i = 0; i < lastMsg_.size(); i++) {
-          output.writeFixed32NoTag(lastMsg_.get(i));
+        if (((bitField0_ & 0x00000400) == 0x00000400)) {
+          output.writeBytes(11, lastMsg_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -6911,46 +6724,25 @@ public final class C2SProtos {
           size += com.google.protobuf.CodedOutputStream
             .computeBoolSize(6, allowsPublicLookup_);
         }
-        {
-          int dataSize = 0;
-          dataSize = 4 * getLookupIndexList().size();
-          size += dataSize;
-          if (!getLookupIndexList().isEmpty()) {
-            size += 1;
-            size += com.google.protobuf.CodedOutputStream
-                .computeInt32SizeNoTag(dataSize);
-          }
-          lookupIndexMemoizedSerializedSize = dataSize;
-        }
         if (((bitField0_ & 0x00000040) == 0x00000040)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeUInt32Size(8, intlevels_);
-        }
-        {
-          int dataSize = 0;
-          dataSize = 4 * getSignatureList().size();
-          size += dataSize;
-          if (!getSignatureList().isEmpty()) {
-            size += 1;
-            size += com.google.protobuf.CodedOutputStream
-                .computeInt32SizeNoTag(dataSize);
-          }
-          signatureMemoizedSerializedSize = dataSize;
+            .computeBytesSize(7, lookupIndex_);
         }
         if (((bitField0_ & 0x00000080) == 0x00000080)) {
           size += com.google.protobuf.CodedOutputStream
+            .computeUInt32Size(8, intlevels_);
+        }
+        if (((bitField0_ & 0x00000100) == 0x00000100)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(9, signature_);
+        }
+        if (((bitField0_ & 0x00000200) == 0x00000200)) {
+          size += com.google.protobuf.CodedOutputStream
             .computeMessageSize(10, changeKey_);
         }
-        {
-          int dataSize = 0;
-          dataSize = 4 * getLastMsgList().size();
-          size += dataSize;
-          if (!getLastMsgList().isEmpty()) {
-            size += 1;
-            size += com.google.protobuf.CodedOutputStream
-                .computeInt32SizeNoTag(dataSize);
-          }
-          lastMsgMemoizedSerializedSize = dataSize;
+        if (((bitField0_ & 0x00000400) == 0x00000400)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBytesSize(11, lastMsg_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -7086,11 +6878,11 @@ public final class C2SProtos {
           bitField0_ = (bitField0_ & ~0x00000010);
           allowsPublicLookup_ = false;
           bitField0_ = (bitField0_ & ~0x00000020);
-          lookupIndex_ = java.util.Collections.emptyList();
+          lookupIndex_ = com.google.protobuf.ByteString.EMPTY;
           bitField0_ = (bitField0_ & ~0x00000040);
           intlevels_ = 0;
           bitField0_ = (bitField0_ & ~0x00000080);
-          signature_ = java.util.Collections.emptyList();
+          signature_ = com.google.protobuf.ByteString.EMPTY;
           bitField0_ = (bitField0_ & ~0x00000100);
           if (changeKeyBuilder_ == null) {
             changeKey_ = org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto.getDefaultInstance();
@@ -7098,7 +6890,7 @@ public final class C2SProtos {
             changeKeyBuilder_.clear();
           }
           bitField0_ = (bitField0_ & ~0x00000200);
-          lastMsg_ = java.util.Collections.emptyList();
+          lastMsg_ = com.google.protobuf.ByteString.EMPTY;
           bitField0_ = (bitField0_ & ~0x00000400);
           return this;
         }
@@ -7152,31 +6944,28 @@ public final class C2SProtos {
             to_bitField0_ |= 0x00000020;
           }
           result.allowsPublicLookup_ = allowsPublicLookup_;
-          if (((bitField0_ & 0x00000040) == 0x00000040)) {
-            lookupIndex_ = java.util.Collections.unmodifiableList(lookupIndex_);
-            bitField0_ = (bitField0_ & ~0x00000040);
+          if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+            to_bitField0_ |= 0x00000040;
           }
           result.lookupIndex_ = lookupIndex_;
           if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
-            to_bitField0_ |= 0x00000040;
+            to_bitField0_ |= 0x00000080;
           }
           result.intlevels_ = intlevels_;
-          if (((bitField0_ & 0x00000100) == 0x00000100)) {
-            signature_ = java.util.Collections.unmodifiableList(signature_);
-            bitField0_ = (bitField0_ & ~0x00000100);
+          if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+            to_bitField0_ |= 0x00000100;
           }
           result.signature_ = signature_;
           if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
-            to_bitField0_ |= 0x00000080;
+            to_bitField0_ |= 0x00000200;
           }
           if (changeKeyBuilder_ == null) {
             result.changeKey_ = changeKey_;
           } else {
             result.changeKey_ = changeKeyBuilder_.build();
           }
-          if (((bitField0_ & 0x00000400) == 0x00000400)) {
-            lastMsg_ = java.util.Collections.unmodifiableList(lastMsg_);
-            bitField0_ = (bitField0_ & ~0x00000400);
+          if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+            to_bitField0_ |= 0x00000400;
           }
           result.lastMsg_ = lastMsg_;
           result.bitField0_ = to_bitField0_;
@@ -7217,41 +7006,20 @@ public final class C2SProtos {
           if (other.hasAllowsPublicLookup()) {
             setAllowsPublicLookup(other.getAllowsPublicLookup());
           }
-          if (!other.lookupIndex_.isEmpty()) {
-            if (lookupIndex_.isEmpty()) {
-              lookupIndex_ = other.lookupIndex_;
-              bitField0_ = (bitField0_ & ~0x00000040);
-            } else {
-              ensureLookupIndexIsMutable();
-              lookupIndex_.addAll(other.lookupIndex_);
-            }
-            onChanged();
+          if (other.hasLookupIndex()) {
+            setLookupIndex(other.getLookupIndex());
           }
           if (other.hasIntlevels()) {
             setIntlevels(other.getIntlevels());
           }
-          if (!other.signature_.isEmpty()) {
-            if (signature_.isEmpty()) {
-              signature_ = other.signature_;
-              bitField0_ = (bitField0_ & ~0x00000100);
-            } else {
-              ensureSignatureIsMutable();
-              signature_.addAll(other.signature_);
-            }
-            onChanged();
+          if (other.hasSignature()) {
+            setSignature(other.getSignature());
           }
           if (other.hasChangeKey()) {
             mergeChangeKey(other.getChangeKey());
           }
-          if (!other.lastMsg_.isEmpty()) {
-            if (lastMsg_.isEmpty()) {
-              lastMsg_ = other.lastMsg_;
-              bitField0_ = (bitField0_ & ~0x00000400);
-            } else {
-              ensureLastMsgIsMutable();
-              lastMsg_.addAll(other.lastMsg_);
-            }
-            onChanged();
+          if (other.hasLastMsg()) {
+            setLastMsg(other.getLastMsg());
           }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
@@ -7590,68 +7358,37 @@ public final class C2SProtos {
           return this;
         }
 
-        private java.util.List<java.lang.Integer> lookupIndex_ = java.util.Collections.emptyList();
-        private void ensureLookupIndexIsMutable() {
-          if (!((bitField0_ & 0x00000040) == 0x00000040)) {
-            lookupIndex_ = new java.util.ArrayList<java.lang.Integer>(lookupIndex_);
-            bitField0_ |= 0x00000040;
-           }
+        private com.google.protobuf.ByteString lookupIndex_ = com.google.protobuf.ByteString.EMPTY;
+        /**
+         * <code>optional bytes lookup_index = 7;</code>
+         */
+        public boolean hasLookupIndex() {
+          return ((bitField0_ & 0x00000040) == 0x00000040);
         }
         /**
-         * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
+         * <code>optional bytes lookup_index = 7;</code>
          */
-        public java.util.List<java.lang.Integer>
-            getLookupIndexList() {
-          return java.util.Collections.unmodifiableList(lookupIndex_);
+        public com.google.protobuf.ByteString getLookupIndex() {
+          return lookupIndex_;
         }
         /**
-         * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
+         * <code>optional bytes lookup_index = 7;</code>
          */
-        public int getLookupIndexCount() {
-          return lookupIndex_.size();
-        }
-        /**
-         * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
-         */
-        public int getLookupIndex(int index) {
-          return lookupIndex_.get(index);
-        }
-        /**
-         * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
-         */
-        public Builder setLookupIndex(
-            int index, int value) {
-          ensureLookupIndexIsMutable();
-          lookupIndex_.set(index, value);
+        public Builder setLookupIndex(com.google.protobuf.ByteString value) {
+          if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+          lookupIndex_ = value;
           onChanged();
           return this;
         }
         /**
-         * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
-         */
-        public Builder addLookupIndex(int value) {
-          ensureLookupIndexIsMutable();
-          lookupIndex_.add(value);
-          onChanged();
-          return this;
-        }
-        /**
-         * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
-         */
-        public Builder addAllLookupIndex(
-            java.lang.Iterable<? extends java.lang.Integer> values) {
-          ensureLookupIndexIsMutable();
-          com.google.protobuf.AbstractMessageLite.Builder.addAll(
-              values, lookupIndex_);
-          onChanged();
-          return this;
-        }
-        /**
-         * <code>repeated fixed32 lookup_index = 7 [packed = true];</code>
+         * <code>optional bytes lookup_index = 7;</code>
          */
         public Builder clearLookupIndex() {
-          lookupIndex_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000040);
+          lookupIndex_ = getDefaultInstance().getLookupIndex();
           onChanged();
           return this;
         }
@@ -7661,7 +7398,7 @@ public final class C2SProtos {
          * <code>optional uint32 intlevels = 8;</code>
          *
          * <pre>
-         *repeated fixed32 signature = 7;
+         * needed so client can loop over interior nodes
          * </pre>
          */
         public boolean hasIntlevels() {
@@ -7671,7 +7408,7 @@ public final class C2SProtos {
          * <code>optional uint32 intlevels = 8;</code>
          *
          * <pre>
-         *repeated fixed32 signature = 7;
+         * needed so client can loop over interior nodes
          * </pre>
          */
         public int getIntlevels() {
@@ -7681,7 +7418,7 @@ public final class C2SProtos {
          * <code>optional uint32 intlevels = 8;</code>
          *
          * <pre>
-         *repeated fixed32 signature = 7;
+         * needed so client can loop over interior nodes
          * </pre>
          */
         public Builder setIntlevels(int value) {
@@ -7694,7 +7431,7 @@ public final class C2SProtos {
          * <code>optional uint32 intlevels = 8;</code>
          *
          * <pre>
-         *repeated fixed32 signature = 7;
+         * needed so client can loop over interior nodes
          * </pre>
          */
         public Builder clearIntlevels() {
@@ -7704,68 +7441,37 @@ public final class C2SProtos {
           return this;
         }
 
-        private java.util.List<java.lang.Integer> signature_ = java.util.Collections.emptyList();
-        private void ensureSignatureIsMutable() {
-          if (!((bitField0_ & 0x00000100) == 0x00000100)) {
-            signature_ = new java.util.ArrayList<java.lang.Integer>(signature_);
-            bitField0_ |= 0x00000100;
-           }
+        private com.google.protobuf.ByteString signature_ = com.google.protobuf.ByteString.EMPTY;
+        /**
+         * <code>optional bytes signature = 9;</code>
+         */
+        public boolean hasSignature() {
+          return ((bitField0_ & 0x00000100) == 0x00000100);
         }
         /**
-         * <code>repeated fixed32 signature = 9 [packed = true];</code>
+         * <code>optional bytes signature = 9;</code>
          */
-        public java.util.List<java.lang.Integer>
-            getSignatureList() {
-          return java.util.Collections.unmodifiableList(signature_);
+        public com.google.protobuf.ByteString getSignature() {
+          return signature_;
         }
         /**
-         * <code>repeated fixed32 signature = 9 [packed = true];</code>
+         * <code>optional bytes signature = 9;</code>
          */
-        public int getSignatureCount() {
-          return signature_.size();
-        }
-        /**
-         * <code>repeated fixed32 signature = 9 [packed = true];</code>
-         */
-        public int getSignature(int index) {
-          return signature_.get(index);
-        }
-        /**
-         * <code>repeated fixed32 signature = 9 [packed = true];</code>
-         */
-        public Builder setSignature(
-            int index, int value) {
-          ensureSignatureIsMutable();
-          signature_.set(index, value);
+        public Builder setSignature(com.google.protobuf.ByteString value) {
+          if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000100;
+          signature_ = value;
           onChanged();
           return this;
         }
         /**
-         * <code>repeated fixed32 signature = 9 [packed = true];</code>
-         */
-        public Builder addSignature(int value) {
-          ensureSignatureIsMutable();
-          signature_.add(value);
-          onChanged();
-          return this;
-        }
-        /**
-         * <code>repeated fixed32 signature = 9 [packed = true];</code>
-         */
-        public Builder addAllSignature(
-            java.lang.Iterable<? extends java.lang.Integer> values) {
-          ensureSignatureIsMutable();
-          com.google.protobuf.AbstractMessageLite.Builder.addAll(
-              values, signature_);
-          onChanged();
-          return this;
-        }
-        /**
-         * <code>repeated fixed32 signature = 9 [packed = true];</code>
+         * <code>optional bytes signature = 9;</code>
          */
         public Builder clearSignature() {
-          signature_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000100);
+          signature_ = getDefaultInstance().getSignature();
           onChanged();
           return this;
         }
@@ -7886,68 +7592,37 @@ public final class C2SProtos {
           return changeKeyBuilder_;
         }
 
-        private java.util.List<java.lang.Integer> lastMsg_ = java.util.Collections.emptyList();
-        private void ensureLastMsgIsMutable() {
-          if (!((bitField0_ & 0x00000400) == 0x00000400)) {
-            lastMsg_ = new java.util.ArrayList<java.lang.Integer>(lastMsg_);
-            bitField0_ |= 0x00000400;
-           }
+        private com.google.protobuf.ByteString lastMsg_ = com.google.protobuf.ByteString.EMPTY;
+        /**
+         * <code>optional bytes lastMsg = 11;</code>
+         */
+        public boolean hasLastMsg() {
+          return ((bitField0_ & 0x00000400) == 0x00000400);
         }
         /**
-         * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
+         * <code>optional bytes lastMsg = 11;</code>
          */
-        public java.util.List<java.lang.Integer>
-            getLastMsgList() {
-          return java.util.Collections.unmodifiableList(lastMsg_);
+        public com.google.protobuf.ByteString getLastMsg() {
+          return lastMsg_;
         }
         /**
-         * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
+         * <code>optional bytes lastMsg = 11;</code>
          */
-        public int getLastMsgCount() {
-          return lastMsg_.size();
-        }
-        /**
-         * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
-         */
-        public int getLastMsg(int index) {
-          return lastMsg_.get(index);
-        }
-        /**
-         * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
-         */
-        public Builder setLastMsg(
-            int index, int value) {
-          ensureLastMsgIsMutable();
-          lastMsg_.set(index, value);
+        public Builder setLastMsg(com.google.protobuf.ByteString value) {
+          if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+          lastMsg_ = value;
           onChanged();
           return this;
         }
         /**
-         * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
-         */
-        public Builder addLastMsg(int value) {
-          ensureLastMsgIsMutable();
-          lastMsg_.add(value);
-          onChanged();
-          return this;
-        }
-        /**
-         * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
-         */
-        public Builder addAllLastMsg(
-            java.lang.Iterable<? extends java.lang.Integer> values) {
-          ensureLastMsgIsMutable();
-          com.google.protobuf.AbstractMessageLite.Builder.addAll(
-              values, lastMsg_);
-          onChanged();
-          return this;
-        }
-        /**
-         * <code>repeated fixed32 lastMsg = 11 [packed = true];</code>
+         * <code>optional bytes lastMsg = 11;</code>
          */
         public Builder clearLastMsg() {
-          lastMsg_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000400);
+          lastMsg_ = getDefaultInstance().getLastMsg();
           onChanged();
           return this;
         }
@@ -10227,37 +9902,37 @@ public final class C2SProtos {
       "\017\n\007newBlob\030\002 \001(\t\022A\n\014newChangeKey\030\003 \001(\0132+" +
       ".org.coniks.coniks_common.DSAPublicKeyPr",
       "oto\022\037\n\027allowsUnsignedKeychange\030\004 \001(\010\022\032\n\022" +
-      "allowsPublicLookup\030\005 \001(\010\"Z\n\022SignedULNCha" +
+      "allowsPublicLookup\030\005 \001(\010\"V\n\022SignedULNCha" +
       "ngeReq\0223\n\003req\030\001 \001(\0132&.org.coniks.coniks_" +
-      "common.ULNChangeReq\022\017\n\003sig\030\002 \003(\007B\002\020\001\"\237\001\n" +
-      "\rCommitmentReq\022D\n\004type\030\001 \001(\01626.org.conik" +
-      "s.coniks_common.CommitmentReq.Commitment" +
-      "Type\022\r\n\005epoch\030\002 \001(\004\022\020\n\010provider\030\003 \001(\t\"\'\n" +
-      "\016CommitmentType\022\010\n\004SELF\020\000\022\013\n\007WITNESS\020\001\"(" +
-      "\n\tKeyLookup\022\014\n\004name\030\001 \001(\t\022\r\n\005epoch\030\002 \001(\004" +
-      "\">\n\020RegistrationResp\022\022\n\ninit_epoch\030\001 \001(\004",
-      "\022\026\n\016epoch_interval\030\002 \001(\r\"\255\006\n\010AuthPath\022=\n" +
-      "\004leaf\030\001 \001(\0132/.org.coniks.coniks_common.A" +
-      "uthPath.UserLeafNode\022A\n\010interior\030\002 \003(\0132/" +
-      ".org.coniks.coniks_common.AuthPath.Inter" +
-      "iorNode\0229\n\004root\030\003 \001(\0132+.org.coniks.conik" +
-      "s_common.AuthPath.RootNode\032\265\002\n\014UserLeafN" +
-      "ode\022\014\n\004name\030\001 \001(\t\022\021\n\tpublickey\030\002 \001(\t\022\023\n\013" +
-      "epoch_added\030\003 \001(\004\022\025\n\repoch_changed\030\004 \001(\004" +
-      "\022!\n\031allows_unsigned_keychange\030\005 \001(\010\022\034\n\024a" +
-      "llows_public_lookup\030\006 \001(\010\022\030\n\014lookup_inde",
-      "x\030\007 \003(\007B\002\020\001\022\021\n\tintlevels\030\010 \001(\r\022\025\n\tsignat" +
-      "ure\030\t \003(\007B\002\020\001\022>\n\tchangeKey\030\n \001(\0132+.org.c" +
-      "oniks.coniks_common.DSAPublicKeyProto\022\023\n" +
-      "\007lastMsg\030\013 \003(\007B\002\020\001\032\204\001\n\014InteriorNode\022C\n\013p" +
-      "runedchild\030\001 \001(\0162..org.coniks.coniks_com" +
-      "mon.AuthPath.PrunedChild\022/\n\007subtree\030\002 \001(" +
-      "\0132\036.org.coniks.coniks_common.Hash\032\200\001\n\010Ro" +
-      "otNode\022C\n\013prunedchild\030\001 \001(\0162..org.coniks" +
-      ".coniks_common.AuthPath.PrunedChild\022/\n\007s" +
-      "ubtree\030\002 \001(\0132\036.org.coniks.coniks_common.",
-      "Hash\"\"\n\013PrunedChild\022\010\n\004LEFT\020\000\022\t\n\005RIGHT\020\001" +
-      "B%\n\030org.coniks.coniks_commonB\tC2SProtos"
+      "common.ULNChangeReq\022\013\n\003sig\030\002 \001(\014\"\237\001\n\rCom" +
+      "mitmentReq\022D\n\004type\030\001 \001(\01626.org.coniks.co" +
+      "niks_common.CommitmentReq.CommitmentType" +
+      "\022\r\n\005epoch\030\002 \001(\004\022\020\n\010provider\030\003 \001(\t\"\'\n\016Com" +
+      "mitmentType\022\010\n\004SELF\020\000\022\013\n\007WITNESS\020\001\"(\n\tKe" +
+      "yLookup\022\014\n\004name\030\001 \001(\t\022\r\n\005epoch\030\002 \001(\004\">\n\020" +
+      "RegistrationResp\022\022\n\ninit_epoch\030\001 \001(\004\022\026\n\016",
+      "epoch_interval\030\002 \001(\r\"\241\006\n\010AuthPath\022=\n\004lea" +
+      "f\030\001 \001(\0132/.org.coniks.coniks_common.AuthP" +
+      "ath.UserLeafNode\022A\n\010interior\030\002 \003(\0132/.org" +
+      ".coniks.coniks_common.AuthPath.InteriorN" +
+      "ode\0229\n\004root\030\003 \001(\0132+.org.coniks.coniks_co" +
+      "mmon.AuthPath.RootNode\032\251\002\n\014UserLeafNode\022" +
+      "\014\n\004name\030\001 \001(\t\022\021\n\tpublickey\030\002 \001(\t\022\023\n\013epoc" +
+      "h_added\030\003 \001(\004\022\025\n\repoch_changed\030\004 \001(\004\022!\n\031" +
+      "allows_unsigned_keychange\030\005 \001(\010\022\034\n\024allow" +
+      "s_public_lookup\030\006 \001(\010\022\024\n\014lookup_index\030\007 ",
+      "\001(\014\022\021\n\tintlevels\030\010 \001(\r\022\021\n\tsignature\030\t \001(" +
+      "\014\022>\n\tchangeKey\030\n \001(\0132+.org.coniks.coniks" +
+      "_common.DSAPublicKeyProto\022\017\n\007lastMsg\030\013 \001" +
+      "(\014\032\204\001\n\014InteriorNode\022C\n\013prunedchild\030\001 \001(\016" +
+      "2..org.coniks.coniks_common.AuthPath.Pru" +
+      "nedChild\022/\n\007subtree\030\002 \001(\0132\036.org.coniks.c" +
+      "oniks_common.Hash\032\200\001\n\010RootNode\022C\n\013pruned" +
+      "child\030\001 \001(\0162..org.coniks.coniks_common.A" +
+      "uthPath.PrunedChild\022/\n\007subtree\030\002 \001(\0132\036.o" +
+      "rg.coniks.coniks_common.Hash\"\"\n\013PrunedCh",
+      "ild\022\010\n\004LEFT\020\000\022\t\n\005RIGHT\020\001B%\n\030org.coniks.c" +
+      "oniks_commonB\tC2SProtos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

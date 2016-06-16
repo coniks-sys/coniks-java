@@ -42,7 +42,8 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.interfaces.DSAParams;
 
-import com.google.protobuf.*;
+import com.google.protobuf.AbstractMessage;
+import com.google.protobuf.ByteString;
 
 import org.coniks.coniks_common.MsgType;
 import org.coniks.coniks_common.C2SProtos.Registration;
@@ -300,7 +301,7 @@ public class RequestHandler extends Thread{
         DSAPublicKey publicChangeKey = uln.getChangeKey();
         
         byte[] reqMsg = changeReq.toByteArray();
-        byte[] sig = ServerUtils.intListToByteArr(new ArrayList<Integer>(signedReq.getSigList()));
+        byte[] sig = signedReq.getSig().toByteArray();
         if (!SignatureOps.verifySigFromDSA(reqMsg, sig, publicChangeKey)) {
             MsgHandlerLogger.log("Failed to verify message");
             MsgHandlerLogger.log("Failed sig said\n" + Arrays.toString(sig));

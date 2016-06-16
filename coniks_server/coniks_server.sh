@@ -58,8 +58,8 @@ if [ ! -d "$CONIKS_SERVERLOGS" ]; then
 
 # start up the server in full mode if no other instances are running.
 if [ "$CMD" = "start" ]; then
-    # need to check for 1 since the grep command 
-    # itself is included in the count    
+    # need to check for 1 since the grep command
+    # itself is included in the count
     if [ `ps ax | grep -c $SERVER_BIN` -gt 1 ]; then
         echo "An instance of $SERVER_BIN is already running."
         echo "Exiting."
@@ -76,8 +76,8 @@ if [ "$CMD" = "start" ]; then
 
 # start up the server in testing mode if no other instances are running.
 elif [ "$CMD" = "test" ]; then
-    # need to check for 1 since the grep command 
-    # itself is included in the count    
+    # need to check for 1 since the grep command
+    # itself is included in the count
     if [ `ps ax | grep -c $SERVER_BIN` -gt 1 ]; then
         echo "An instance of $SERVER_BIN is already running."
         echo "Exiting."

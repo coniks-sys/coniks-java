@@ -33,6 +33,7 @@
 
 package org.coniks.coniks_server;
 
+import com.google.protobuf.ByteString;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
 import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.Hash;
@@ -114,10 +115,10 @@ public class TransparencyOps{
         ulnBuilder.setEpochAdded(uln.getEpochAdded());
         ulnBuilder.setAllowsUnsignedKeychange(uln.allowsUnsignedKeychange());
         ulnBuilder.setAllowsPublicLookup(uln.allowsPublicLookups());
-        ulnBuilder.addAllLookupIndex(ServerUtils.byteArrToIntList(uln.getIndex()));
+        ulnBuilder.setLookupIndex(ByteString.copyFrom(uln.getIndex()));
         ulnBuilder.setEpochChanged(uln.getEpochChanged());
         if (uln.getSignature() != null)
-            ulnBuilder.addAllSignature(ServerUtils.byteArrToIntList(uln.getSignature()));
+            ulnBuilder.setSignature(ByteString.copyFrom(uln.getSignature()));
 
 
         DSAPublicKeyProto.Builder dsaBuilder = DSAPublicKeyProto.newBuilder();
@@ -131,7 +132,7 @@ public class TransparencyOps{
             ulnBuilder.setChangeKey(dsaBuilder.build());
         }
         if (uln.getLastMsg() != null)
-            ulnBuilder.addAllLastMsg(ServerUtils.byteArrToIntList(uln.getLastMsg()));
+            ulnBuilder.setLastMsg(ByteString.copyFrom(uln.getLastMsg()));
 
         // book-keeping for interior nodes
         int numInteriors = 0;
@@ -178,13 +179,12 @@ public class TransparencyOps{
                 }
 
                 Hash.Builder subtree = Hash.newBuilder();
-                ArrayList<Integer> subTreeHashList = ServerUtils.byteArrToIntList(prunedChildHash);
-                if(subTreeHashList.size() != ServerUtils.HASH_SIZE_BYTES){
-                    ServerLogger.error("Bad length of pruned child hash: "+subTreeHashList.size());
+                if(prunedChildHash.length != ServerUtils.HASH_SIZE_BYTES){
+                    ServerLogger.error("Bad length of pruned child hash: "+prunedChildHash.length);
                     return null;
                 }
-                subtree.setLen(subTreeHashList.size());
-                subtree.addAllHash(subTreeHashList);
+                subtree.setLen(prunedChildHash.length);
+                subtree.setHash(ByteString.copyFrom(prunedChildHash));
                 rootBuilder.setSubtree(subtree.build());
                 
                 authPath.setRoot(rootBuilder.build());
@@ -208,13 +208,12 @@ public class TransparencyOps{
                     runner = curNodeI.getRight();
                 }
                 Hash.Builder subtree = Hash.newBuilder();
-                ArrayList<Integer> subTreeHashList = ServerUtils.byteArrToIntList(prunedChildHash);
-                if(subTreeHashList.size() != ServerUtils.HASH_SIZE_BYTES){
-                    ServerLogger.error("Bad length of pruned child hash: "+subTreeHashList.size());
+                  if(prunedChildHash.length != ServerUtils.HASH_SIZE_BYTES){
+                    ServerLogger.error("Bad length of pruned child hash: "+prunedChildHash.length);
                     return null;
                 }
-                subtree.setLen(subTreeHashList.size());
-                subtree.addAllHash(subTreeHashList);
+                subtree.setLen(prunedChildHash.length);
+                subtree.setHash(ByteString.copyFrom(prunedChildHash));
                 inBuilder.setSubtree(subtree.build());
                 interiorList.add(0, inBuilder.build());
 		
@@ -233,26 +232,6 @@ public class TransparencyOps{
         authPath.addAllInterior(interiorList);
         
         return authPath.build();
-    }
-
-    /** Generates a Hash protobuf message (e.g. included in the RootNode or
-     * in the Commitment protobuf messages) with the given {@code hashBytes}.
-     * The {@code name} inducates "whose" hash is being set up and is used for debugging.
-     */
-    private static Hash setupHashProto (byte[] hashBytes, String name) {
-         ArrayList<Integer> hashList = ServerUtils.byteArrToIntList(hashBytes);
-         
-         if(hashList.size() != ServerUtils.HASH_SIZE_BYTES){
-            ServerLogger.error("Bad length of "+name+": "+hashList.size());
-            return null;
-        }
-
-         Hash.Builder hash = Hash.newBuilder();
-         hash.setLen(hashList.size());
-         hash.addAllHash(hashList);
-
-         return hash.build();
-
     }
     
 }

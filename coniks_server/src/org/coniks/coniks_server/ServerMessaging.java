@@ -38,7 +38,9 @@ import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
 
-import com.google.protobuf.*;
+import com.google.protobuf.AbstractMessage;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.javatuples.*;
 
 import org.coniks.coniks_common.*;
@@ -167,19 +169,16 @@ public class ServerMessaging {
         byte[] rootBytes = ServerUtils.getRootNodeBytes(str.getRoot());
         byte[] rootHashBytes = ServerUtils.hash(rootBytes);
         
-        Hash.Builder rootHash = Hash.newBuilder();
-        ArrayList<Integer> rootHashList = ServerUtils.byteArrToIntList(rootHashBytes);
-        
-        if(rootHashList.size() != ServerUtils.HASH_SIZE_BYTES){
-            MsgHandlerLogger.error("Bad length of root hash: "+rootHashList.size());
+        Hash.Builder rootHash = Hash.newBuilder();        
+        if(rootHashBytes.length != ServerUtils.HASH_SIZE_BYTES){
+            MsgHandlerLogger.error("Bad length of root hash: "+rootHashBytes.length);
             return null;
         }
-        rootHash.setLen(rootHashList.size());
-        rootHash.addAllHash(rootHashList);
+        rootHash.setLen(rootHashBytes.length);
+        rootHash.setHash(ByteString.copyFrom(rootHashBytes));
         commMsg.setEpoch(str.getEpoch());
-        ArrayList<Integer> sigList = ServerUtils.byteArrToIntList(str.getSignature());
         commMsg.setRootHash(rootHash.build());
-        commMsg.addAllSignature(sigList);
+        commMsg.setSignature(ByteString.copyFrom(str.getSignature()));
         return commMsg.build();
     }
     
@@ -258,7 +257,7 @@ public class ServerMessaging {
             }
             else if (msgType == MsgType.SIGNED_ULNCHANGE_REQ) {
                 SignedULNChangeReq sulnReq = SignedULNChangeReq.parseDelimitedFrom(din);
-                if (!sulnReq.hasReq() || sulnReq.getSigCount() < 1 || !sulnReq.getReq().hasName()) {
+                if (!sulnReq.hasReq() || !sulnReq.hasSig() || !sulnReq.getReq().hasName()) {
                     MsgHandlerLogger.log("Malformed signed uln change req");
                 }
                 else {

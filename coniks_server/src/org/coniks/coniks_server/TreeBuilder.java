@@ -248,18 +248,12 @@ public class TreeBuilder{
                                        RootNode root) {
 
         RootNode newRoot = root;
-        
-        // insert nodes
-        // record the prefix for each index and compare to the prefix of the
-        // previous node added
+       
         byte[] prefix = null;
-        byte[] prevPrefix = null;        
-        
-        int prevPrefixLevel = 0;
-        int insCount = 0;
-        // need to insert all nodes with the same prefix into the correct prefix subtree
         
         int toInsert = pendingQ.size();
+
+        System.out.print("extending tree");
         
         Triplet<byte[], UserLeafNode, Operation> p = pendingQ.poll();
         while(p != null){
@@ -273,14 +267,17 @@ public class TreeBuilder{
             
             insertNode(index, toAdd, newRoot, op);
             
-            if (prevPrefixLevel < toAdd.getLevel())
-                prevPrefixLevel = toAdd.getLevel(); 
-
-            prevPrefix = prefix;
-            
             p = pendingQ.poll();
+
+            if (toInsert > 100 && toInsert % 100 == 0) {
+                System.out.print("n");
+            }
+
+            toInsert--;
             
         }
+
+        System.out.println();
         
         // recompute hashes
         computeHashes(newRoot);

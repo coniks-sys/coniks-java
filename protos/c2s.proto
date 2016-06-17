@@ -71,7 +71,7 @@ message SignedULNChangeReq {
     // Then converting to a byte[]
     // Then signing/verifying
     optional ULNChangeReq req = 1;
-    repeated fixed32 sig = 2 [packed = true];
+    optional bytes sig = 2;
 }
 
 
@@ -112,12 +112,11 @@ message AuthPath{
                 optional uint64 epoch_changed = 4;
                 optional bool allows_unsigned_keychange = 5;
                 optional bool allows_public_lookup = 6;
-                repeated fixed32 lookup_index = 7 [packed = true];
-                //repeated fixed32 signature = 7;
+                optional bytes lookup_index = 7;
                 optional uint32 intlevels = 8; // needed so client can loop over interior nodes
-                repeated fixed32 signature = 9 [packed = true];
+                optional bytes signature = 9;
                 optional DSAPublicKeyProto changeKey = 10;
-                repeated fixed32 lastMsg = 11 [packed = true];
+                optional bytes lastMsg = 11;
         }
         
         optional UserLeafNode leaf = 1; // client checks if leaf is specified

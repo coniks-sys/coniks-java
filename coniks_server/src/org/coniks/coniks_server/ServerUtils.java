@@ -169,41 +169,6 @@ public class ServerUtils{
         return new String(hexChars);
     }
 
-    /** Converts a {@code byte[]} into a list of integers.
-     * This utility is needed for building protobuf messages that
-     * contain fields representing byte buffers.
-     *
-     *@return The {@code arr} as an {@link java.util.ArrayList} of
-     * integers.
-     */
-    public static ArrayList<Integer> byteArrToIntList(byte[] arr){
-        ArrayList<Integer> list = new ArrayList<Integer>();
-       
-        for(int i = 0; i < arr.length; i++){
-            int nextInt = arr[i] & 0xff; 
-            list.add(new Integer(nextInt));
-        }
-        
-        return list;
-    }
-
-     /** Converts a list of integers into a {@code byte[]}.
-     * This utility is needed for parsing protobuf messages that
-     * contain fields representing byte buffers.
-     *
-     *@return The {@link java.util.ArrayList} of integers as a {@code byte[]}.
-     */
-    public static byte[] intListToByteArr(ArrayList<Integer> list){
-        byte[] arr = new byte[list.size()];
-       
-        for(int i = 0; i < list.size(); i++){
-            byte nextByte = list.get(i).byteValue();
-            arr[i] = nextByte;
-        }
-        
-        return arr;
-    }
-
     /** Converts a UTF-8 String {@code str} to an array of bytes.
      */
     public static byte[] strToBytes (String str) {

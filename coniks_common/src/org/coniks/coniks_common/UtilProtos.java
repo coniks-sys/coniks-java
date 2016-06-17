@@ -14,7 +14,6 @@
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
-
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
@@ -69,17 +68,13 @@ public final class UtilProtos {
     int getLen();
 
     /**
-     * <code>repeated fixed32 hash = 2 [packed = true];</code>
+     * <code>optional bytes hash = 2;</code>
      */
-    java.util.List<java.lang.Integer> getHashList();
+    boolean hasHash();
     /**
-     * <code>repeated fixed32 hash = 2 [packed = true];</code>
+     * <code>optional bytes hash = 2;</code>
      */
-    int getHashCount();
-    /**
-     * <code>repeated fixed32 hash = 2 [packed = true];</code>
-     */
-    int getHash(int index);
+    com.google.protobuf.ByteString getHash();
   }
   /**
    * Protobuf type {@code org.coniks.coniks_common.Hash}
@@ -138,25 +133,9 @@ public final class UtilProtos {
               len_ = input.readInt32();
               break;
             }
-            case 21: {
-              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-                hash_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000002;
-              }
-              hash_.add(input.readFixed32());
-              break;
-            }
             case 18: {
-              int length = input.readRawVarint32();
-              int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002) && input.getBytesUntilLimit() > 0) {
-                hash_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000002;
-              }
-              while (input.getBytesUntilLimit() > 0) {
-                hash_.add(input.readFixed32());
-              }
-              input.popLimit(limit);
+              bitField0_ |= 0x00000002;
+              hash_ = input.readBytes();
               break;
             }
           }
@@ -167,9 +146,6 @@ public final class UtilProtos {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-          hash_ = java.util.Collections.unmodifiableList(hash_);
-        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -226,31 +202,23 @@ public final class UtilProtos {
     }
 
     public static final int HASH_FIELD_NUMBER = 2;
-    private java.util.List<java.lang.Integer> hash_;
+    private com.google.protobuf.ByteString hash_;
     /**
-     * <code>repeated fixed32 hash = 2 [packed = true];</code>
+     * <code>optional bytes hash = 2;</code>
      */
-    public java.util.List<java.lang.Integer>
-        getHashList() {
+    public boolean hasHash() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional bytes hash = 2;</code>
+     */
+    public com.google.protobuf.ByteString getHash() {
       return hash_;
     }
-    /**
-     * <code>repeated fixed32 hash = 2 [packed = true];</code>
-     */
-    public int getHashCount() {
-      return hash_.size();
-    }
-    /**
-     * <code>repeated fixed32 hash = 2 [packed = true];</code>
-     */
-    public int getHash(int index) {
-      return hash_.get(index);
-    }
-    private int hashMemoizedSerializedSize = -1;
 
     private void initFields() {
       len_ = 0;
-      hash_ = java.util.Collections.emptyList();
+      hash_ = com.google.protobuf.ByteString.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -268,12 +236,8 @@ public final class UtilProtos {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt32(1, len_);
       }
-      if (getHashList().size() > 0) {
-        output.writeRawVarint32(18);
-        output.writeRawVarint32(hashMemoizedSerializedSize);
-      }
-      for (int i = 0; i < hash_.size(); i++) {
-        output.writeFixed32NoTag(hash_.get(i));
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(2, hash_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -288,16 +252,9 @@ public final class UtilProtos {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(1, len_);
       }
-      {
-        int dataSize = 0;
-        dataSize = 4 * getHashList().size();
-        size += dataSize;
-        if (!getHashList().isEmpty()) {
-          size += 1;
-          size += com.google.protobuf.CodedOutputStream
-              .computeInt32SizeNoTag(dataSize);
-        }
-        hashMemoizedSerializedSize = dataSize;
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, hash_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -418,7 +375,7 @@ public final class UtilProtos {
         super.clear();
         len_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
-        hash_ = java.util.Collections.emptyList();
+        hash_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
@@ -452,9 +409,8 @@ public final class UtilProtos {
           to_bitField0_ |= 0x00000001;
         }
         result.len_ = len_;
-        if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          hash_ = java.util.Collections.unmodifiableList(hash_);
-          bitField0_ = (bitField0_ & ~0x00000002);
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
         }
         result.hash_ = hash_;
         result.bitField0_ = to_bitField0_;
@@ -476,15 +432,8 @@ public final class UtilProtos {
         if (other.hasLen()) {
           setLen(other.getLen());
         }
-        if (!other.hash_.isEmpty()) {
-          if (hash_.isEmpty()) {
-            hash_ = other.hash_;
-            bitField0_ = (bitField0_ & ~0x00000002);
-          } else {
-            ensureHashIsMutable();
-            hash_.addAll(other.hash_);
-          }
-          onChanged();
+        if (other.hasHash()) {
+          setHash(other.getHash());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -561,68 +510,37 @@ public final class UtilProtos {
         return this;
       }
 
-      private java.util.List<java.lang.Integer> hash_ = java.util.Collections.emptyList();
-      private void ensureHashIsMutable() {
-        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-          hash_ = new java.util.ArrayList<java.lang.Integer>(hash_);
-          bitField0_ |= 0x00000002;
-         }
+      private com.google.protobuf.ByteString hash_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes hash = 2;</code>
+       */
+      public boolean hasHash() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>repeated fixed32 hash = 2 [packed = true];</code>
+       * <code>optional bytes hash = 2;</code>
        */
-      public java.util.List<java.lang.Integer>
-          getHashList() {
-        return java.util.Collections.unmodifiableList(hash_);
+      public com.google.protobuf.ByteString getHash() {
+        return hash_;
       }
       /**
-       * <code>repeated fixed32 hash = 2 [packed = true];</code>
+       * <code>optional bytes hash = 2;</code>
        */
-      public int getHashCount() {
-        return hash_.size();
-      }
-      /**
-       * <code>repeated fixed32 hash = 2 [packed = true];</code>
-       */
-      public int getHash(int index) {
-        return hash_.get(index);
-      }
-      /**
-       * <code>repeated fixed32 hash = 2 [packed = true];</code>
-       */
-      public Builder setHash(
-          int index, int value) {
-        ensureHashIsMutable();
-        hash_.set(index, value);
+      public Builder setHash(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        hash_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>repeated fixed32 hash = 2 [packed = true];</code>
-       */
-      public Builder addHash(int value) {
-        ensureHashIsMutable();
-        hash_.add(value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated fixed32 hash = 2 [packed = true];</code>
-       */
-      public Builder addAllHash(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureHashIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, hash_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated fixed32 hash = 2 [packed = true];</code>
+       * <code>optional bytes hash = 2;</code>
        */
       public Builder clearHash() {
-        hash_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000002);
+        hash_ = getDefaultInstance().getHash();
         onChanged();
         return this;
       }
@@ -685,17 +603,13 @@ public final class UtilProtos {
     org.coniks.coniks_common.UtilProtos.HashOrBuilder getRootHashOrBuilder();
 
     /**
-     * <code>repeated fixed32 signature = 3;</code>
+     * <code>optional bytes signature = 3;</code>
      */
-    java.util.List<java.lang.Integer> getSignatureList();
+    boolean hasSignature();
     /**
-     * <code>repeated fixed32 signature = 3;</code>
+     * <code>optional bytes signature = 3;</code>
      */
-    int getSignatureCount();
-    /**
-     * <code>repeated fixed32 signature = 3;</code>
-     */
-    int getSignature(int index);
+    com.google.protobuf.ByteString getSignature();
   }
   /**
    * Protobuf type {@code org.coniks.coniks_common.Commitment}
@@ -767,25 +681,9 @@ public final class UtilProtos {
               bitField0_ |= 0x00000002;
               break;
             }
-            case 29: {
-              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
-                signature_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000004;
-              }
-              signature_.add(input.readFixed32());
-              break;
-            }
             case 26: {
-              int length = input.readRawVarint32();
-              int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004) && input.getBytesUntilLimit() > 0) {
-                signature_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000004;
-              }
-              while (input.getBytesUntilLimit() > 0) {
-                signature_.add(input.readFixed32());
-              }
-              input.popLimit(limit);
+              bitField0_ |= 0x00000004;
+              signature_ = input.readBytes();
               break;
             }
           }
@@ -796,9 +694,6 @@ public final class UtilProtos {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
-          signature_ = java.util.Collections.unmodifiableList(signature_);
-        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -888,31 +783,24 @@ public final class UtilProtos {
     }
 
     public static final int SIGNATURE_FIELD_NUMBER = 3;
-    private java.util.List<java.lang.Integer> signature_;
+    private com.google.protobuf.ByteString signature_;
     /**
-     * <code>repeated fixed32 signature = 3;</code>
+     * <code>optional bytes signature = 3;</code>
      */
-    public java.util.List<java.lang.Integer>
-        getSignatureList() {
+    public boolean hasSignature() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional bytes signature = 3;</code>
+     */
+    public com.google.protobuf.ByteString getSignature() {
       return signature_;
-    }
-    /**
-     * <code>repeated fixed32 signature = 3;</code>
-     */
-    public int getSignatureCount() {
-      return signature_.size();
-    }
-    /**
-     * <code>repeated fixed32 signature = 3;</code>
-     */
-    public int getSignature(int index) {
-      return signature_.get(index);
     }
 
     private void initFields() {
       epoch_ = 0L;
       rootHash_ = org.coniks.coniks_common.UtilProtos.Hash.getDefaultInstance();
-      signature_ = java.util.Collections.emptyList();
+      signature_ = com.google.protobuf.ByteString.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -933,8 +821,8 @@ public final class UtilProtos {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeMessage(2, rootHash_);
       }
-      for (int i = 0; i < signature_.size(); i++) {
-        output.writeFixed32(3, signature_.get(i));
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(3, signature_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -953,11 +841,9 @@ public final class UtilProtos {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, rootHash_);
       }
-      {
-        int dataSize = 0;
-        dataSize = 4 * getSignatureList().size();
-        size += dataSize;
-        size += 1 * getSignatureList().size();
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, signature_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1085,7 +971,7 @@ public final class UtilProtos {
           rootHashBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
-        signature_ = java.util.Collections.emptyList();
+        signature_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
@@ -1127,9 +1013,8 @@ public final class UtilProtos {
         } else {
           result.rootHash_ = rootHashBuilder_.build();
         }
-        if (((bitField0_ & 0x00000004) == 0x00000004)) {
-          signature_ = java.util.Collections.unmodifiableList(signature_);
-          bitField0_ = (bitField0_ & ~0x00000004);
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
         }
         result.signature_ = signature_;
         result.bitField0_ = to_bitField0_;
@@ -1154,15 +1039,8 @@ public final class UtilProtos {
         if (other.hasRootHash()) {
           mergeRootHash(other.getRootHash());
         }
-        if (!other.signature_.isEmpty()) {
-          if (signature_.isEmpty()) {
-            signature_ = other.signature_;
-            bitField0_ = (bitField0_ & ~0x00000004);
-          } else {
-            ensureSignatureIsMutable();
-            signature_.addAll(other.signature_);
-          }
-          onChanged();
+        if (other.hasSignature()) {
+          setSignature(other.getSignature());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -1391,68 +1269,37 @@ public final class UtilProtos {
         return rootHashBuilder_;
       }
 
-      private java.util.List<java.lang.Integer> signature_ = java.util.Collections.emptyList();
-      private void ensureSignatureIsMutable() {
-        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
-          signature_ = new java.util.ArrayList<java.lang.Integer>(signature_);
-          bitField0_ |= 0x00000004;
-         }
+      private com.google.protobuf.ByteString signature_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes signature = 3;</code>
+       */
+      public boolean hasSignature() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>repeated fixed32 signature = 3;</code>
+       * <code>optional bytes signature = 3;</code>
        */
-      public java.util.List<java.lang.Integer>
-          getSignatureList() {
-        return java.util.Collections.unmodifiableList(signature_);
+      public com.google.protobuf.ByteString getSignature() {
+        return signature_;
       }
       /**
-       * <code>repeated fixed32 signature = 3;</code>
+       * <code>optional bytes signature = 3;</code>
        */
-      public int getSignatureCount() {
-        return signature_.size();
-      }
-      /**
-       * <code>repeated fixed32 signature = 3;</code>
-       */
-      public int getSignature(int index) {
-        return signature_.get(index);
-      }
-      /**
-       * <code>repeated fixed32 signature = 3;</code>
-       */
-      public Builder setSignature(
-          int index, int value) {
-        ensureSignatureIsMutable();
-        signature_.set(index, value);
+      public Builder setSignature(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        signature_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>repeated fixed32 signature = 3;</code>
-       */
-      public Builder addSignature(int value) {
-        ensureSignatureIsMutable();
-        signature_.add(value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated fixed32 signature = 3;</code>
-       */
-      public Builder addAllSignature(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureSignatureIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, signature_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated fixed32 signature = 3;</code>
+       * <code>optional bytes signature = 3;</code>
        */
       public Builder clearSignature() {
-        signature_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000004);
+        signature_ = getDefaultInstance().getSignature();
         onChanged();
         return this;
       }
@@ -3607,25 +3454,24 @@ public final class UtilProtos {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\nutil.proto\022\030org.coniks.coniks_common\"%" +
-      "\n\004Hash\022\013\n\003len\030\001 \001(\005\022\020\n\004hash\030\002 \003(\007B\002\020\001\"a\n" +
-      "\nCommitment\022\r\n\005epoch\030\001 \001(\004\0221\n\troot_hash\030" +
-      "\002 \001(\0132\036.org.coniks.coniks_common.Hash\022\021\n" +
-      "\tsignature\030\003 \003(\007\"\356\001\n\nServerResp\022=\n\007messa" +
-      "ge\030\001 \001(\0162,.org.coniks.coniks_common.Serv" +
-      "erResp.Message\"\240\001\n\007Message\022\013\n\007SUCCESS\020\000\022" +
-      "\023\n\017NAME_EXISTS_ERR\020\001\022\021\n\rMALFORMED_ERR\020\002\022" +
-      "\016\n\nSERVER_ERR\020\003\022\026\n\022NAME_NOT_FOUND_ERR\020\004\022" +
-      "\023\n\017COMMITMENT_RESP\020\005\022\r\n\tAUTH_PATH\020\006\022\024\n\020V",
-      "ERIFICATION_ERR\020\007\"o\n\020CompleteRootNode\022,\n" +
-      "\004left\030\001 \001(\0132\036.org.coniks.coniks_common.H" +
-      "ash\022-\n\005right\030\002 \001(\0132\036.org.coniks.coniks_c" +
-      "ommon.Hash\"\225\001\n\023WitnessedCommitment\022\020\n\010pr" +
-      "ovider\030\001 \001(\t\0222\n\004comm\030\002 \001(\0132$.org.coniks." +
-      "coniks_common.Commitment\0228\n\004root\030\003 \001(\0132*" +
-      ".org.coniks.coniks_common.CompleteRootNo" +
-      "deB&\n\030org.coniks.coniks_commonB\nUtilProt" +
-      "os"
+      "\n\nutil.proto\022\030org.coniks.coniks_common\"!" +
+      "\n\004Hash\022\013\n\003len\030\001 \001(\005\022\014\n\004hash\030\002 \001(\014\"a\n\nCom" +
+      "mitment\022\r\n\005epoch\030\001 \001(\004\0221\n\troot_hash\030\002 \001(" +
+      "\0132\036.org.coniks.coniks_common.Hash\022\021\n\tsig" +
+      "nature\030\003 \001(\014\"\356\001\n\nServerResp\022=\n\007message\030\001" +
+      " \001(\0162,.org.coniks.coniks_common.ServerRe" +
+      "sp.Message\"\240\001\n\007Message\022\013\n\007SUCCESS\020\000\022\023\n\017N" +
+      "AME_EXISTS_ERR\020\001\022\021\n\rMALFORMED_ERR\020\002\022\016\n\nS" +
+      "ERVER_ERR\020\003\022\026\n\022NAME_NOT_FOUND_ERR\020\004\022\023\n\017C" +
+      "OMMITMENT_RESP\020\005\022\r\n\tAUTH_PATH\020\006\022\024\n\020VERIF",
+      "ICATION_ERR\020\007\"o\n\020CompleteRootNode\022,\n\004lef" +
+      "t\030\001 \001(\0132\036.org.coniks.coniks_common.Hash\022" +
+      "-\n\005right\030\002 \001(\0132\036.org.coniks.coniks_commo" +
+      "n.Hash\"\225\001\n\023WitnessedCommitment\022\020\n\010provid" +
+      "er\030\001 \001(\t\0222\n\004comm\030\002 \001(\0132$.org.coniks.coni" +
+      "ks_common.Commitment\0228\n\004root\030\003 \001(\0132*.org" +
+      ".coniks.coniks_common.CompleteRootNodeB&" +
+      "\n\030org.coniks.coniks_commonB\nUtilProtos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

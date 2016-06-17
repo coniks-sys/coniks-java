@@ -52,7 +52,7 @@ public class ClientLogger {
      *@param clientLog the file name for this logger.
      */
     public static void setup (String clientLog) {
-        logger = Logger.getLogger("ConiksLogger-Debug");
+        logger = Logger.getLogger("ConiksLogger-Client");
 
         // suppress the logging output to the console
         logger.setUseParentHandlers(false);

@@ -1,6 +1,6 @@
 #CONIKS
 
-[![Build Status](https://travis-ci.org/coniks-sys/coniks-ref-implementation.svg?branch=use-proto-bytestrs)](https://travis-ci.org/coniks-sys/coniks-ref-implementation)
+[![Build Status](https://travis-ci.org/coniks-sys/coniks-ref-implementation.svg?branch=master)](https://travis-ci.org/coniks-sys/coniks-ref-implementation)
 
 Copyright (C) 2015-16 Princeton University.
 

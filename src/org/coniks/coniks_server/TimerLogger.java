@@ -53,6 +53,7 @@ public class TimerLogger {
      *@param epochTimerLog the file name for this logger.
      */
     public static void setup (String epochTimerLog) {
+        logger = Logger.getLogger("ConiksLogger-Timer");
 
         // suppress the logging output to the console
         logger.setUseParentHandlers(false);

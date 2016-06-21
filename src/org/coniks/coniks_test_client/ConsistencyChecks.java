@@ -41,7 +41,7 @@ import java.security.spec.*;
 import java.security.interfaces.*;
 import java.util.ArrayList;
 
-import com.google.protobuf.*;
+import com.google.protobuf.ByteString;
 import org.javatuples.*;
 
 import org.coniks.coniks_common.ServerErr;
@@ -97,10 +97,15 @@ public class ConsistencyChecks {
     private static byte[] recomputeAuthPathRootProto(AuthPath authPath){
         
         AuthPath.UserLeafNode apUln = authPath.getLeaf();        
-       
-        ArrayList<Integer> lookupIndexList = new ArrayList<Integer>(apUln.getLookupIndexList());
+        ByteString index = apUln.getLookupIndex();
 
-        byte[] lookupIndex = ClientUtils.intListToByteArr(lookupIndexList);
+        // verify the input: expect the index to be the size of the hash
+        if(index.size() != ClientUtils.HASH_SIZE_BYTES){
+            ClientLogger.error("Bad index length");
+            return null;
+        }
+        
+        byte[] lookupIndex = index.toByteArray();
         int numInteriors = apUln.getIntlevels();
 
         byte[] ulnHash = ClientUtils.hash(ClientUtils.ulnProtoToBytes(apUln));

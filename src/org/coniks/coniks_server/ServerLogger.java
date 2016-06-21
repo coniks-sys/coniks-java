@@ -52,6 +52,7 @@ public class ServerLogger {
      *@param serverLog the file name for this logger.
      */
     public static void setup (String serverLog) {
+        logger = Logger.getLogger("ConiksLogger-Server");
 
         // suppress the logging output to the console
         logger.setUseParentHandlers(false);

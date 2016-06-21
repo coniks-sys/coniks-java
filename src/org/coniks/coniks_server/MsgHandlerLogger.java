@@ -54,7 +54,8 @@ public class MsgHandlerLogger {
      *@param msgHandlerLog the file name for this logger.
      */
     public static void setup (String msgHandlerLog) {
-
+        logger = Logger.getLogger("ConiksLogger-Msg Handler");
+        
         // suppress the logging output to the console
         logger.setUseParentHandlers(false);
         

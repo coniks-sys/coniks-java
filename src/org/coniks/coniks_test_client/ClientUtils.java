@@ -39,6 +39,8 @@ import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.Commitment;
 import org.coniks.coniks_common.UtilProtos.Hash;
 
+import com.google.protobuf.ByteString;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.nio.ByteBuffer;
@@ -159,41 +161,6 @@ public class ClientUtils{
             hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
         return new String(hexChars);
-    }
-
-    /** Converts a {@code byte[]} into a list of integers.
-     * This utility is needed for building protobuf messages that
-     * contain fields representing byte buffers.
-     *
-     *@return The {@code arr} as an {@link java.util.ArrayList} of
-     * integers.
-     */
-    public static ArrayList<Integer> byteArrToIntList(byte[] arr){
-        ArrayList<Integer> list = new ArrayList<Integer>();
-       
-        for(int i = 0; i < arr.length; i++){
-            int nextInt = arr[i] & 0xff; 
-            list.add(new Integer(nextInt));
-        }
-        
-        return list;
-    }
-
-     /** Converts a list of integers into a {@code byte[]}.
-     * This utility is needed for parsing protobuf messages that
-     * contain fields representing byte buffers.
-     *
-     *@return The {@link java.util.ArrayList} of integers as a {@code byte[]}.
-     */
-    public static byte[] intListToByteArr(ArrayList<Integer> list){
-        byte[] arr = new byte[list.size()];
-       
-        for(int i = 0; i < list.size(); i++){
-            byte nextByte = list.get(i).byteValue();
-            arr[i] = nextByte;
-        }
-        
-        return arr;
     }
 
     /** Converts a UTF-8 String {@code str} to an array of bytes.
@@ -363,8 +330,8 @@ public class ClientUtils{
         byte[] auk = new byte[]{(byte)(uln.getAllowsUnsignedKeychange() ? 0x01 : 0x00)};
         byte[] apl = new byte[]{(byte)(uln.getAllowsPublicLookup() ? 0x01 : 0x00)};
         byte[] ck = convertDSAPubKey(uln.getChangeKey());
-        byte[] sig = ClientUtils.intListToByteArr(new ArrayList<Integer>(uln.getSignatureList()));
-        byte[] lastMsg = ClientUtils.intListToByteArr(new ArrayList<Integer>(uln.getLastMsgList()));
+        byte[] sig = uln.getSignature().toByteArray();
+        byte[] lastMsg = uln.getLastMsg().toByteArray();
 
         byte[] leafBytes = new byte[pubKey.length+usr.length+ep_add.length+auk.length+
                                     apl.length+ep_changed.length+ck.length+sig.length+lastMsg.length];
@@ -403,17 +370,15 @@ public class ClientUtils{
             
             Hash pcHash = in.getSubtree();
             AuthPath.PrunedChild pcSide = in.getPrunedchild();
-            ArrayList<Integer> pcHashList = new ArrayList<Integer>(pcHash.getHashList());
 
-            if(pcHashList.size() != ClientUtils.HASH_SIZE_BYTES){
+            // verify the input
+            ByteString subtreeHash = pcHash.getHash();
+            if(subtreeHash.size() != ClientUtils.HASH_SIZE_BYTES){
                 ClientLogger.error("Bad hash length");
                 return null;
             }
 
-            byte[] prunedChild = new byte[ClientUtils.HASH_SIZE_BYTES];
-            for(int j = 0; j < pcHashList.size(); j++){
-                prunedChild[j] = pcHashList.get(j).byteValue();
-            }
+            byte[] prunedChild = subtreeHash.toByteArray();
             
             if(pcSide == AuthPath.PrunedChild.LEFT){
                 curHash = ClientUtils.hashChildren(prunedChild, curHash);
@@ -437,17 +402,15 @@ public class ClientUtils{
 
         Hash pcHash = root.getSubtree();
         AuthPath.PrunedChild pcSide = root.getPrunedchild();
-        ArrayList<Integer> pcHashList = new ArrayList<Integer>(pcHash.getHashList());
-        
-        if(pcHashList.size() != ClientUtils.HASH_SIZE_BYTES){
+
+        // verify the input
+        ByteString subtreeHash = pcHash.getHash();
+        if(subtreeHash.size() != ClientUtils.HASH_SIZE_BYTES){
             ClientLogger.error("Bad hash length");
             return null;
         }
         
-        byte[] prunedChild = new byte[ClientUtils.HASH_SIZE_BYTES];
-        for(int j = 0; j < pcHashList.size(); j++){
-            prunedChild[j] = pcHashList.get(j).byteValue();
-        }
+        byte[] prunedChild = subtreeHash.toByteArray();
 
         byte[] rootBytes = new byte[authPathHash.length+prunedChild.length];
 	

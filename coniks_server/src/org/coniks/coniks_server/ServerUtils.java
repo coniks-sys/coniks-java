@@ -304,7 +304,7 @@ public class ServerUtils{
         byte[] auk = new byte[]{(byte)(uln.allowsUnsignedKeychange() ? 0x01 : 0x00)};
         byte[] apl = new byte[]{(byte)(uln.allowsPublicLookups() ? 0x01 : 0x00)};
 
-	byte[] leafBytes = new byte[pubKey.length+usr.length+ep_add.length+auk.length+
+	byte[] leafBytes = new byte[pubKey.length+usr.length+ck.length+ep_add.length+auk.length+
                                     apl.length];
 	
 	ByteBuffer arr = ByteBuffer.wrap(leafBytes);

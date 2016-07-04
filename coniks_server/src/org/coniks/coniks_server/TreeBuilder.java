@@ -33,8 +33,6 @@
 
 package org.coniks.coniks_server;
 
-import java.nio.charset.Charset;
-
 import java.util.PriorityQueue;
 import java.security.KeyPair;
 import java.security.interfaces.DSAPublicKey;
@@ -53,7 +51,7 @@ import org.javatuples.*;
 public class TreeBuilder{
     
     private static int lastLevel;
-
+    
     // inserts a new user leaf node into the tree
     private static void insertNode(byte[] key, UserLeafNode toAdd, RootNode root, Operation op){
         int curOffset = 0;
@@ -67,7 +65,7 @@ public class TreeBuilder{
         int counter = 1;
         
         insertLoop:
-            while(true){
+        while(true){
             int arrayOffset = curOffset / 8;
             int bitOfByte = curOffset % 8;
             // 0 is left-most byte in string
@@ -81,7 +79,7 @@ public class TreeBuilder{
                 if (curNode.parent == null){
                     throw new UnsupportedOperationException("parent is null!!");
                 }
-
+                
                 // TODO: Does this need to be moved?
                 InteriorNode newInt = new InteriorNode(curNode.parent,
                                                        curNode.level);
@@ -112,7 +110,7 @@ public class TreeBuilder{
                 if (!(op instanceof Register)) {
                     throw new UnsupportedOperationException("Failed to make key-change!");
                 }
-
+                
                 byte[] curNodeKey = ServerUtils.unameToIndex(curNodeUL.username);
                 curNodeUL.setIndex(curNodeKey);
                 // This is what's happening below:
@@ -173,9 +171,9 @@ public class TreeBuilder{
             curNode.setName("n"+counter);
             counter++;
         }
-            if (toAdd.level > lastLevel){
-                lastLevel = toAdd.level;
-            }
+        if (toAdd.level > lastLevel){
+            lastLevel = toAdd.level;
+        }
     }
     
     // Compute the hashes of the left and right subtrees
@@ -193,7 +191,7 @@ public class TreeBuilder{
     // this recursively computes the hash of the subtree specified
     // by curNode
     private static byte[] innerComputeHash(TreeNode curNode){
-    	if(curNode == null){
+    	if(curNode == null) {
     	    return ServerUtils.hash(new byte[ServerUtils.HASH_SIZE_BYTES]);
     	}
 
@@ -207,21 +205,23 @@ public class TreeBuilder{
     		// compute right-side hash
     		curNodeI.rightHash = innerComputeHash(curNode.right);
     	    }
+            
     	    return ServerUtils.hash(ServerUtils.getInteriorNodeBytes(curNodeI));
-    	}else{
+    	}
+        else{
     	    // assertion: must be user leaf node.
     	    UserLeafNode curNodeU = (UserLeafNode) curNode;
-    	    return ServerUtils.hash(ServerUtils.getUserLeafNodeBytes(curNodeU));
+            return ServerUtils.hash(ServerUtils.getUserLeafNodeBytes(curNodeU));
     	}
     }
-
+    
     /** Clones a Merkle prefix tree {@code prevRoot} and 
      * extends it with any new nodes in {@code pendingQ}.
      *
      *@return The {@link RootNode} for the next epoch's Merkle tree.
      */
     public static RootNode copyExtendTree(RootNode prevRoot,
-                                   PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ){
+                                          PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ){
         // clone old tree
         RootNode newRoot;
         if (prevRoot != null){
@@ -236,7 +236,7 @@ public class TreeBuilder{
         }
         return extendTree(pendingQ, newRoot);
     }
-
+    
     /** Inserts any new nodes in {@code pendingQ} ordered by the 24-bit prefix
      * of their lookup index into the Merkle tree, and recomputes all necessary 
      * hashes.
@@ -246,14 +246,12 @@ public class TreeBuilder{
     private static RootNode extendTree(
                                        PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
                                        RootNode root) {
-
+        
         RootNode newRoot = root;
-       
+        
         byte[] prefix = null;
         
         int toInsert = pendingQ.size();
-
-        System.out.print("extending tree");
         
         Triplet<byte[], UserLeafNode, Operation> p = pendingQ.poll();
         while(p != null){
@@ -268,16 +266,10 @@ public class TreeBuilder{
             insertNode(index, toAdd, newRoot, op);
             
             p = pendingQ.poll();
-
-            if (toInsert > 100 && toInsert % 100 == 0) {
-                System.out.print("n");
-            }
-
+            
             toInsert--;
             
         }
-
-        System.out.println();
         
         // recompute hashes
         computeHashes(newRoot);

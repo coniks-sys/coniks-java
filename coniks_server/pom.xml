@@ -5,13 +5,13 @@
   <parent>
     <groupId>org.coniks</groupId>
     <artifactId>coniks-java</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
   </parent>
 
   <groupId>org.coniks.coniks_server</groupId>
   <artifactId>coniks_server</artifactId>
   <packaging>jar</packaging>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.2-SNAPSHOT</version>
   <name>coniks_server</name>
   <url>http://coniks.org</url>
 
@@ -26,7 +26,7 @@
     <dependency>
       <groupId>org.coniks.coniks_common</groupId>
       <artifactId>coniks_common</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.2-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
 

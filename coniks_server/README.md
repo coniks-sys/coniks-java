@@ -5,7 +5,7 @@ Copyright (C) 2015-16 Princeton University.
 http://coniks.org
 
 ##Introduction
-This is a basic reference implementation of a server for the CONIKS key management system. It currently supports new key registrations, key lookups, changes to key data and user policies (**new features**) and can generate consistency proofs and signed directory summaries. It is designed to communicate with the [CONIKS test client](https://github.com/coniks-sys/coniks-ref-implementation/tree/master/coniks_test_client).
+This is a basic reference implementation of a server for the CONIKS key management system. It currently supports new key registrations, key lookups, changes to key data and user policies (**new features**) and can generate consistency proofs and signed directory summaries. It is designed to communicate with the [CONIKS test client](https://github.com/coniks-sys/coniks-java/tree/master/coniks_test_client).
 
 ##Building the Server - With Maven
 The coniks_server build is managed using Maven. (Instructions for building without Maven coming soon)
@@ -82,7 +82,7 @@ For example, to start the server in full operation mode, use
 Analogously to test and stop the server, and remove the logs.
 
 ## Disclaimer
-Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/citp/coniks-ref-implementation/releases).
+Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/coniks-sys/coniks-java/releases).
 
 ##Documentation
-[Read the server's Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation/org/coniks/coniks_server/package-summary.html)
+[Read the server's Java API (javadoc)](https://coniks-sys.github.io/coniks-java/org/coniks/coniks_server/package-summary.html)

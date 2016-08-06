@@ -2,21 +2,7 @@ sudo: false
 
 language: java
 
-env:
-        global:
-        - MAKE=make
-
-addons:
-        apt:
-                packages: &common_packages
-                - automake
-                - build-essential
-
-script:
-        - cd coniks_server; ${MAKE}
-        - cd ..
-        - cd coniks_test_client; ${MAKE}
-        - cd ..
+script: mvn compile
 
 notifications:
   # Email notifications are disabled to not annoy anybody.

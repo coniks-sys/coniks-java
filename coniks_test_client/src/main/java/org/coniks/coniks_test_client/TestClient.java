@@ -1,33 +1,33 @@
 /*
   Copyright (c) 2015-16, Princeton University.
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are 
+  modification, are permitted provided that the following conditions are
   met:
-  * Redistributions of source code must retain the above copyright 
+  * Redistributions of source code must retain the above copyright
   notice, this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above 
-  copyright notice, this list of conditions and the following disclaimer 
-  in the documentation and/or other materials provided with the 
+  * Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
   distribution.
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
-  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -44,6 +44,10 @@ import java.io.FileNotFoundException;
 import java.lang.NumberFormatException;
 
 import com.google.protobuf.*;
+
+// coniks-java imports
+import org.coniks.crypto.Signing;
+import org.coniks.crypto.Keys;
 import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.ServerResp;
 import org.coniks.coniks_common.ServerErr;
@@ -52,9 +56,9 @@ import org.coniks.coniks_common.ServerErr;
  * that simply displays how each component of the
  * protocol works.
  * The client is completely agnostic to the underlying format
- * of the data sent to the server (it only needs to know 
+ * of the data sent to the server (it only needs to know
  * whether it's using protobufs)).
- * 
+ *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Aaron Blankstein
  *@author Michael Rochlin
@@ -72,15 +76,15 @@ public class TestClient {
     private static final String FAKE_PK_DATA = "fake key data";
 
     /** List of coniks users - for now used for testing */
-    private static HashMap<String,ClientUser> users;    
+    private static HashMap<String,ClientUser> users;
 
     private static int changeCtr = 0; // this is just used to change the key data
-    
+
     /** Sets the default truststore according to the {@link ClientConfig}.
      * This is needed to set up SSL connections with a CONIKS server.
      */
     private static void setDefaultTruststore () {
-        System.setProperty("javax.net.ssl.trustStore", 
+        System.setProperty("javax.net.ssl.trustStore",
                            ClientConfig.getTruststorePath());
         System.setProperty("javax.net.ssl.trustStorePassword",
                            ClientConfig.getTruststorePassword());
@@ -118,7 +122,7 @@ public class TestClient {
             break;
         default:
             serverErr = ServerErr.SERVER_ERR;
-            break;                
+            break;
         }
 
         return serverErr;
@@ -133,14 +137,23 @@ public class TestClient {
      *@return whether the registration succeeded or an error code
      */
     private static int register (String uname, String server) {
-        KeyPair kp = KeyOps.generateDSAKeyPair();
+        KeyPair kp = null;
+
+        try {
+            kp = Keys.generateDSAKeyPair();
+        }
+        catch(NoSuchAlgorithmException e) {
+            ClientLogger.error("[TestClient] "+e.getMessage());
+            return ClientUtils.INTERNAL_CLIENT_ERR;
+        }
+
         String pk = uname+" "+FAKE_PK_DATA;
 
         ClientUser user = new ClientUser(uname, pk, kp);
         users.put(uname, user);
 
         ClientMessaging.sendRegistrationProto(user, server);
-        
+
         AbstractMessage serverMsg = ClientMessaging.receiveRegistrationRespProto();
 
         if (serverMsg == null) {
@@ -223,7 +236,7 @@ public class TestClient {
             System.out.println("user "+uname+" allows unsigned key changes");
         }
 
-        // ugh, maybe this isn't the best. 
+        // ugh, maybe this isn't the best.
         // we're testing the signing, mostly, so the key data doesn't really matter right now
         String newKeyData = user.getKeyData()+changeCtr;
 
@@ -235,22 +248,32 @@ public class TestClient {
         }
 
         // update the change key for good measure
-        KeyPair newCk = KeyOps.generateDSAKeyPair();
+        KeyPair newCk = null;
+
+        try {
+            newCk = Keys.generateDSAKeyPair();
+        }
+        catch(NoSuchAlgorithmException e) {
+            ClientLogger.error("[TestClient] "+e.getMessage());
+            user.unloadChangePrivKey();
+            return ClientUtils.INTERNAL_CLIENT_ERR;
+        }
 
         // sign the whole key change request (including all unchanged data)
         byte[] sig = null;
         try {
-            ULNChangeReq changeReq = ClientMessaging.buildULNChangeReqMsgProto(user.getUsername(), 
-                                                                               newKeyData, 
-                                                                               (DSAPublicKey)newCk.getPublic(), 
-                                                                               user.isAllowsUnsignedChanges(), 
-                                                                               user.isAllowsPublicVisibility());
+            ULNChangeReq changeReq =
+                ClientMessaging.buildULNChangeReqMsgProto(user.getUsername(),
+                                                          newKeyData,
+                                                          (DSAPublicKey)newCk.getPublic(),
+                                                          user.isAllowsUnsignedChanges(),
+                                                          user.isAllowsPublicVisibility());
 
 
-            sig = SignatureOps.signDSA(changeReq.toByteArray(), prKey);
+            sig = Signing.dsaSign(prKey, changeReq.toByteArray());
         }
-        catch (InvalidKeyException e) {
-            ClientLogger.error(e.getMessage());
+        catch (NoSuchAlgorithmException e) {
+            ClientLogger.error("[TestClient] "+e.getMessage());
             user.unloadChangePrivKey();
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
@@ -284,7 +307,7 @@ public class TestClient {
         else {
             // TODO: verify registration resp and save the new key data to disk
             changeCtr++;
-            
+
             return ConsistencyErr.CHECK_PASSED;
         }
 
@@ -306,7 +329,7 @@ public class TestClient {
             return ConsistencyErr.DISALLOWED_OP_ERR;
         }
 
-        // ugh, maybe this isn't the best. 
+        // ugh, maybe this isn't the best.
         // we're testing the signing, mostly, so the key data doesn't really matter right now
         String newKeyData = user.getKeyData()+changeCtr;
         user.setKeyData(newKeyData);
@@ -324,7 +347,7 @@ public class TestClient {
         else {
             // TODO: check the registration resp and save the new key data to disk
             changeCtr++;
-            
+
             return ConsistencyErr.CHECK_PASSED;
         }
     }
@@ -355,23 +378,32 @@ public class TestClient {
             System.out.println("no private key for "+uname);
             return ConsistencyErr.KEYSTORE_ERR;
         }
-        
+
         // update the change key for good measure
-        KeyPair newCk = KeyOps.generateDSAKeyPair();
-        
+        KeyPair newCk = null;
+
+        try {
+            newCk = Keys.generateDSAKeyPair();
+        }
+        catch(NoSuchAlgorithmException e) {
+            ClientLogger.error("[TestClient] "+e.getMessage());
+            user.unloadChangePrivKey();
+            return ClientUtils.INTERNAL_CLIENT_ERR;
+        }
+
         // sign the whole policy change request (including all unchanged data)
         byte[] sig = null;
         try {
-            ULNChangeReq changeReq = ClientMessaging.buildULNChangeReqMsgProto(user.getUsername(), user.getKeyData(), 
-                                                                               (DSAPublicKey)newCk.getPublic(), 
-                                                                               user.isAllowsUnsignedChanges(), 
+            ULNChangeReq changeReq = ClientMessaging.buildULNChangeReqMsgProto(user.getUsername(), user.getKeyData(),
+                                                                               (DSAPublicKey)newCk.getPublic(),
+                                                                               user.isAllowsUnsignedChanges(),
                                                                                user.isAllowsPublicVisibility());
 
 
-            sig = SignatureOps.signDSA(changeReq.toByteArray(), prKey);
+            sig = Signing.dsaSign(prKey, changeReq.toByteArray());
         }
-        catch (InvalidKeyException e) {
-            ClientLogger.error(e.getMessage());
+        catch (NoSuchAlgorithmException e) {
+            ClientLogger.error("[TestClient] "+e.getMessage());
             user.unloadChangePrivKey();
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
@@ -384,7 +416,7 @@ public class TestClient {
             ClientLogger.error("Couldn't get a signature for the new policy");
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
-        
+
         // now we can update the user's data internally
         user.saveChangeKeyPair(newCk);
 
@@ -480,7 +512,7 @@ public class TestClient {
             break;
         default:
             printErr("Some unknown server error occurred: "+err);
-            break;                
+            break;
         }
 
     }
@@ -491,9 +523,9 @@ public class TestClient {
      *@return {@code true} if it's valid, {@code false} otherwise.
      */
     private static boolean isValidOperation (String op) {
-         if (op.equalsIgnoreCase("LOOKUP") || 
-            op.equalsIgnoreCase("REGISTER") || 
-            op.equalsIgnoreCase("SIGNED") || 
+         if (op.equalsIgnoreCase("LOOKUP") ||
+            op.equalsIgnoreCase("REGISTER") ||
+            op.equalsIgnoreCase("SIGNED") ||
             op.equalsIgnoreCase("UNSIGNED") ||
             op.equalsIgnoreCase("POLICY")) {
              return true;
@@ -537,7 +569,7 @@ public class TestClient {
             String uname = "test-"+(offset+i);
 
             int error = 0;
-            
+
             if(op.equalsIgnoreCase("LOOKUP")){
                 error = lookup(uname, server);
             }
@@ -553,7 +585,7 @@ public class TestClient {
             else if (op.equalsIgnoreCase("POLICY")) {
                 error = changeKeyChangePolicy(uname, server);
             }
-        
+
             // if we got an error, print a new line so the error msg doesn't
             // appear next to the progress dots
             if (error != ServerErr.SUCCESS && error != ConsistencyErr.CHECK_PASSED) {
@@ -635,7 +667,7 @@ public class TestClient {
 
             //  prompt for the user's name
             System.out.print("Enter the next operation (or h for help): ");
-            
+
             // get their input as a String
             String op = scanner.next();
 
@@ -683,11 +715,11 @@ public class TestClient {
                 doOperation(op, numUsers, offset);
 
                 System.out.print("Would you like to perform another operation? [y/n]: ");
-                
+
                 cont = scanner.next();
 
                 while (!cont.equalsIgnoreCase("y")  && !cont.equalsIgnoreCase("n")) {
-                    System.out.print("Please enter y or n: ");                
+                    System.out.print("Please enter y or n: ");
                     cont = scanner.next();
                 }
             }
@@ -696,7 +728,7 @@ public class TestClient {
                 usage();
                 break;
             }
-            
+
         }
 
         System.out.println("Goodbye.");

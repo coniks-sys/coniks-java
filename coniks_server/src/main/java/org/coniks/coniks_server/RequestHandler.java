@@ -45,6 +45,9 @@ import java.security.interfaces.DSAParams;
 import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.ByteString;
 
+// coniks-java imports
+import org.coniks.crypto.*;
+
 import org.coniks.coniks_common.MsgType;
 import org.coniks.coniks_common.C2SProtos.Registration;
 import org.coniks.coniks_common.C2SProtos.CommitmentReq;
@@ -302,7 +305,18 @@ public class RequestHandler extends Thread{
         
         byte[] reqMsg = changeReq.toByteArray();
         byte[] sig = signedReq.getSig().toByteArray();
-        if (!SignatureOps.verifySigFromDSA(reqMsg, sig, publicChangeKey)) {
+
+        boolean res = false;
+
+        try {
+            res = Signing.dsaVerify(publicChangeKey, reqMsg, sig);
+        }
+        // let's catch the panic here and log it
+        catch (Exception e) {
+            ServerLogger.error("[RequestHandler] "+e.getMessage());
+        }
+
+        if (!res) {
             MsgHandlerLogger.log("Failed to verify message");
             MsgHandlerLogger.log("Failed sig said\n" + Arrays.toString(sig));
             ServerMessaging.sendSimpleResponseProto(ServerErr.SIGNED_CHANGE_VERIF_ERR, clientSocket);

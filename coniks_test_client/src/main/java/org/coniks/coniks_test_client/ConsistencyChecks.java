@@ -1,33 +1,33 @@
 /*
   Copyright (c) 2015-16, Princeton University.
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are 
+  modification, are permitted provided that the following conditions are
   met:
-  * Redistributions of source code must retain the above copyright 
+  * Redistributions of source code must retain the above copyright
   notice, this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above 
-  copyright notice, this list of conditions and the following disclaimer 
-  in the documentation and/or other materials provided with the 
+  * Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
   distribution.
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
-  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import com.google.protobuf.ByteString;
 import org.javatuples.*;
 
+// coniks-java imports
+import org.coniks.crypto.Util;
 import org.coniks.coniks_common.ServerErr;
 import org.coniks.coniks_common.C2SProtos.RegistrationResp;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
@@ -54,7 +56,7 @@ import org.coniks.coniks_common.UtilProtos.ServerResp;
  * on data received from a CONIKS server.
  * These include data binding proof verification,
  * and non-equivocation checks.
- * 
+ *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Aaron Blankstein
  */
@@ -91,26 +93,27 @@ public class ConsistencyChecks {
     /** Recomputes the root node from an AuthPath protobuf message
      * {@code authPath}.
      *
-     *@return The recomputed root node as a {@code byte[]} or {@code null} 
+     *@return The recomputed root node as a {@code byte[]} or {@code null}
      * upon failure.
      */
-    private static byte[] recomputeAuthPathRootProto(AuthPath authPath){
-        
-        AuthPath.UserLeafNode apUln = authPath.getLeaf();        
+    private static byte[] recomputeAuthPathRootProto(AuthPath authPath)
+        throws NoSuchAlgorithmException{
+
+        AuthPath.UserLeafNode apUln = authPath.getLeaf();
         ByteString index = apUln.getLookupIndex();
 
         // verify the input: expect the index to be the size of the hash
-        if(index.size() != ClientUtils.HASH_SIZE_BYTES){
+        if(index.size() != Util.HASH_SIZE_BYTES){
             ClientLogger.error("Bad index length");
             return null;
         }
-        
+
         byte[] lookupIndex = index.toByteArray();
         int numInteriors = apUln.getIntlevels();
 
-        byte[] ulnHash = ClientUtils.hash(ClientUtils.ulnProtoToBytes(apUln));
-        
-        ArrayList<AuthPath.InteriorNode> inList = 
+        byte[] ulnHash = Util.digest(ClientUtils.ulnProtoToBytes(apUln));
+
+        ArrayList<AuthPath.InteriorNode> inList =
             new ArrayList<AuthPath.InteriorNode>(authPath.getInteriorList());
 
         if(inList.size() != numInteriors){
@@ -130,7 +133,7 @@ public class ConsistencyChecks {
             ClientLogger.error("Root malformed");
             return null;
         }
-        
+
         return ClientUtils.rootProtoToBytes(interiorsHash, root);
 
     }
@@ -141,16 +144,24 @@ public class ConsistencyChecks {
      *@return A {@link ConsistencyErr} error code. {@code NO_ERR} indicates
      * that the verification passed.
      */
-    public static int verifyMappingProto (AuthPath authPath, Commitment comm){
+    public static int verifyMappingProto (AuthPath authPath,
+                                          Commitment comm){
 
         // this really shouldn't be null at this point, but we'll check jic
         if (authPath == null /*|| comm == null*/) {
             return ServerErr.MALFORMED_SERVER_MSG_ERR;
         }
-        
+
         // first recompute the root node from the authentication path
-        byte[] recomputedRoot = recomputeAuthPathRootProto(authPath);
-       
+        byte[] recomputedRoot = null;
+
+        try {
+            recomputedRoot = recomputeAuthPathRootProto(authPath);
+        }
+        catch(NoSuchAlgorithmException e) {
+            return ClientUtils.INTERNAL_CLIENT_ERR;
+        }
+
         if (recomputedRoot == null) {
             return ServerErr.MALFORMED_SERVER_MSG_ERR;
         }
@@ -159,7 +170,18 @@ public class ConsistencyChecks {
         // TODO: implement this
 
         // compute the hash of the recomputed root
-        byte[] recomputedRootHash = ClientUtils.hash(recomputedRoot);
+        byte[] recomputedRootHash = null;
+        try {
+            recomputedRootHash = Util.digest(recomputedRoot);
+        }
+        catch(NoSuchAlgorithmException e) {
+            return ClientUtils.INTERNAL_CLIENT_ERR;
+        }
+
+        // something still went wrong with the hash computation
+        if (recomputedRootHash == null) {
+            return ClientUtils.INTERNAL_CLIENT_ERR;
+        }
 
         // get the received root hash from the commitment and compare
         // the two byte buffers

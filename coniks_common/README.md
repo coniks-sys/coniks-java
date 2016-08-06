@@ -23,7 +23,7 @@ The coniks_common build is managed using Maven. (Instructions for building witho
 These instructions will install the ``coniks_common`` Maven artifact.
 
 ## Disclaimer
-Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/coniks-sys/coniks-java/releases).
+Please keep in mind that this CONIKS Java implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/coniks-sys/coniks-java/releases).
 
 ##Documentation
 [Read the common files' Java API (javadoc)](https://coniks-sys.github.io/coniks-java/org/coniks/coniks_common/package-summary.html)

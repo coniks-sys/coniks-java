@@ -1,33 +1,33 @@
 /*
   Copyright (c) 2015-16, Princeton University.
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are 
+  modification, are permitted provided that the following conditions are
   met:
-  * Redistributions of source code must retain the above copyright 
+  * Redistributions of source code must retain the above copyright
   notice, this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above 
-  copyright notice, this list of conditions and the following disclaimer 
-  in the documentation and/or other materials provided with the 
+  * Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
   distribution.
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
-  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -65,17 +65,26 @@ public class ClientUtils{
 
     /** The size of the Merkle tree hashes in bits.
      * Current hashing algorithm: SHA-256
+     *
+     *@deprecated Moved to {@link org.coniks.crypto.Util}.
      */
-    public static final int HASH_SIZE_BITS =  256; 
+    @Deprecated
+    public static final int HASH_SIZE_BITS =  256;
 
     /** The size of the Merkle tree hashes in bytes.
      * Current hashing algorithm: SHA-256
+     *
+     *@deprecated Moved to {@link org.coniks.crypto.Util}.
      */
+    @Deprecated
     public static final int HASH_SIZE_BYTES = HASH_SIZE_BITS/8;
-    
+
     /** The size of the CONIKS server's STR signatures in bytes.
      * Expected server signature scheme: RSAwithSHA256.
+     *
+     *@deprecated Moved to {@link org.coniks.crypto.Signing}.
      */
+    @Deprecated
     public static final int SIG_SIZE_BYTES = 256;
 
      /** The maximum number of bytes logged per log file.
@@ -97,25 +106,27 @@ public class ClientUtils{
      * Current hashing algorithm: SHA-256.
      *
      *@return The hash as a {@code byte[]} or null in case of an error.
+     *@deprecated Replaced with {@link org.coniks.crypto.Util#digest(byte[])}
      */
+    @Deprecated
     public static byte[] hash(byte[] input){
 
-	try{
-	    MessageDigest md = MessageDigest.getInstance("SHA-256");
-	   
-	    byte[] digest = md.digest(input);
+        try{
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-	    return digest;
+            byte[] digest = md.digest(input);
 
-	}
-	catch(NoSuchAlgorithmException e){
-	    ClientLogger.error("SHA-256 is not a valid algorithm for some reason");
-	}
+            return digest;
 
-	return null; // should never get here
+        }
+        catch(NoSuchAlgorithmException e){
+            ClientLogger.error("SHA-256 is not a valid algorithm for some reason");
+        }
+
+        return null; // should never get here
     }
 
-    /** Generates the cryptographic hash of the {@code left} 
+    /** Generates the cryptographic hash of the {@code left}
      * and {@code right} subtree hashes of a Merkle tree node.
      * This is really just a wrapper around {@link ClientUtils#hash(byte[])}.
      *
@@ -123,27 +134,27 @@ public class ClientUtils{
      */
     public static byte[] hashChildren(byte[] left, byte[] right){
 
-	byte[] childrenBytes = new byte[left.length+right.length];
-	
-	ByteBuffer arr = ByteBuffer.wrap(childrenBytes);
-	arr.put(left);
-	arr.put(right);
+        byte[] childrenBytes = new byte[left.length+right.length];
 
-	byte[] children = arr.array();
+        ByteBuffer arr = ByteBuffer.wrap(childrenBytes);
+        arr.put(left);
+        arr.put(right);
 
-	try{
-	    MessageDigest md = MessageDigest.getInstance("SHA-256");
-	   
-	    byte[] digest = md.digest(children);
+        byte[] children = arr.array();
 
-	    return digest;
+        try{
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-	}
-	catch(NoSuchAlgorithmException e){
-	    ClientLogger.error("SHA-256 is not a valid algorithm for some reason");
-	}
+            byte[] digest = md.digest(children);
 
-	return null; // should never get here
+            return digest;
+
+        }
+        catch(NoSuchAlgorithmException e){
+            ClientLogger.error("SHA-256 is not a valid algorithm for some reason");
+        }
+
+        return null; // should never get here
 
     }
 
@@ -173,12 +184,12 @@ public class ClientUtils{
      * index using a verifiable unpredicctable function (VUF).
      * Current VUF algorithm: SHA-256.
      *
-     *@return The {@code byte[]} representation of the 
+     *@return The {@code byte[]} representation of the
      * lookup index.
      */
     public static byte[] unameToIndex (String username){
-	byte[] b = strToBytes(username);
-	return ClientUtils.hash(b);
+        byte[] b = strToBytes(username);
+        return ClientUtils.hash(b);
     }
 
     /** Converts a long {@code val} into an array of bytes.
@@ -187,7 +198,7 @@ public class ClientUtils{
      */
     public static byte[] longToBytes(long val) {
         byte[] byteArr = new byte[8];
-        
+
         for(int i = 0; i < 8; i++) {
             byte nextByte = (byte)((val >> i*8) & 0xff);
             byteArr[i] = nextByte;
@@ -196,25 +207,25 @@ public class ClientUtils{
         return byteArr;
     }
 
-    /** Finds the byte in the byte array {@code arr} 
+    /** Finds the byte in the byte array {@code arr}
      * at offset {@code offset}, and determines whether it is 1 or 0.
      *
      *@return true if the nth bit is 1, false otherwise.
      */
     public static boolean getNthBit(byte[] arr, int offset){
-	int arrayOffset = offset / 8;
-	int bitOfByte = offset % 8;
-	int maskedBit = arr[arrayOffset] & (1 << (7 - bitOfByte));
-	return (maskedBit != 0);
+        int arrayOffset = offset / 8;
+        int bitOfByte = offset % 8;
+        int maskedBit = arr[arrayOffset] & (1 << (7 - bitOfByte));
+        return (maskedBit != 0);
     }
-    
+
     /** Gets the 16-bit prefix of a byte array {@code arr}.
      *
      *@return the first 16 bits of {@code arr} or all zeros if the length
      * of the array is less than 2 bytes.
      */
     public static byte[] getPrefixBytes(byte[] arr){
-	byte[] out = new byte[2];
+        byte[] out = new byte[2];
 
         if (arr.length < 2) {
             out[0] = 0;
@@ -224,9 +235,9 @@ public class ClientUtils{
             out[0] = arr[0];
             out[1] = arr[1];
         }
-	return out;
+        return out;
     }
-    
+
 
     /** Compares two byte buffers for byte-by-byte equality.
      *
@@ -237,17 +248,17 @@ public class ClientUtils{
             return false;
         }
 
-	for(int i = 0; i < buf1.length; i++){
-	    if(buf1[i] != buf2[i]){
-		return false;
-	    }
-	}
-	return true;
+        for(int i = 0; i < buf1.length; i++){
+            if(buf1[i] != buf2[i]){
+                return false;
+            }
+        }
+        return true;
     }
 
     /** Converts a DSAPublicKey {@code pub} to a byte array.
      *
-     *@return the DSA public key as a {@code byte[]}  in g-p-q-y order 
+     *@return the DSA public key as a {@code byte[]}  in g-p-q-y order
      */
     public static byte[] convertDSAPubKey(DSAPublicKey pub){
         byte[] g = strToBytes(pub.getParams().getG().toString());
@@ -268,7 +279,7 @@ public class ClientUtils{
 
      /** Converts a DSAPublicKeyProto {@code pub} to a byte array.
      *
-     *@return the DSA public key protobuf as a {@code byte[]}  in g-p-q-y order 
+     *@return the DSA public key protobuf as a {@code byte[]}  in g-p-q-y order
      */
     public static byte[] convertDSAPubKey(DSAPublicKeyProto pub){
         byte[] g = strToBytes(pub.getG());
@@ -304,7 +315,7 @@ public class ClientUtils{
      *
      *@return the DSAPublicKeyProto
      */
-    public static DSAPublicKeyProto buildDSAPublicKeyProto(BigInteger p, 
+    public static DSAPublicKeyProto buildDSAPublicKeyProto(BigInteger p,
                                                             BigInteger q,
                                                             BigInteger g,
                                                             BigInteger y) {
@@ -318,7 +329,7 @@ public class ClientUtils{
     }
 
 
-    /** Converts an AuthPath.UserLeafNode protobuf {@code uln} 
+    /** Converts an AuthPath.UserLeafNode protobuf {@code uln}
      * to a {@code byte[]}.
      */
     public static byte[] ulnProtoToBytes(AuthPath.UserLeafNode uln){
@@ -335,7 +346,7 @@ public class ClientUtils{
 
         byte[] leafBytes = new byte[pubKey.length+usr.length+ep_add.length+auk.length+
                                     apl.length+ep_changed.length+ck.length+sig.length+lastMsg.length];
-    
+
         ByteBuffer arr = ByteBuffer.wrap(leafBytes);
         arr.put(usr);
         arr.put(pubKey);
@@ -362,12 +373,12 @@ public class ClientUtils{
 
         for(int i = 0; i < inList.size(); i++){
             AuthPath.InteriorNode in = inList.get(i);
-            
+
             if(!in.hasPrunedchild() && !in.hasSubtree()){
                 ClientLogger.error("No pruned child at level: "+i);
                 return null;
             }
-            
+
             Hash pcHash = in.getSubtree();
             AuthPath.PrunedChild pcSide = in.getPrunedchild();
 
@@ -379,14 +390,14 @@ public class ClientUtils{
             }
 
             byte[] prunedChild = subtreeHash.toByteArray();
-            
+
             if(pcSide == AuthPath.PrunedChild.LEFT){
                 curHash = ClientUtils.hashChildren(prunedChild, curHash);
             }
             else if(pcSide == AuthPath.PrunedChild.RIGHT){
                 curHash = ClientUtils.hashChildren(curHash, prunedChild);
             }
-         
+
         }
 
         // at this point, curHash should be the root node's direct child
@@ -395,7 +406,7 @@ public class ClientUtils{
     }
 
     /** Takes the hash  {@code authPathHash} computed from an authentication path
-     * and incorporates it into the root node {@code root} of an 
+     * and incorporates it into the root node {@code root} of an
      * AuthPath.RootNode protobuf. Returns this root node as a byte[].
      */
     public static byte[] rootProtoToBytes(byte[] authPathHash, AuthPath.RootNode root){
@@ -409,12 +420,12 @@ public class ClientUtils{
             ClientLogger.error("Bad hash length");
             return null;
         }
-        
+
         byte[] prunedChild = subtreeHash.toByteArray();
 
         byte[] rootBytes = new byte[authPathHash.length+prunedChild.length];
-	
-	ByteBuffer arr = ByteBuffer.wrap(rootBytes);
+
+        ByteBuffer arr = ByteBuffer.wrap(rootBytes);
 
         if(pcSide == AuthPath.PrunedChild.LEFT){
             arr.put(prunedChild);

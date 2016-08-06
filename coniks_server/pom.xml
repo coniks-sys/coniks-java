@@ -5,28 +5,31 @@
   <parent>
     <groupId>org.coniks</groupId>
     <artifactId>coniks-java</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.3-SNAPSHOT</version>
   </parent>
 
   <groupId>org.coniks.coniks_server</groupId>
   <artifactId>coniks_server</artifactId>
+  <version>1.3-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <version>1.2-SNAPSHOT</version>
-  <name>coniks_server</name>
+
+  <name>CONIKS [Reference Server]</name>
   <url>http://coniks.org</url>
+  <description>CONIKS server library and reference implementation.
+  </description>
 
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
+      <groupId>org.coniks.coniks_common</groupId>
+      <artifactId>coniks_common</artifactId>
+      <version>1.3-SNAPSHOT</version>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.coniks.coniks_common</groupId>
-      <artifactId>coniks_common</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <groupId>org.coniks.crypto</groupId>
+      <artifactId>coniks-crypto</artifactId>
+      <version>1.3-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
 
@@ -48,4 +51,26 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <appendAssemblyId>false</appendAssemblyId>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

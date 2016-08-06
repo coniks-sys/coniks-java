@@ -19,12 +19,16 @@ The coniks_test_client build is managed using Maven. (Instructions for building 
 ```$ mvn package```
 
 These instructions will install the ``coniks_test_client`` Maven artifact.
+The build configuration for coniks_test_client assembles all dependencies,
+and includes them in the generated .jar file, so you can run the server
+only using the coniks_test_client .jar file.
 
 ##Using the Test Client
 
-The CONIKS test client has two operating modes: Test Mode and Full Operation. 
-Running the client in test mode allows you to still test all CONIKS protocols and operations,
-but requires less setup as you can simply use the default configuration in the included *config* file.
+The CONIKS test client has two operating modes: Test Mode and Full Operation.
+Running the client in test mode allows you to still test all CONIKS
+protocols and operations, but requires less setup as you can simply use
+the default configuration in the included *config* file.
 **Note:** You must be running the server in the same operating mode.
 
 ### Setup
@@ -36,8 +40,8 @@ keytool -import -alias <alias> -file <certificate file> -keystore <truststore na
 The alias must match the alias used when generating the cert for the server. You will be asked to
 enter a password for each truststore. Make sure to remember this password.
 - Set all of the configurations in the config file:
-Defaults for the port number and user keys directory are already set, 
-except for the absolute path to the keystore generated in the 
+Defaults for the port number and user keys directory are already set,
+except for the absolute path to the keystore generated in the
 previous step along with its password. You'll have to set these using the format
 described below.
 You may write your own config file, but it must follow the following format:
@@ -47,7 +51,7 @@ You may write your own config file, but it must follow the following format:
 ```
 - Set all of the configs in the run script *coniks_test_client.sh*:
 Defaults are already set, but you may change the following variables:
-```CLASS_DEST``` if you used a different classpath when building the client.
+```CLASS_DEST``` if you've changed configurations such as the artifactID or version in the client's pom.xml file before building.
 ```CONIKS_CLIENTCONFIG``` if you're using a different config file
 ```CONIKS_CLIENTLOGS``` to store the client logs somewhere other than a *logs* directory
 
@@ -55,7 +59,7 @@ Defaults are already set, but you may change the following variables:
 We provide a run script for the CONIKS test client *coniks_test_client.sh*, which allows you to run
 the test client in full operation mode and test mode.
 
-The run script supports three commands: 
+The run script supports three commands:
 - ```start <server hostname>```: start the client in full operation mode, connecting it to the given server.
 - ```test <server hostname>```: start the client in test mode, connecting it to the given server.
 - ```clean```: remove all logs written by the client.
@@ -68,7 +72,7 @@ perform the operation and the first dummy user for which to run the operation. D
 identified by numbers, so user "5" is the 5th dummy user.
 The test client will prompt you until you no longer want to continue.
 
-Supported operations: 
+Supported operations:
 - ```REGISTER```: register a new name-to-public key mapping with the CONIKS server.
 - ```LOOKUP```: look up a public key, and verify the cryptographic proof of inclusion if the user exists.
 - ```SIGNED```: change the public key registered for an existing name and authorize this change via a digital signature.
@@ -83,7 +87,7 @@ Some examples:
 - POLICY 1 18: changes the key change policy for user 18.
 
 ## Disclaimer
-Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/coniks-sys/coniks-java/releases).
+Please keep in mind that this CONIKS Java implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/coniks-sys/coniks-java/releases).
 
 ##Documentation
 [Read the test client's Java API (javadoc)](https://coniks-sys.github.io/coniks-java/org/coniks/coniks_test_client/package-summary.html)

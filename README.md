@@ -17,3 +17,8 @@ Please keep in mind that this CONIKS reference implementation is under active de
 
 ##Documentation
 [Read the package's Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation/)
+
+## Current Core Developers
+Releases of coniks-ref-implementation will be signed with one of the following GPG keys:
+
+- **Marcela Melara** &lt;msmelara@gmail.com&gt; `C0EB3C38F30F80AB6A12C9B78E556CF999AAFE`

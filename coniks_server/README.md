@@ -5,17 +5,18 @@ http://coniks.org
 ##Introduction
 This is a basic reference implementation of a server for the CONIKS key management system. It currently supports new key registrations, key lookups, changes to key data and user policies (**new features**) and can generate consistency proofs and signed directory summaries. It is designed to communicate with the [CONIKS test client](https://github.com/coniks-sys/coniks-ref-implementation/tree/master/coniks_test_client).
 
-##Building the Server
-- Prerequisites:
-You'll need Java JDK7 or greater and need to ensure that the Google protobufs have been compiled with the most recent version of protoc. If you've already compiled the protobufs for the test client, you don't need
-to repeat this step for the server.
-You'll also need to install the automake and build-essential packages.
-- Compiling:
-The default classpath is *bin*. If you'd like to change this, you'll need to change the ```CLASS_DEST``` 
-variable in the Makefile. To build, run:
-```
-make 
-```
+##Building the Server - With Maven
+The coniks_server build is managed using Maven. (Instructions for building without Maven coming soon)
+
+1) Install Apache Maven, if you don't have it. Visit the [Maven downloads page](https://maven.apache.org/download.cgi) for details.
+
+2) Install the library into your Maven repository:
+```$ mvn install```
+
+3) If you don't use Maven to manage your own build, you can build a .jar file to use:
+```$ mvn package```
+
+These instructions will install the ``coniks_server`` Maven artifact.
 
 ##Using the Server
 
@@ -77,21 +78,6 @@ The run script supports four commands:
 For example, to start the server in full operation mode, use
 ```./coniks_server.sh start```
 Analogously to test and stop the server, and remove the logs.
-
-## Server Installation on a Remote Machine
-You may want to install the server on a remote machine.
-Set the ```PUBUSER```, ```PUBHOST``` and ```PUBPATH``` variables in the Makefile.
-```PUBUSER``` will need ssh access to the remote machine.
-You'll then have to run the setup steps on the remote machine or send the appropriate files.
-Assuming you've built the server locally, run:
-```
-make pubbin
-```
-Next, install the run script on the remote machine:
-```
-make pubscr
-```
-You may need to change the permissions on the script to be able to execute it on the remote machine.
 
 ## Disclaimer
 Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/citp/coniks-ref-implementation/releases).

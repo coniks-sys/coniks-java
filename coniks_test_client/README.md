@@ -5,17 +5,18 @@ http://coniks.org
 ##Introduction
 This is a simple test client for the CONIKS key management system. It supports new key registrations, key lookups, key changes (**new feature**), and user policy changes (e.g. key change policy) (**new feature**). It is designed to communicate with the basic implementation of a [CONIKS server](https://github.com/coniks-sys/coniks-ref-implementation/tree/master/coniks_server).
 
-##Building the Test Client
-- Prerequisites:
-You'll need Java JDK7 or greater and need to ensure that the Google protobufs have been compiled with the most recent version of protoc. If you've already compiled the protobufs for the server, you don't need to
-repeat this step for the client.
-You'll also need to install the automake and build-essential packages.
-- Compiling:
-The default classpath is *bin*. If you'd like to change this, you'll need to change the ```CLASS_DEST``` 
-variable in the Makefile. To build, run:
-```
-make 
-```
+##Building the Test Client - With Maven
+The coniks_test_client build is managed using Maven. (Instructions for building without Maven coming soon)
+
+1) Install Apache Maven, if you don't have it. Visit the [Maven downloads page](https://maven.apache.org/download.cgi) for details.
+
+2) Install the library into your Maven repository:
+```$ mvn install```
+
+3) If you don't use Maven to manage your own build, you can build a .jar file to use:
+```$ mvn package```
+
+These instructions will install the ``coniks_test_client`` Maven artifact.
 
 ##Using the Test Client
 
@@ -78,21 +79,6 @@ Some examples:
 - SIGNED 10 10: performs a signed key data change for users 10 through 19.
 - UNSIGNED 10 10: performs an unsigned key data change for users 10 throught 19.
 - POLICY 1 18: changes the key change policy for user 18.
-
-## Test Client Installation on a Remote Machine
-You may want to install the test client on a remote machine.
-Set the ```PUBUSER```, ```PUBHOST``` and ```PUBPATH``` variables in the Makefile.
-```PUBUSER``` will need ssh access to the remote machine.
-You'll then have to run the setup steps on the remote machine or send the appropriate files.
-Assuming you've built the test client locally, run:
-```
-make pubbin
-```
-Next, install the run script on the remote machine:
-```
-make pubscr
-```
-You may need to change the permissions on the script to be able to execute it on the remote machine.
 
 ## Disclaimer
 Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/citp/coniks-ref-implementation/releases).

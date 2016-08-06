@@ -3,7 +3,7 @@
 http://coniks.org
 
 ##Introduction
-This is a simple test client for the CONIKS key management system. It supports new key registrations, key lookups, key changes (**new feature**), and user policy changes (e.g. key change policy) (**new feature**). It is designed to communicate with the basic implementation of a [CONIKS server](https://github.com/coniks-sys/coniks-ref-implementation/tree/master/coniks_server).
+This is a simple test client for the CONIKS key management system. It supports new key registrations, key lookups, key changes (**new feature**), and user policy changes (e.g. key change policy) (**new feature**). It is designed to communicate with the basic implementation of a [CONIKS server](https://github.com/coniks-sys/coniks-java/tree/master/coniks_server).
 
 ##Building the Test Client - With Maven
 The coniks_test_client build is managed using Maven. (Instructions for building without Maven coming soon)
@@ -81,7 +81,7 @@ Some examples:
 - POLICY 1 18: changes the key change policy for user 18.
 
 ## Disclaimer
-Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/citp/coniks-ref-implementation/releases).
+Please keep in mind that this CONIKS reference implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/coniks-sys/coniks-java/releases).
 
 ##Documentation
-[Read the test client's Java API (javadoc)](https://coniks-sys.github.io/coniks-ref-implementation/org/coniks/coniks_test_client/package-summary.html)
+[Read the test client's Java API (javadoc)](https://coniks-sys.github.io/coniks-java/org/coniks/coniks_test_client/package-summary.html)

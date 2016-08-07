@@ -31,7 +31,6 @@ public class KeysTest
             fail("Expected an ClassCastException to be thrown");
         }
         catch(ClassCastException e) {
-            System.out.println(e.getMessage());
             assertThat(e.getMessage(),
                        containsString("sun.security.rsa.RSAPrivateCrtKeyImpl cannot be cast to java.security.interfaces.DSAPrivateKey"));
         }
@@ -48,7 +47,6 @@ public class KeysTest
             fail("Expected an ClassCastException to be thrown");
         }
         catch(ClassCastException e) {
-            System.out.println(e.getMessage());
             assertThat(e.getMessage(),
                        containsString("sun.security.rsa.RSAPublicKeyImpl cannot be cast to java.security.interfaces.DSAPublicKey"));
         }
@@ -65,7 +63,6 @@ public class KeysTest
             fail("Expected an ClassCastException to be thrown");
         }
         catch(ClassCastException e) {
-            System.out.println(e.getMessage());
             assertThat(e.getMessage(),
                        containsString("sun.security.provider.DSAPrivateKey cannot be cast to java.security.interfaces.RSAPrivateKey"));
         }
@@ -82,7 +79,6 @@ public class KeysTest
             fail("Expected an ClassCastException to be thrown");
         }
         catch(ClassCastException e) {
-            System.out.println(e.getMessage());
             assertThat(e.getMessage(),
                        containsString("sun.security.provider.DSAPublicKeyImpl cannot be cast to java.security.interfaces.RSAPublicKey"));
         }

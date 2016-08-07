@@ -34,6 +34,9 @@
 package org.coniks.coniks_server;
 
 import com.google.protobuf.ByteString;
+
+// coniks-java imports
+import org.coniks.crypto.*;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
 import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.Hash;
@@ -43,8 +46,7 @@ import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.PriorityQueue;
 import java.security.*;
-import java.security.interfaces.RSAPublicKey;
-import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.*;
 import java.nio.ByteBuffer;
 
 import org.javatuples.*;
@@ -71,7 +73,16 @@ public class TransparencyOps{
         byte[] strBytesPreSig = ServerUtils.getSTRBytesForSig(root, ep, prevEp,
                                                               prevStrHash);
 
-        byte[] sig = SignatureOps.sign(strBytesPreSig);
+        RSAPrivateKey key = KeyOps.loadSigningKey();
+
+        byte[] sig = null;
+        try {
+            sig = Signing.rsaSign(key, strBytesPreSig);
+        }
+        catch (Exception e) {
+            ServerLogger.error("[RequestHandler] "+e.getMessage());
+            return null;
+        }
         
 	return new SignedTreeRoot(root, ep, prevEp, prevStrHash, sig, null);
     }
@@ -93,8 +104,17 @@ public class TransparencyOps{
         byte[] strBytesPreSig = ServerUtils.getSTRBytesForSig(root, ep, prevEpoch,
                                                               prevStrHash);
 
-        byte[] sig = SignatureOps.sign(strBytesPreSig);
-        
+        RSAPrivateKey key = KeyOps.loadSigningKey();
+
+        byte[] sig = null;
+        try {
+            sig = Signing.rsaSign(key, strBytesPreSig);
+        }
+        catch (Exception e) {
+            ServerLogger.error("[RequestHandler] "+e.getMessage());
+            return null;
+        }
+       
 	return new SignedTreeRoot(root, ep, prevEpoch, prevStrHash, sig, ServerHistory.getCurSTR());
     }
     

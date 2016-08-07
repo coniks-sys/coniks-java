@@ -44,6 +44,9 @@ import java.io.FileNotFoundException;
 import java.lang.NumberFormatException;
 
 import com.google.protobuf.*;
+
+// coniks-java imports
+import org.coniks.crypto.*;
 import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.ServerResp;
 import org.coniks.coniks_common.ServerErr;
@@ -247,10 +250,10 @@ public class TestClient {
                                                                                user.isAllowsPublicVisibility());
 
 
-            sig = SignatureOps.signDSA(changeReq.toByteArray(), prKey);
+            sig = Signing.dsaSign(prKey, changeReq.toByteArray());
         }
-        catch (InvalidKeyException e) {
-            ClientLogger.error(e.getMessage());
+        catch (NoSuchAlgorithmException e) {
+            ClientLogger.error("[TestClient] "+e.getMessage());
             user.unloadChangePrivKey();
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
@@ -368,10 +371,10 @@ public class TestClient {
                                                                                user.isAllowsPublicVisibility());
 
 
-            sig = SignatureOps.signDSA(changeReq.toByteArray(), prKey);
+            sig = Signing.dsaSign(prKey, changeReq.toByteArray());
         }
-        catch (InvalidKeyException e) {
-            ClientLogger.error(e.getMessage());
+        catch (NoSuchAlgorithmException e) {
+            ClientLogger.error("[TestClient] "+e.getMessage());
             user.unloadChangePrivKey();
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }

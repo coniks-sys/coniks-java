@@ -39,17 +39,6 @@ import java.security.interfaces.*;
 import javax.crypto.*;
 import java.math.BigInteger;
 
-// TODO(mrochlin)
-// Should use protected keystore instead of just file streams
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 /** Implements all operations involving digital signatures
  * that a CONIKS client must perform.
  *
@@ -60,7 +49,9 @@ public class SignatureOps{
     /** Verifies {@code msg} and the {@code sig} using the DSA PublicKey {@code pk} 
      *
      *@return {@code true} if the signature is valid, {@code false} otherwise.
+     **@deprecated Use more general {@link org.coniks.crypto.Signing#dsaVerify(DSAPublicKey, byte[], byte[]) dsaVerify} instead.
      */
+    @Deprecated
     public static boolean verifySigFromDSA(byte[] msg, byte[] sig, PublicKey pk) {
         try {
             Signature verifyalg = Signature.getInstance("DSA");
@@ -86,8 +77,10 @@ public class SignatureOps{
 
     /** Signs {@code msg} using DSAPrivateKey {@code prk} 
      *
-     *@return the signature or null on an error  
+     *@return the signature or null on an error
+     *@deprecated Use more general {@link org.coniks.crypto.Signing#dsaSign(DSAPublicKey, byte[], byte[]) dsaSign} instead.
      */
+    @Deprecated
     public static byte[] signDSA(byte[] msg, DSAPrivateKey prk) throws InvalidKeyException {
         if (prk == null) {
             ClientLogger.error("The given key is invalid.");

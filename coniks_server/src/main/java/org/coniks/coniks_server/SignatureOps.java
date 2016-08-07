@@ -58,7 +58,9 @@ public class SignatureOps{
      * of the {@code input}.
      *@throws A RuntimeException if there is a problem with the private key
      * loaded from the server's keystore.
+     *@deprecated Use more general {@link org.coniks.crypto.Signing#rsaSign(RSAPublicKey, byte[]) rsaVerify} instead.
      */
+    @Deprecated
     public static byte[] sign(byte[] input) {
 
         RSAPrivateKey MY_PRIV_KEY = KeyOps.loadSigningKey();
@@ -95,7 +97,9 @@ public class SignatureOps{
      *
      *@return {@code true} if the signature on the message is valid, {@code false}
      * otherwise.
+     *@deprecated Use more general {@link org.coniks.crypto.Signing#rsaVerify(RSAPublicKey, byte[], byte[]) rsaVerify} instead.
      */
+    @Deprecated
     public static boolean verifySig(byte[] msg, byte[] signature, String keyOwner){
 
         RSAPublicKey pubKey = KeyOps.loadPublicKey(keyOwner);
@@ -122,7 +126,10 @@ public class SignatureOps{
 
     }
 
-    /** Verify {@code msg} with {@code sig} using {@code pk} */
+    /** Verify {@code msg} with {@code sig} using {@code pk} 
+     *
+     *@deprecated Use more general {@link org.coniks.crypto.Signing#dsaVerify(DSAPublicKey, byte[], byte[]) dsaVerify} instead.*/
+    @Deprecated
     public static boolean verifySigFromDSA(byte[] msg, byte[] sig, PublicKey pk) {
         try {
             Signature verifyalg = Signature.getInstance("DSA");

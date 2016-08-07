@@ -2,10 +2,11 @@ sudo: false
 
 language: java
 
-script: mvn compile
+env:
+  global:
+    secure: B5ZEHKFRa11V7e9JZwr4vGFSdo1lvnbxijd00mm41qbvwT5YFSMZhEQLRVlDmxhsqcc6guC84Q49LsY3/4rlzspHe8fkByY2sQUM3aXuK13/lJJT8CeDXxYAicWMPBLvybpt3ML1wXcbskQzv5C7oNLgkeMwvpd2zw5pYMV2dHwRhRkfsYgH7hzlVgCOMnPLHfPiDgjuQK6KJUr1qlO4Y9vmFsCiCi94fLHIxu+MsvFy3XRnnlTERTGQCeBD2GGHTH5wjiwTL0GHdKX/ntpODyWZAnbYs8OYsLuCq7QQHJDk4uBVCnMIj1zt6lwxa0iiz+uuvxnL6msSeF/BkIWG/yxRkBjdVtdJL0WBEIDmfzeEugdNFke1I2dsH68Fe+R2syUwIjJ654HSoLZ/xL9Dbnxo8wmix2cO46ictXN3WVNrWwB4KUV5N+aGW/hB0KRqSsO2iUmXqweifJz7qfWm20Y//pgtMtVTnZVTneiSCPucY1QWQmiOgC0jcseV+oIbpFjbYArxGhhPhqJqAWYhJeR/7uX872zMwPqpyHRF3y1XQ+C2xI9IWC2SqjinCsgUnZei1pu7A4Qd34Isd8uCICrLMu8JPe98+Dc+jksGrH/SgOcDI/pffnD2rk/ablNU7JY8yE2t5me9B6SAxOEOyle60i5WiRHcM+pZukBwvwU=
+
+script: mvn test
 
 notifications:
-  # Email notifications are disabled to not annoy anybody.
-  # See http://about.travis-ci.org/docs/user/build-configuration/ to learn more
-  # about configuring notification recipients and more.
   email: false

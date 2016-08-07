@@ -21,6 +21,13 @@
     </dependency>
   </dependencies>
 
+  <modules>
+    <module>crypto</module>
+    <module>coniks_common</module>
+    <module>coniks_server</module>
+    <module>coniks_test_client</module>
+  </modules>
+
   <build>
     <plugins>
       <plugin>
@@ -32,6 +39,16 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19.1</version>
+      </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.19.1</version>
@@ -58,12 +75,6 @@
         </reportSets>
       </plugin>
     </plugins>
-  </build>
+  </reporting>
 
-  <modules>
-    <module>crypto</module>
-    <module>coniks_common</module>
-    <module>coniks_server</module>
-    <module>coniks_test_client</module>
-  </modules>
 </project>

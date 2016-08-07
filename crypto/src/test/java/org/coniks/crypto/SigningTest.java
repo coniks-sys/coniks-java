@@ -6,7 +6,10 @@ import static org.junit.Assert.assertTrue;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.*;
+import java.security.interfaces.DSAPrivateKey;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 
 /**
  * Unit tests for Signing.
@@ -15,32 +18,30 @@ public class SigningTest
 {
 
     @Test
-    public void testRsaSignVerify() 
+    public void testRsaSignVerify()
         throws NoSuchAlgorithmException {
-        KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
-        gen.initialize(2048);
 
-        KeyPair pair = gen.generateKeyPair();
+        KeyPair pair = Keys.generateRSAKeyPair();
 
         byte[] msg = "message".getBytes();
 
-        byte[] sig = Signing.rsaSign((RSAPrivateKey)pair.getPrivate(), msg);
+        byte[] sig = Signing.rsaSign(Keys.getRSAPrivate(pair), msg);
 
-        assertTrue("RSA signature of message using same key pair can be verified", Signing.rsaVerify((RSAPublicKey)pair.getPublic(), msg, sig));
+        assertTrue("RSA signature of message using same key pair can be verified",
+                   Signing.rsaVerify(Keys.getRSAPublic(pair), msg, sig));
     }
 
     @Test
-    public void testDsaSignVerify() 
+    public void testDsaSignVerify()
         throws NoSuchAlgorithmException {
-        KeyPairGenerator gen = KeyPairGenerator.getInstance("DSA");
-        gen.initialize(1024);
 
-        KeyPair pair = gen.generateKeyPair();
+        KeyPair pair = Keys.generateDSAKeyPair();
 
         byte[] msg = "message".getBytes();
 
-        byte[] sig = Signing.dsaSign((DSAPrivateKey)pair.getPrivate(), msg);
+        byte[] sig = Signing.dsaSign(Keys.getDSAPrivate(pair), msg);
 
-        assertTrue("DSA signature of message using same key pair can be verified", Signing.dsaVerify((DSAPublicKey)pair.getPublic(), msg, sig));
+        assertTrue("DSA signature of message using same key pair can be verified",
+                   Signing.dsaVerify(Keys.getDSAPublic(pair), msg, sig));
     }
 }

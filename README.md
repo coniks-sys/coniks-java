@@ -1,6 +1,7 @@
 #CONIKS
 
 [![Build Status](https://travis-ci.org/coniks-sys/coniks-java.svg?branch=master)](https://travis-ci.org/coniks-sys/coniks-java)
+[![Coverage Status](https://coveralls.io/repos/github/coniks-sys/coniks-java/badge.svg?branch=master&dummy=1)](https://coveralls.io/github/coniks-sys/coniks-java)
 
 http://coniks.org
 

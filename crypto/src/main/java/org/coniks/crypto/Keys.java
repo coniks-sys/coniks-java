@@ -50,6 +50,7 @@ public class Keys {
     /** Generates a DSA key pair.
      *
      *@return the DSA key pair or null in case of an error.
+     *@throws java.security.NoSuchAlgorithmException
      */
     public static KeyPair generateDSAKeyPair()
         throws NoSuchAlgorithmException {
@@ -84,8 +85,10 @@ public class Keys {
      *
      *@return the DSAPublicKey, or {@code null} in case of an error.
      */
-    public static DSAPublicKey getDSAPublicFromParams(BigInteger p, BigInteger q,
-                                                          BigInteger g, BigInteger y) {
+    public static DSAPublicKey getDSAPublicFromParams(BigInteger p,
+                                                      BigInteger q,
+                                                      BigInteger g,
+                                                      BigInteger y) {
 
         DSAPublicKey pk = null;
         try {
@@ -102,6 +105,7 @@ public class Keys {
     /** Generates an RSA key pair.
      *
      *@return the RSA key pair or null in case of an error.
+     *@throws java.security.NoSuchAlgorithmException
      */
     public static KeyPair generateRSAKeyPair()
         throws NoSuchAlgorithmException {

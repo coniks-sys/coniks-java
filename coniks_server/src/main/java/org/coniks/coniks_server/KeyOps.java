@@ -122,7 +122,8 @@ public class KeyOps{
         try{
             ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
-            char[] ts_password = ServerConfig.getTruststorePassword().toCharArray();
+            char[] ts_password =
+                ServerConfig.getTruststorePassword().toCharArray();
 
             FileInputStream fis = null;
 
@@ -133,9 +134,12 @@ public class KeyOps{
                 KeyStore.ProtectionParameter protParam =
                     new KeyStore.PasswordProtection(ts_password);
 
-                KeyStore.TrustedCertificateEntry pkEntry = (KeyStore.TrustedCertificateEntry)
+                KeyStore.TrustedCertificateEntry pkEntry =
+                    (KeyStore.TrustedCertificateEntry)
                     ks.getEntry(keyOwner, protParam);
-                publicKey = (RSAPublicKey)pkEntry.getTrustedCertificate().getPublicKey();
+
+                publicKey =
+                    (RSAPublicKey)pkEntry.getTrustedCertificate().getPublicKey();
             }
             else{
                 throw new CertificateException();
@@ -165,9 +169,13 @@ public class KeyOps{
      * {@code g} and {@code y} parameters.
      *
      *@return the DSAPublicKey, or {@code null} in case of an error.
+     *@deprecated Replaced with {@link org.coniks.crypto.Keys#getDSAPublicFromParams(BigInteger, BigInteger, BigInteger, BigInteger)}.
      */
-    public static DSAPublicKey makeDSAPublicKeyFromParams(BigInteger p, BigInteger q,
-                                                          BigInteger g, BigInteger y) {
+    @Deprecated
+    public static DSAPublicKey makeDSAPublicKeyFromParams(BigInteger p,
+                                                          BigInteger q,
+                                                          BigInteger g,
+                                                          BigInteger y) {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("DSA");
             KeySpec publicKeySpec = new DSAPublicKeySpec(y, p, q, g);
@@ -187,7 +195,8 @@ public class KeyOps{
 
      /** Converts a {@link DSAPublicKeyProto} to a {@link DSAPublicKey}.
      *
-     *@param pkProto the DSA public key protobuf to convert into a DSAPublicKey.
+     *@param pkProto the DSA public key protobuf to convert into a
+     * DSAPublicKey.
      *@return the DSAPublicKey, or {@code null} in case of an error.
      */
     public static DSAPublicKey makeDSAPublicKeyFromProto(DSAPublicKeyProto pkProto) {

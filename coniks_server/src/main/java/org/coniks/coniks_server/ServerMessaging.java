@@ -1,33 +1,33 @@
 /*
   Copyright (c) 2015-16, Princeton University.
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are 
+  modification, are permitted provided that the following conditions are
   met:
-  * Redistributions of source code must retain the above copyright 
+  * Redistributions of source code must retain the above copyright
   notice, this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above 
-  copyright notice, this list of conditions and the following disclaimer 
-  in the documentation and/or other materials provided with the 
+  * Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
   distribution.
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
-  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -37,12 +37,15 @@ import javax.net.ssl.*;
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.security.NoSuchAlgorithmException;
 
 import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.javatuples.*;
 
+// coniks-java imports
+import org.coniks.crypto.Util;
 import org.coniks.coniks_common.*;
 import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.*;
@@ -55,20 +58,20 @@ import org.coniks.coniks_common.UtilProtos.*;
  */
 public class ServerMessaging {
 
-    /** Sends a simple server response protobuf based on the 
+    /** Sends a simple server response protobuf based on the
      * result (often an error) of a client request.
      *
-     *@param reqResult the result of the request 
+     *@param reqResult the result of the request
      *@param socket the client socket to which to send the message
      */
     public static synchronized void sendSimpleResponseProto(int reqResult, Socket socket){
         MsgHandlerLogger.log("Sending simple server response... ");
-        
+
         ServerResp respMsg = buildServerRespMsg(reqResult);
-        sendMsgProto(MsgType.SERVER_RESP, respMsg, socket);     
+        sendMsgProto(MsgType.SERVER_RESP, respMsg, socket);
 
     }
-    
+
     /** Sends the signed tree root protobuf returned for a client's signed tree root request.
      *
      *@param str the signed tree root to send
@@ -76,12 +79,12 @@ public class ServerMessaging {
      */
     public static synchronized void sendCommitmentProto(SignedTreeRoot str, Socket socket){
         MsgHandlerLogger.log("Sending commitment response... ");
-     
+
         Commitment comm = buildCommitmentMsg(str);
-      
+
         sendMsgProto(MsgType.COMMITMENT, comm, socket);
     }
-    
+
     /** Sends a basic registration response protobuf for a new name-to-key mapping
      * registration.
      *@param regEpoch the epoch at which the mapping will be registered in the directory
@@ -91,11 +94,11 @@ public class ServerMessaging {
     public static synchronized void sendRegistrationRespProto(long regEpoch, int epochInterval,
                                                               Socket socket){
         MsgHandlerLogger.log("Sending registration response... ");
-          
+
         RegistrationResp regResp = buildRegistrationRespMsg(regEpoch, epochInterval);
         sendMsgProto(MsgType.REGISTRATION_RESP, regResp, socket);
     }
-    
+
     /** Sends the authentication path protobuf returned for a client's key lookup.
      *
      *@param uln the key directory entry for which to send the authentication path
@@ -104,11 +107,11 @@ public class ServerMessaging {
      */
     public static synchronized void sendAuthPathProto(UserLeafNode uln, RootNode root, Socket socket){
         MsgHandlerLogger.log("Sending authentication path response... ");
-  
+
         AuthPath authPath = buildAuthPathMsg(uln, root);
         sendMsgProto(MsgType.AUTH_PATH, authPath, socket);
     }
-    
+
     /** Sends any protobuf message {@code msg} of type {@code msgType}
      * to the given socket.
      */
@@ -132,10 +135,10 @@ public class ServerMessaging {
             CommonMessaging.close(dout);
         }
 
-    }    
+    }
 
     /* Message building functions */
-    
+
     // create the simple server response message
     private static synchronized ServerResp buildServerRespMsg(int respType){
         ServerResp.Builder respMsg = ServerResp.newBuilder();
@@ -157,20 +160,28 @@ public class ServerMessaging {
             break;
         default:
             respMsg.setMessage(ServerResp.Message.SERVER_ERR);
-            break;                
+            break;
         }
         return respMsg.build();
     }
-    
+
     // create the commitment response message
-    private static synchronized Commitment buildCommitmentMsg(SignedTreeRoot str){            
-        
+    private static synchronized Commitment buildCommitmentMsg(SignedTreeRoot str){
+
         Commitment.Builder commMsg = Commitment.newBuilder();
         byte[] rootBytes = ServerUtils.getRootNodeBytes(str.getRoot());
-        byte[] rootHashBytes = ServerUtils.hash(rootBytes);
-        
-        Hash.Builder rootHash = Hash.newBuilder();        
-        if(rootHashBytes.length != ServerUtils.HASH_SIZE_BYTES){
+        byte[] rootHashBytes = null;
+
+        try {
+            rootHashBytes = Util.digest(rootBytes);
+        }
+        catch(NoSuchAlgorithmException e) {
+            ServerLogger.error("[ServerMessagging] "+e.getMessage());
+            return null;
+        }
+
+        Hash.Builder rootHash = Hash.newBuilder();
+        if(rootHashBytes.length != Util.HASH_SIZE_BYTES){
             MsgHandlerLogger.error("Bad length of root hash: "+rootHashBytes.length);
             return null;
         }
@@ -181,18 +192,18 @@ public class ServerMessaging {
         commMsg.setSignature(ByteString.copyFrom(str.getSignature()));
         return commMsg.build();
     }
-    
+
     // create the registration response message
-    private static synchronized RegistrationResp buildRegistrationRespMsg(long initEpoch, int epochInterval){            
-        
+    private static synchronized RegistrationResp buildRegistrationRespMsg(long initEpoch, int epochInterval){
+
         RegistrationResp.Builder regRespMsg = RegistrationResp.newBuilder();
         regRespMsg.setInitEpoch(initEpoch);
         regRespMsg.setEpochInterval(epochInterval);
         return regRespMsg.build();
     }
-    
+
     // create the commitment response message
-    private static synchronized AuthPath buildAuthPathMsg(UserLeafNode uln, RootNode root){            
+    private static synchronized AuthPath buildAuthPathMsg(UserLeafNode uln, RootNode root){
         return TransparencyOps.generateAuthPathProto(uln, root);
     }
 
@@ -205,17 +216,17 @@ public class ServerMessaging {
      * indicated by the client.
      */
     public static synchronized AbstractMessage receiveMsgProto(Socket socket) {
-        
+
         DataInputStream din = null;
         try {
             din = new DataInputStream(socket.getInputStream());
-            
+
             // get the message type of the message and read in the stream
             int msgType = din.readUnsignedByte();
-            
+
             if (msgType == MsgType.REGISTRATION){
                 Registration reg = Registration.parseDelimitedFrom(din);
-                
+
                 if(!reg.hasBlob() || !reg.hasChangeKey() || !reg.hasAllowsUnsignedKeychange()
                    || !reg.hasAllowsPublicLookup()) {
                     MsgHandlerLogger.log("Malformed registration message");
@@ -226,8 +237,8 @@ public class ServerMessaging {
             }
             else if (msgType == MsgType.KEY_LOOKUP) {
                 KeyLookup lookup = KeyLookup.parseDelimitedFrom(din);
-                
-                if(!lookup.hasName() || !lookup.hasEpoch() || 
+
+                if(!lookup.hasName() || !lookup.hasEpoch() ||
                    lookup.getEpoch() <= 0){
                     MsgHandlerLogger.log("Malformed key lookup");
                 }
@@ -237,7 +248,7 @@ public class ServerMessaging {
             }
             else if (msgType == MsgType.COMMITMENT_REQ) {
                 CommitmentReq commReq = CommitmentReq.parseDelimitedFrom(din);
-                
+
                 if (!commReq.hasType() || !commReq.hasEpoch() || commReq.getEpoch() <= 0) {
                     MsgHandlerLogger.log("Malformed commitment request message");
                 }
@@ -274,27 +285,27 @@ public class ServerMessaging {
         catch (IOException e) {
             MsgHandlerLogger.error("receiving data from client");
         }
-        
+
         // unexpected message type from the client
         return null;
     }
 
     /* Functions for handling the lower-level communication with the client */
 
-    /** Listens for incoming requests. Uses an SSL connection if the server is running in 
+    /** Listens for incoming requests. Uses an SSL connection if the server is running in
      * full operating mode.
      *
-     *@param isFullOp indicates whether the client is operating in full mode 
+     *@param isFullOp indicates whether the client is operating in full mode
      * or in testing mode
      */
     public static void listenForRequests (boolean isFullOp) {
 
         ServerSocket s = null;
-        
+
         try{
 
             if (isFullOp) {
-                SSLServerSocketFactory sslSrvFact = 
+                SSLServerSocketFactory sslSrvFact =
                 (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
                 s =(SSLServerSocket)sslSrvFact.createServerSocket(ServerConfig.getPort());
             }
@@ -302,18 +313,18 @@ public class ServerMessaging {
                 s = new ServerSocket(ServerConfig.getPort());
 
                 System.out.println("Listening for connections on port "+ServerConfig.getPort()+"...");
-            }            
+            }
 
             MsgHandlerLogger.log("Listening for connections on port "+ServerConfig.getPort()+"...");
-            
+
             // loop to listen for requests
             while(true){
                 Socket c = s.accept(); // closing done by thread
-                
+
                 MsgHandlerLogger.log("Server accepted new connection.");
 
                 RequestHandler th;
-                
+
                 if (isFullOp) {
                     th = new RequestHandler((SSLSocket)c);
                 }
@@ -322,13 +333,13 @@ public class ServerMessaging {
                 }
 
                 th.start();
-                
+
             }
         }
         catch(IOException e){
             MsgHandlerLogger.error("hello: "+e.getMessage());
         }
-        
+
     }
-    
+
 }

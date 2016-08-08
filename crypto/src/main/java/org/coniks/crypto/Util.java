@@ -33,48 +33,48 @@
 
 package org.coniks.crypto;
 
-import org.junit.Test;
-import static org.junit.Assert.assertTrue;
-
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.DSAPrivateKey;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 
-/**
- * Unit tests for Signing.
+/** Implements all cryptographic utility functions for CONIKS.
+ * Currently supported hash algorithms: SHA-256.
+ *
+ *@author Marcela S. Melara (melara@cs.princeton.edu)
+ *@author Michael Rochlin
  */
-public class SigningTest
-{
+public class Util {
 
-    @Test
-    public void testRsaSignVerify()
+     /** The size of a SHA-256 hash in bits.
+     */
+    public static final int HASH_SIZE_BITS =  256;
+
+    /** The size of a SHA-256 hash in bytes.
+     */
+    public static final int HASH_SIZE_BYTES = HASH_SIZE_BITS/8;
+
+    /** The supported hashing scheme.
+     */
+    public static final String HASH_ID = "SHA-256";
+
+    /** Generates the cryptographic hash of {@code input}.
+     * Current hashing algorithm: SHA-256.
+     *
+     *@return The hash as a {@code byte[]} or null in case of an error.
+     */
+    public static byte[] digest(byte[] input)
         throws NoSuchAlgorithmException {
 
-        KeyPair pair = Keys.generateRSAKeyPair();
+        byte [] digest = null;
+        try{
+            MessageDigest md = MessageDigest.getInstance(HASH_ID);
+            digest = md.digest(input);
+            return digest;
 
-        byte[] msg = "message".getBytes();
-
-        byte[] sig = Signing.rsaSign(Keys.getRSAPrivate(pair), msg);
-
-        assertTrue("Verification of RSA signature failed",
-                   Signing.rsaVerify(Keys.getRSAPublic(pair), msg, sig));
+        }
+        // let's panic if an exception occurs
+        finally {
+            return digest;
+        }
     }
 
-    @Test
-    public void testDsaSignVerify()
-        throws NoSuchAlgorithmException {
-
-        KeyPair pair = Keys.generateDSAKeyPair();
-
-        byte[] msg = "message".getBytes();
-
-        byte[] sig = Signing.dsaSign(Keys.getDSAPrivate(pair), msg);
-
-        assertTrue("Verification of DSA signature failed",
-                   Signing.dsaVerify(Keys.getDSAPublic(pair), msg, sig));
-    }
 }

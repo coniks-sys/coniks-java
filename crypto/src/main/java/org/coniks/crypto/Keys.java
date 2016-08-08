@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-16, Princeton University.
+  Copyright (c) 2016, Princeton University.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -38,9 +38,8 @@ import java.security.interfaces.*;
 import java.security.spec.*;
 import java.math.BigInteger;
 
-/** Implements all encryption-key related operations that a
- * CONIKS server must perform.
- * Current encryption/signing algorithm used: RSA with SHA-256.
+/** Implements all encryption-key related operations for CONIKS.
+ * Currently supported algorithms: RSA with SHA-256 and DSA.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Michael Rochlin

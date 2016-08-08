@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-16, Princeton University.
+  Copyright (c) 2016, Princeton University.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -44,12 +44,16 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 /** Implements all digital signature operations for CONIKS.
- * Current supported algorithms: RSA with SHA-256 and DSA.
+ * Currently supported algorithms: RSA with SHA-256 and DSA.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Michael Rochlin
  */
 public class Signing {
+
+    /** The size of a 2048-bit RSA signature in bytes.
+     */
+    public static final int SIG_SIZE_BYTES = 256;
 
     /** Generate the RSA digital signature of {@code msg} using {@code key}.
      *

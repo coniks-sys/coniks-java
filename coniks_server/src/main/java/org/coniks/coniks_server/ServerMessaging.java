@@ -45,7 +45,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.javatuples.*;
 
 // coniks-java imports
-import org.coniks.crypto.Util;
+import org.coniks.crypto.Digest;
+import org.coniks.util.Logging;
 import org.coniks.coniks_common.*;
 import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.*;
@@ -65,7 +66,7 @@ public class ServerMessaging {
      *@param socket the client socket to which to send the message
      */
     public static synchronized void sendSimpleResponseProto(int reqResult, Socket socket){
-        MsgHandlerLogger.log("Sending simple server response... ");
+        Logging.log("Sending simple server response... ");
 
         ServerResp respMsg = buildServerRespMsg(reqResult);
         sendMsgProto(MsgType.SERVER_RESP, respMsg, socket);
@@ -78,7 +79,7 @@ public class ServerMessaging {
      *@param socket the client socket to which to send the message
      */
     public static synchronized void sendCommitmentProto(SignedTreeRoot str, Socket socket){
-        MsgHandlerLogger.log("Sending commitment response... ");
+        Logging.log("Sending commitment response... ");
 
         Commitment comm = buildCommitmentMsg(str);
 
@@ -93,7 +94,7 @@ public class ServerMessaging {
      */
     public static synchronized void sendRegistrationRespProto(long regEpoch, int epochInterval,
                                                               Socket socket){
-        MsgHandlerLogger.log("Sending registration response... ");
+        Logging.log("Sending registration response... ");
 
         RegistrationResp regResp = buildRegistrationRespMsg(regEpoch, epochInterval);
         sendMsgProto(MsgType.REGISTRATION_RESP, regResp, socket);
@@ -106,7 +107,7 @@ public class ServerMessaging {
      *@param socket the client socket to which to send the message
      */
     public static synchronized void sendAuthPathProto(UserLeafNode uln, RootNode root, Socket socket){
-        MsgHandlerLogger.log("Sending authentication path response... ");
+        Logging.log("Sending authentication path response... ");
 
         AuthPath authPath = buildAuthPathMsg(uln, root);
         sendMsgProto(MsgType.AUTH_PATH, authPath, socket);
@@ -128,8 +129,8 @@ public class ServerMessaging {
             dout.flush();
         }
         catch (IOException e) {
-            MsgHandlerLogger.error("Sending msg proto "+msg.toString());
-            MsgHandlerLogger.error("Error: "+e.getMessage());
+            Logging.error("Sending msg proto "+msg.toString());
+            Logging.error("Error: "+e.getMessage());
         }
         finally {
             CommonMessaging.close(dout);
@@ -173,16 +174,16 @@ public class ServerMessaging {
         byte[] rootHashBytes = null;
 
         try {
-            rootHashBytes = Util.digest(rootBytes);
+            rootHashBytes = Digest.digest(rootBytes);
         }
         catch(NoSuchAlgorithmException e) {
-            ServerLogger.error("[ServerMessagging] "+e.getMessage());
+            Logging.error("[ServerMessagging] "+e.getMessage());
             return null;
         }
 
         Hash.Builder rootHash = Hash.newBuilder();
-        if(rootHashBytes.length != Util.HASH_SIZE_BYTES){
-            MsgHandlerLogger.error("Bad length of root hash: "+rootHashBytes.length);
+        if(rootHashBytes.length != Digest.HASH_SIZE_BYTES){
+            Logging.error("Bad length of root hash: "+rootHashBytes.length);
             return null;
         }
         rootHash.setLen(rootHashBytes.length);
@@ -229,7 +230,7 @@ public class ServerMessaging {
 
                 if(!reg.hasBlob() || !reg.hasChangeKey() || !reg.hasAllowsUnsignedKeychange()
                    || !reg.hasAllowsPublicLookup()) {
-                    MsgHandlerLogger.log("Malformed registration message");
+                    Logging.log("Malformed registration message");
                 }
                 else {
                     return reg;
@@ -240,7 +241,7 @@ public class ServerMessaging {
 
                 if(!lookup.hasName() || !lookup.hasEpoch() ||
                    lookup.getEpoch() <= 0){
-                    MsgHandlerLogger.log("Malformed key lookup");
+                    Logging.log("Malformed key lookup");
                 }
                 else {
                     return lookup;
@@ -250,7 +251,7 @@ public class ServerMessaging {
                 CommitmentReq commReq = CommitmentReq.parseDelimitedFrom(din);
 
                 if (!commReq.hasType() || !commReq.hasEpoch() || commReq.getEpoch() <= 0) {
-                    MsgHandlerLogger.log("Malformed commitment request message");
+                    Logging.log("Malformed commitment request message");
                 }
                 else {
                     return commReq;
@@ -260,7 +261,7 @@ public class ServerMessaging {
                 ULNChangeReq ulnChange = ULNChangeReq.parseDelimitedFrom(din);
                 if (!ulnChange.hasName() || !ulnChange.hasNewBlob() || !ulnChange.hasNewChangeKey() ||
                     !ulnChange.hasAllowsUnsignedKeychange() || !ulnChange.hasAllowsPublicLookup()) {
-                    MsgHandlerLogger.log("Malformed uln change req");
+                    Logging.log("Malformed uln change req");
                 }
                 else {
                     return ulnChange;
@@ -269,21 +270,21 @@ public class ServerMessaging {
             else if (msgType == MsgType.SIGNED_ULNCHANGE_REQ) {
                 SignedULNChangeReq sulnReq = SignedULNChangeReq.parseDelimitedFrom(din);
                 if (!sulnReq.hasReq() || !sulnReq.hasSig() || !sulnReq.getReq().hasName()) {
-                    MsgHandlerLogger.log("Malformed signed uln change req");
+                    Logging.log("Malformed signed uln change req");
                 }
                 else {
                     return sulnReq;
                 }
             }
             else {
-                MsgHandlerLogger.log("Unknown incoming message type");
+                Logging.log("Unknown incoming message type");
             }
         }
         catch (InvalidProtocolBufferException e) {
-            MsgHandlerLogger.error("parsing a protobuf message");
+            Logging.error("parsing a protobuf message");
         }
         catch (IOException e) {
-            MsgHandlerLogger.error("receiving data from client");
+            Logging.error("receiving data from client");
         }
 
         // unexpected message type from the client
@@ -315,13 +316,13 @@ public class ServerMessaging {
                 System.out.println("Listening for connections on port "+ServerConfig.getPort()+"...");
             }
 
-            MsgHandlerLogger.log("Listening for connections on port "+ServerConfig.getPort()+"...");
+            Logging.log("Listening for connections on port "+ServerConfig.getPort()+"...");
 
             // loop to listen for requests
             while(true){
                 Socket c = s.accept(); // closing done by thread
 
-                MsgHandlerLogger.log("Server accepted new connection.");
+                Logging.log("Server accepted new connection.");
 
                 RequestHandler th;
 
@@ -337,7 +338,7 @@ public class ServerMessaging {
             }
         }
         catch(IOException e){
-            MsgHandlerLogger.error("hello: "+e.getMessage());
+            Logging.error("hello: "+e.getMessage());
         }
 
     }

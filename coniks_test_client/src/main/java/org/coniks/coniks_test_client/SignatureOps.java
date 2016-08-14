@@ -39,6 +39,9 @@ import java.security.interfaces.*;
 import javax.crypto.*;
 import java.math.BigInteger;
 
+// coniks-java import
+import org.coniks.util.Logging;
+
 /** Implements all operations involving digital signatures
  * that a CONIKS client must perform.
  *
@@ -62,19 +65,19 @@ public class SignatureOps{
             verifyalg.initVerify(pk);
             verifyalg.update(msg);
             if (!verifyalg.verify(sig)) {
-                ClientLogger.error("Failed to validate signature");
+                Logging.error("Failed to validate signature");
                 return false;
             }
             return true;
         }
         catch(NoSuchAlgorithmException e){
-            ClientLogger.error("DSA is invalid for some reason.");
+            Logging.error("DSA is invalid for some reason.");
         }
         catch(InvalidKeyException e){
-            ClientLogger.error("The given key is invalid.");
+            Logging.error("The given key is invalid.");
         }
         catch(SignatureException e){
-            ClientLogger.error("The format of the input is invalid: "+e.getMessage());
+            Logging.error("The format of the input is invalid: "+e.getMessage());
         }
         return false;
     }
@@ -87,7 +90,7 @@ public class SignatureOps{
     @Deprecated
     public static byte[] signDSA(byte[] msg, DSAPrivateKey prk) throws InvalidKeyException {
         if (prk == null) {
-            ClientLogger.error("The given key is invalid.");
+            Logging.error("The given key is invalid.");
         }
         else {
             try {
@@ -97,13 +100,13 @@ public class SignatureOps{
                 return sigProcess.sign();
             }
             catch(NoSuchAlgorithmException e){
-                ClientLogger.error("DSA is invalid for some reason.");
+                Logging.error("DSA is invalid for some reason.");
             }
             catch(InvalidKeyException e){
-                ClientLogger.error("The given key is invalid.");
+                Logging.error("The given key is invalid.");
             }
             catch(SignatureException e){
-                ClientLogger.error("The format of the input is invalid: "+e.getMessage());
+                Logging.error("The format of the input is invalid: "+e.getMessage());
             }
         }
             return null;

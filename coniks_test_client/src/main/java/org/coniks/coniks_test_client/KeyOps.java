@@ -48,6 +48,8 @@ import java.util.Scanner;
 import java.io.PrintWriter;
 import java.io.*;
 
+// coniks-java imports
+import org.coniks.util.Logging;
 import org.coniks.coniks_common.CommonMessaging;
 
 /** Implements all operations involving encryption keys
@@ -81,16 +83,16 @@ public class KeyOps{
             pubKey = (DSAPublicKey) keyFactory.generatePublic(pubKeySpec);
         }
         catch (IOException e) {
-            ClientLogger.error(e.getMessage());
+            Logging.error(e.getMessage());
         }
         catch (NoSuchAlgorithmException e){
-            ClientLogger.error(e.getMessage());
+            Logging.error(e.getMessage());
         }
         catch (NoSuchProviderException e){
-            ClientLogger.error(e.getMessage());
+            Logging.error(e.getMessage());
         }
          catch(InvalidKeySpecException e){
-            ClientLogger.error(e.getMessage());
+            Logging.error(e.getMessage());
         }
         finally {
             CommonMessaging.close(fis);
@@ -125,16 +127,16 @@ public class KeyOps{
             prKey = (DSAPrivateKey) keyFactory.generatePrivate(prKeySpec);
         }
         catch (IOException e) {
-            ClientLogger.error(e.getMessage());
+            Logging.error(e.getMessage());
         }
         catch (NoSuchAlgorithmException e){
-            ClientLogger.error(e.getMessage());
+            Logging.error(e.getMessage());
         }
         catch (NoSuchProviderException e){
-            ClientLogger.error(e.getMessage());
+            Logging.error(e.getMessage());
         }
          catch(InvalidKeySpecException e){
-            ClientLogger.error(e.getMessage());
+            Logging.error(e.getMessage());
         }
         finally {
             CommonMessaging.close(fis);
@@ -169,7 +171,7 @@ public class KeyOps{
             success = true;
         }
         catch (IOException e) {
-            ClientLogger.error(e.getMessage());
+            Logging.error(e.getMessage());
         }
         finally {
             CommonMessaging.close(fos);
@@ -202,7 +204,7 @@ public class KeyOps{
             success = true;
         }
         catch (IOException e) {
-            ClientLogger.error(e.getMessage());
+            Logging.error(e.getMessage());
         }
         finally {
             CommonMessaging.close(fos);
@@ -246,11 +248,11 @@ public class KeyOps{
             kg.initialize(1024, new SecureRandom());
         }
         catch(NoSuchAlgorithmException e){
-            ClientLogger.error("DSA is not valid for some reason.");
+            Logging.error("DSA is not valid for some reason.");
             return null;
         }
         catch(InvalidParameterException e){
-            ClientLogger.error("DSA is not valid for some reason.");
+            Logging.error("DSA is not valid for some reason.");
             return null;
         }
 

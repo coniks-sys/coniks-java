@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-16, Princeton University.
+  Copyright (c) 2016, Princeton University.
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
   POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.coniks.coniks_server;
+package org.coniks.util;
 
 import java.util.logging.FileHandler;
 import java.util.logging.SimpleFormatter;
@@ -40,26 +40,37 @@ import java.util.logging.Level;
 import java.io.IOException;
 
 // coniks-java imports
-import org.coniks.util.Logging;
+import org.coniks.util.Convert;
 
-/** Implements the main logger used for a CONIKS server.
+/** Implements the logger used by any CONIKS component.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  */
-public class ServerLogger {
+public class Logging {
+
+    /** The maximum number of bytes logged per log file.
+     */
+    public static final int MAX_BYTES_LOGGED_PER_FILE = (1 << 15);
+
+    /** The maximum number of log files per log.
+     */
+    public static final int MAX_NUM_LOG_FILES = 5;
 
     private static Logger logger;
 
-    /** Sets up a server logger for the CONIKS server.
+    /** Sets up a logger for a CONIKS component.
      *
-     *@param serverLog the file name for this logger.
-     *
-     *@deprecated Replaced by
-     * {@link org.coniks.util.Logging#setup(String, String)}.
+     *@param logFile the file name for this logger.
+     *@param name the name for this logger.
      */
-    @Deprecated
-    public static void setup (String serverLog) {
-        logger = Logger.getLogger("ConiksLogger-Server");
+    public static void setup (String logFile, String name) {
+
+        String logName = "";
+        if (name != null) {
+            logName = " - "+name;
+        }
+
+        logger = Logger.getLogger("ConiksLogger"+logName);
 
         // suppress the logging output to the console
         logger.setUseParentHandlers(false);
@@ -67,9 +78,9 @@ public class ServerLogger {
         logger.setLevel(Level.INFO);
 
         try {
-             FileHandler handler = new FileHandler(serverLog,
-                                                  Logging.MAX_BYTES_LOGGED_PER_FILE,
-                                                  Logging.MAX_NUM_LOG_FILES, true);
+             FileHandler handler = new FileHandler(logFile,
+                                                  MAX_BYTES_LOGGED_PER_FILE,
+                                                  MAX_NUM_LOG_FILES, true);
 
             // create a TXT formatter
             SimpleFormatter fmt = new SimpleFormatter();
@@ -87,23 +98,15 @@ public class ServerLogger {
     }
 
     /** Writes an information message {@code msg}
-     * to the main server log.
-     *
-     *@deprecated Replaced by
-     * {@link org.coniks.util.Logging#log(String)}.
+     * to the main client log.
      */
-    @Deprecated
     public static void log (String msg) {
         logger.info(msg);
     }
 
     /** Writes a severe error message {@code msg}
-     * to the main server log.
-     *
-     *@deprecated Replaced by
-     * {@link org.coniks.util.Logging#error(String)}.
+     * to the main client log.
      */
-    @Deprecated
     public static void error (String msg) {
         logger.severe(msg);
     }

@@ -40,7 +40,9 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 // coniks-java imports
-import org.coniks.crypto.Util;
+import org.coniks.crypto.Digest;
+import org.coniks.util.Convert;
+import org.coniks.util.Logging;
 
 import org.javatuples.*;
 
@@ -198,7 +200,7 @@ public class TreeBuilder{
     private static byte[] innerComputeHash(TreeNode curNode)
         throws NoSuchAlgorithmException {
         if(curNode == null) {
-            return Util.digest(new byte[Util.HASH_SIZE_BYTES]);
+            return Digest.digest(new byte[Digest.HASH_SIZE_BYTES]);
         }
 
         if(curNode instanceof InteriorNode){
@@ -212,12 +214,12 @@ public class TreeBuilder{
                 curNodeI.rightHash = innerComputeHash(curNode.right);
             }
 
-            return Util.digest(ServerUtils.getInteriorNodeBytes(curNodeI));
+            return Digest.digest(ServerUtils.getInteriorNodeBytes(curNodeI));
         }
         else{
             // assertion: must be user leaf node.
             UserLeafNode curNodeU = (UserLeafNode) curNode;
-            return Util.digest(ServerUtils.getUserLeafNodeBytes(curNodeU));
+            return Digest.digest(ServerUtils.getUserLeafNodeBytes(curNodeU));
         }
     }
 
@@ -237,7 +239,7 @@ public class TreeBuilder{
         }
 
         if(pendingQ == null) {
-            ServerLogger.error("Trying to extend using null pending queue");
+            Logging.error("Trying to extend using null pending queue");
             return null;
         }
 
@@ -247,7 +249,7 @@ public class TreeBuilder{
             r = extendTree(pendingQ, newRoot);
         }
         catch(NoSuchAlgorithmException e) {
-            ServerLogger.error("Trying to extend using null pending queue");
+            Logging.error("Trying to extend using null pending queue");
         }
         return r;
     }
@@ -274,7 +276,7 @@ public class TreeBuilder{
             // while we're handing the same prefix,
             // insert as normal
             byte[] index = p.getValue0();
-            prefix = ServerUtils.getPrefixBytes(index);
+            prefix = Convert.getPrefixBytes(index);
 
             UserLeafNode toAdd = p.getValue1();
             Operation op = p.getValue2();

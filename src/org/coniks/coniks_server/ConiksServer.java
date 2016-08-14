@@ -1,38 +1,40 @@
 /*
   Copyright (c) 2015-16, Princeton University.
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are 
+  modification, are permitted provided that the following conditions are
   met:
-  * Redistributions of source code must retain the above copyright 
+  * Redistributions of source code must retain the above copyright
   notice, this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above 
-  copyright notice, this list of conditions and the following disclaimer 
-  in the documentation and/or other materials provided with the 
+  * Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
   distribution.
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
-  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.coniks.coniks_server;
 
+// coniks-java imports
+import org.coniks.crypto.Util;
 import org.coniks.coniks_common.MsgType;
 import org.coniks.coniks_common.C2SProtos.Registration;
 import org.coniks.coniks_common.C2SProtos.CommitmentReq;
@@ -88,27 +90,27 @@ public class ConiksServer{
 
     private static long initEpoch;
 
-    /** Initialize the directory: get the latest root node from the 
+    /** Initialize the directory: get the latest root node from the
      * database (if using one) and update the directory internally (i.e. build the hash tree)
      * Because users are stored in lexicographic order, we can simply load them all at once.
      * N.B. Designed for few restarts in mind.
      */
     private static RootNode initDirectory(){
-	PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> initUsers = 
-	    new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>(
-		16384, new ServerUtils.PrefixComparator());
+        PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> initUsers =
+            new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>(
+                16384, new ServerUtils.PrefixComparator());
 
         // At this point, if we're using a DB, we want to check if we already have
         // a commitment history stored in the DB
         // if so, retrieve the latest commitment and root node stored in the DB
-        
+
         RootNode initRoot = TreeBuilder.copyExtendTree(null, initUsers);
-        
+
         initUsers.clear();
 
         return initRoot;
     }
-    
+
     /** Configures the server and begins listening for
      * incoming connections from CONIKS clients.
      *<p>
@@ -116,7 +118,7 @@ public class ConiksServer{
      * {@code ./coniks_server.sh <start | test | stop | clean>}
      */
     public static void main(String[] args){
-        
+
         if (args.length != NUM_ARGS) {
             System.out.println("Need "+(NUM_ARGS-1)+" arguments: CONIKS_SERVERCONFIG, and CONIKS_SERVERLOGS");
             System.out.println("The run script may expect these to be passed as env vars, make sure to export these before running the run script again.");
@@ -134,7 +136,7 @@ public class ConiksServer{
             if (!configFile.exists() || !logDir.isDirectory()) {
                 throw new FileNotFoundException();
             }
-  
+
             String opMode = args[2];
             if (opMode.equalsIgnoreCase("full")) {
                 isFullOp = true;
@@ -155,12 +157,12 @@ public class ConiksServer{
             System.out.println("The path you entered for CONIKS_SERVERCONFIG or CONIKS_SERVERLOGS doesn't exist.");
             System.exit(-1);
         }
-        
+
         // false indicates an error, so exit
         if (!ServerConfig.readServerConfig(configFile, isFullOp)) {
             System.exit(-1);
         }
-        
+
         // set some more configs
         initEpoch = ServerConfig.getStartupTime();
         MsgHandlerLogger.setup(logPath+"/msg-handler-%g");
@@ -191,30 +193,30 @@ public class ConiksServer{
         }
 
         // init the history
-         if (!ServerHistory.initHistory(initRoot, initEpoch, 0, 
-                                       new byte[ServerUtils.HASH_SIZE_BYTES])) {
+         if (!ServerHistory.initHistory(initRoot, initEpoch, 0,
+                                       new byte[Util.HASH_SIZE_BYTES])) {
             ServerUtils.printStatusMsg(true, "Error initializing the history");
             System.exit(-1);
          }
-        
+
         EpochTimerTask epochSnapshotTaker = new EpochTimerTask();
-        
-    	ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleWithFixedDelay(epochSnapshotTaker, 
-    					 ServerConfig.getEpochInterval(), 
-    					 ServerConfig.getEpochInterval(),
-    					 TimeUnit.MILLISECONDS);
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleWithFixedDelay(epochSnapshotTaker,
+                                         ServerConfig.getEpochInterval(),
+                                         ServerConfig.getEpochInterval(),
+                                         TimeUnit.MILLISECONDS);
 
         ServerMessaging.listenForRequests(isFullOp);
-        
+
     }
-    
+
     /** Implements a TimerTask that updates the STR history every epoch.
      */
     private static class EpochTimerTask implements Runnable {
 
         public void run() {
-	    TimerLogger.log("Timer task started.");
+            TimerLogger.log("Timer task started.");
             RootNode nextRoot = DirectoryOps.updateDirectory();
 
             // check that we got a good first tree
@@ -253,7 +255,7 @@ public class ConiksServer{
                 ServerUtils.printStatusMsg(false, "Directory update successful. Next epoch: "+nextEpoch);
             }
         }
-        
+
     }
-    
+
 }

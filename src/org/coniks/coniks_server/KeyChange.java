@@ -36,9 +36,13 @@ package org.coniks.coniks_server;
 import java.security.interfaces.DSAPublicKey;
 import java.util.Arrays;
 
+// coniks-java imports
+import org.coniks.crypto.*;
+
 /** Implements a key change operation.
  *
  *@author Michael Rochlin
+ *@author Marcela S. Melara (melara@cs.princeton.edu)
  */
 public class KeyChange extends Operation {
     private String newKeyData;
@@ -97,10 +101,21 @@ public class KeyChange extends Operation {
             ServerLogger.error("Tried to make unsigned KeyChange but wasn't allowed");
             return false;
         }
-        if (!uln.allowsUnsignedKeychange()
-            && !SignatureOps.verifySigFromDSA(msg, sig, uln.getChangeKey())) {
-            ServerLogger.error("Requires that key changes be signed, but the signature was invalid");
-            return false;
+        if (!uln.allowsUnsignedKeychange()) {
+            
+            boolean res = false;
+
+            try {
+                res = Signing.dsaVerify(uln.getChangeKey(), msg, sig);
+            }
+            catch (Exception e) {
+                ServerLogger.error("[KeyChange] "+e.getMessage());
+            }
+
+            if(!res) {
+                ServerLogger.error("Requires that key changes be signed, but the signature was invalid");
+                return false;
+            }
         }
         return true;
     }

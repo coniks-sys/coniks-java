@@ -1,33 +1,33 @@
 /*
   Copyright (c) 2015-16, Princeton University.
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are 
+  modification, are permitted provided that the following conditions are
   met:
-  * Redistributions of source code must retain the above copyright 
+  * Redistributions of source code must retain the above copyright
   notice, this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above 
-  copyright notice, this list of conditions and the following disclaimer 
-  in the documentation and/or other materials provided with the 
+  * Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
   distribution.
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
-  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -35,13 +35,17 @@ package org.coniks.coniks_server;
 
 import java.util.PriorityQueue;
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
+
+// coniks-java imports
+import org.coniks.crypto.Util;
 
 import org.javatuples.*;
 
 /** Implements all operations necessary for building a CONIKS
- * Merkle prefix tree on the server. 
+ * Merkle prefix tree on the server.
  * Current hashing algorithm used: SHA-256.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
@@ -49,29 +53,29 @@ import org.javatuples.*;
  *@author Michael Rochlin
  */
 public class TreeBuilder{
-    
+
     private static int lastLevel;
-    
+
     // inserts a new user leaf node into the tree
     private static void insertNode(byte[] key, UserLeafNode toAdd, RootNode root, Operation op){
         int curOffset = 0;
         // This code would be a lot more natural
         //   if our tries were byte-branching rather than bit-branching, but whatevs.
-        
+
         toAdd.level = 0;
         TreeNode curNode = root;
-        
+
         curNode.setName("root");
         int counter = 1;
-        
+
         insertLoop:
         while(true){
             int arrayOffset = curOffset / 8;
             int bitOfByte = curOffset % 8;
             // 0 is left-most byte in string
-            // 0 of left-most byte is the *left-most* bit of that byte. 
+            // 0 of left-most byte is the *left-most* bit of that byte.
             toAdd.level++;
-            
+
             if( curNode instanceof UserLeafNode ){
                 // reached a "bottom" of the tree.
                 // add a new interior node and push the previous leaf down
@@ -79,11 +83,11 @@ public class TreeBuilder{
                 if (curNode.parent == null){
                     throw new UnsupportedOperationException("parent is null!!");
                 }
-                
+
                 // TODO: Does this need to be moved?
                 InteriorNode newInt = new InteriorNode(curNode.parent,
                                                        curNode.level);
-                
+
                 UserLeafNode curNodeUL = (UserLeafNode) curNode;
                 if (curNodeUL.username.equals( toAdd.username )) {
                     if (op instanceof Register) {
@@ -106,11 +110,11 @@ public class TreeBuilder{
                         throw new UnsupportedOperationException("Weird operation happened. Make sure you've added this functionality");
                     }
                 }
-                
+
                 if (!(op instanceof Register)) {
                     throw new UnsupportedOperationException("Failed to make key-change!");
                 }
-                
+
                 byte[] curNodeKey = ServerUtils.unameToIndex(curNodeUL.username);
                 curNodeUL.setIndex(curNodeKey);
                 // This is what's happening below:
@@ -118,7 +122,7 @@ public class TreeBuilder{
                 int maskedBit = curNodeKey[arrayOffset] & (1 << (7 - bitOfByte));
                 // direction here is going to be false = left,
                 //                               true = right
-                
+
                 boolean direction = (maskedBit != 0);
                 if (direction){
                     newInt.right = curNodeUL;
@@ -127,7 +131,7 @@ public class TreeBuilder{
                 }
                 curNode.level++;
                 curNode.parent = newInt;
-                
+
                 if (newInt.parent.left == curNode) {
                     newInt.parent.left = newInt;
                 }
@@ -135,16 +139,16 @@ public class TreeBuilder{
                     newInt.parent.right = newInt;
                 }
                 curNode = newInt;
-                toAdd.level--;                
-            } 
+                toAdd.level--;
+            }
             else {
                 InteriorNode curNodeI = (InteriorNode) curNode;
                 int maskedBit = key[arrayOffset] & (1 << (7 - bitOfByte));
                 // direction here is going to be false = left,
                 //                               true = right
-                
+
                 boolean direction = (maskedBit != 0);
-                
+
                 if(direction){
                     // mark right tree as needing hash recompute
                     curNodeI.rightHash = null;
@@ -175,47 +179,49 @@ public class TreeBuilder{
             lastLevel = toAdd.level;
         }
     }
-    
+
     // Compute the hashes of the left and right subtrees
     // of the Merkle tree root
     // Wrapper for innerComputeHash
-    private static void computeHashes(RootNode root){
+    private static void computeHashes(RootNode root)
+        throws NoSuchAlgorithmException {
         if (root.leftHash == null){
-            root.leftHash = innerComputeHash(root.left);     
+            root.leftHash = innerComputeHash(root.left);
         }
         if (root.rightHash == null){
             root.rightHash = innerComputeHash(root.right);
         }
     }
-    
+
     // this recursively computes the hash of the subtree specified
     // by curNode
-    private static byte[] innerComputeHash(TreeNode curNode){
-    	if(curNode == null) {
-    	    return ServerUtils.hash(new byte[ServerUtils.HASH_SIZE_BYTES]);
-    	}
+    private static byte[] innerComputeHash(TreeNode curNode)
+        throws NoSuchAlgorithmException {
+        if(curNode == null) {
+            return Util.digest(new byte[Util.HASH_SIZE_BYTES]);
+        }
 
-    	if(curNode instanceof InteriorNode){
-    	    InteriorNode curNodeI = (InteriorNode) curNode; 
-    	    if(curNodeI.leftHash == null){
-    		// compute left-side hash
-    		curNodeI.leftHash = innerComputeHash(curNode.left);
-    	    }
-    	    if(curNodeI.rightHash == null){
-    		// compute right-side hash
-    		curNodeI.rightHash = innerComputeHash(curNode.right);
-    	    }
-            
-    	    return ServerUtils.hash(ServerUtils.getInteriorNodeBytes(curNodeI));
-    	}
+        if(curNode instanceof InteriorNode){
+            InteriorNode curNodeI = (InteriorNode) curNode;
+            if(curNodeI.leftHash == null){
+                // compute left-side hash
+                curNodeI.leftHash = innerComputeHash(curNode.left);
+            }
+            if(curNodeI.rightHash == null){
+                // compute right-side hash
+                curNodeI.rightHash = innerComputeHash(curNode.right);
+            }
+
+            return Util.digest(ServerUtils.getInteriorNodeBytes(curNodeI));
+        }
         else{
-    	    // assertion: must be user leaf node.
-    	    UserLeafNode curNodeU = (UserLeafNode) curNode;
-            return ServerUtils.hash(ServerUtils.getUserLeafNodeBytes(curNodeU));
-    	}
+            // assertion: must be user leaf node.
+            UserLeafNode curNodeU = (UserLeafNode) curNode;
+            return Util.digest(ServerUtils.getUserLeafNodeBytes(curNodeU));
+        }
     }
-    
-    /** Clones a Merkle prefix tree {@code prevRoot} and 
+
+    /** Clones a Merkle prefix tree {@code prevRoot} and
      * extends it with any new nodes in {@code pendingQ}.
      *
      *@return The {@link RootNode} for the next epoch's Merkle tree.
@@ -229,52 +235,62 @@ public class TreeBuilder{
         }else{
             newRoot = new RootNode(null, null, 0);
         }
-        
+
         if(pendingQ == null) {
             ServerLogger.error("Trying to extend using null pending queue");
             return null;
         }
-        return extendTree(pendingQ, newRoot);
+
+        RootNode r = null;
+
+        try {
+            r = extendTree(pendingQ, newRoot);
+        }
+        catch(NoSuchAlgorithmException e) {
+            ServerLogger.error("Trying to extend using null pending queue");
+        }
+        return r;
     }
-    
-    /** Inserts any new nodes in {@code pendingQ} ordered by the 24-bit prefix
-     * of their lookup index into the Merkle tree, and recomputes all necessary 
-     * hashes.
+
+    /** Inserts any new nodes in {@code pendingQ} ordered by the 24-bit
+     * prefix of their lookup index into the Merkle tree, and recomputes
+     * all necessary hashes.
      *
      *@return The {@link RootNode} of the extended Merkle tree.
      */
-    private static RootNode extendTree(
-                                       PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQ,
-                                       RootNode root) {
-        
+    private static RootNode extendTree(PriorityQueue<Triplet<byte[],
+                                       UserLeafNode, Operation>> pendingQ,
+                                       RootNode root)
+        throws NoSuchAlgorithmException {
+
         RootNode newRoot = root;
-        
+
         byte[] prefix = null;
-        
+
         int toInsert = pendingQ.size();
-        
+
         Triplet<byte[], UserLeafNode, Operation> p = pendingQ.poll();
         while(p != null){
             // while we're handing the same prefix,
             // insert as normal
             byte[] index = p.getValue0();
             prefix = ServerUtils.getPrefixBytes(index);
-            
+
             UserLeafNode toAdd = p.getValue1();
             Operation op = p.getValue2();
-            
+
             insertNode(index, toAdd, newRoot, op);
-            
+
             p = pendingQ.poll();
-            
+
             toInsert--;
-            
+
         }
-        
+
         // recompute hashes
         computeHashes(newRoot);
-        
+
         return newRoot;
     }
-    
+
 }

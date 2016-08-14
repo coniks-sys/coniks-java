@@ -23,6 +23,7 @@
 
   <modules>
     <module>crypto</module>
+    <module>util</module>
     <module>coniks_common</module>
     <module>coniks_server</module>
     <module>coniks_test_client</module>

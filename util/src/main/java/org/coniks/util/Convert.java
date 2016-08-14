@@ -33,14 +33,16 @@
 
 package org.coniks.util;
 
-/** Implements various utility functions
+import java.nio.charset.Charset;
+
+/** Implements various utility conversion functions
  * used by various components of CONIKS.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Aaron Blankstein
  *@author Michael Rochlin
  */
-public class Util {
+public class Convert {
 
     /** The maximum number of bytes logged per log file.
      */

@@ -1,33 +1,33 @@
 /*
   Copyright (c) 2016, Princeton University.
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are 
+  modification, are permitted provided that the following conditions are
   met:
-  * Redistributions of source code must retain the above copyright 
+  * Redistributions of source code must retain the above copyright
   notice, this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above 
-  copyright notice, this list of conditions and the following disclaimer 
-  in the documentation and/or other materials provided with the 
+  * Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
   distribution.
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
-  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -37,6 +37,9 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.interfaces.DSAParams;
 import java.util.PriorityQueue;
+
+// coniks-java imports
+import org.coniks.util.Convert;
 
 import org.javatuples.*;
 
@@ -49,8 +52,8 @@ public class DirectoryOps {
 
     // keeps all the operations pending to be inserted into the directory
     private static PriorityQueue<Triplet<byte[], UserLeafNode, Operation>> pendingQueue =
-        new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>( 
-                                                                    16384, new ServerUtils.PrefixComparator());;   
+        new PriorityQueue<Triplet<byte[], UserLeafNode, Operation>>(
+                                                                    16384, new ServerUtils.PrefixComparator());;
 
     // this is a counter to be used to sort the uln changes so they happen in-order for the same person
     private static long ulnCounter = 0;
@@ -65,7 +68,7 @@ public class DirectoryOps {
      *@param allowsPublicVisibility flag indicating the user's key visibility policy
      */
     public static synchronized void register(String uname, String pk, DSAPublicKey ck,
-                                             boolean allowsUnsignedChanges, boolean allowsPublicVisibility){            
+                                             boolean allowsUnsignedChanges, boolean allowsPublicVisibility){
         byte[] index = ServerUtils.unameToIndex(uname);
         UserLeafNode uln = new UserLeafNode(uname, pk, ServerHistory.nextEpoch(), 0,
                                             allowsUnsignedChanges, allowsPublicVisibility, ck, index);
@@ -83,7 +86,7 @@ public class DirectoryOps {
      *@param msg the mapping change message required for signed changes
      *@param sig the signature on {@code msg} required for signed changes
      */
-    public static synchronized void mappingChange(String uname, String newKey, DSAPublicKey ck, 
+    public static synchronized void mappingChange(String uname, String newKey, DSAPublicKey ck,
                                                   boolean allowsUnsignedChanges, boolean allowsPublicVisibility,
                                                   byte[] msg, byte[] sig) {
         byte[] index = ServerUtils.unameToIndex(uname);
@@ -101,7 +104,7 @@ public class DirectoryOps {
      */
     public static synchronized UserLeafNode findUser(String uname) {
         RootNode root = ServerHistory.getCurTree();
-        
+
         return getUlnFromTree(uname, root);
     }
 
@@ -111,32 +114,32 @@ public class DirectoryOps {
      */
     public static synchronized UserLeafNode findUserInEpoch(String uname, long ep) {
         SignedTreeRoot str = ServerHistory.getSTR(ep);
-        RootNode root = str.getRoot(); 
+        RootNode root = str.getRoot();
 
         return getUlnFromTree(uname, root);
     }
 
-    /** Updates the key directory by handling all current pending registration and 
+    /** Updates the key directory by handling all current pending registration and
      * mapping change operations.
      * This function is called at the beginning of the new epoch.
      *
      *@return the tree root for the updated directory, or null in case of an error.
      */
     public static synchronized RootNode updateDirectory() {
-  
+
         // this should never be the case
         if(ServerHistory.getCurSTR() == null){
             ServerLogger.error("Trying to update a server without a history.");
             return null;
         }
-        
+
         RootNode curRoot = ServerHistory.getCurTree();
         long curEpoch = ServerHistory.getCurEpoch();
 
         RootNode newRoot = TreeBuilder.copyExtendTree(curRoot, pendingQueue);
 
-	// it's safe to clear the pending queue.
-	pendingQueue.clear();
+        // it's safe to clear the pending queue.
+        pendingQueue.clear();
 
         return newRoot;
     }
@@ -146,28 +149,28 @@ public class DirectoryOps {
     // so we should really find a way to remove this redundancy
     private static synchronized UserLeafNode getUlnFromTree(String username,
                                                      RootNode root) {
-        
+
         // traverse based on lookup index for this name
         byte[] lookupIndex = ServerUtils.unameToIndex(username);
-        
+
         // not worth doing this recursively
         int curOffset = 0;
         TreeNode runner = root;
-                
+
         while (!(runner instanceof UserLeafNode)) {
-            
+
             // direction here is going to be false = left,
             //                               true = right
-            boolean direction = ServerUtils.getNthBit(lookupIndex, curOffset);
-            
+            boolean direction = Convert.getNthBit(lookupIndex, curOffset);
+
             if (runner == null){
                 break;
             }
-            
+
             if (runner instanceof RootNode) {
-                
+
                     RootNode curNodeR = (RootNode) runner;
-                    
+
                     if(!direction){
                         runner = curNodeR.getLeft();
                     }
@@ -179,10 +182,10 @@ public class DirectoryOps {
 
                 else {
                     InteriorNode curNodeI = (InteriorNode) runner;
-               
+
                     if(!direction){
                         runner = curNodeI.getLeft();
-                    }                             
+                    }
                     else {
                         runner = curNodeI.getRight();
                     }
@@ -191,9 +194,9 @@ public class DirectoryOps {
                     if (runner == null){
                         break;
                     }
-                    
+
                 }
-               
+
                 curOffset++;
             }
 
@@ -208,7 +211,7 @@ public class DirectoryOps {
 
             // we expect the runner to be the right uln at this point
             return (UserLeafNode) runner;
-  
+
         }
 
 }

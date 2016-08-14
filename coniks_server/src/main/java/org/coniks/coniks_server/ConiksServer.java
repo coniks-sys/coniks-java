@@ -35,6 +35,7 @@ package org.coniks.coniks_server;
 
 // coniks-java imports
 import org.coniks.crypto.Util;
+import org.coniks.util.Convert;
 import org.coniks.coniks_common.MsgType;
 import org.coniks.coniks_common.C2SProtos.Registration;
 import org.coniks.coniks_common.C2SProtos.CommitmentReq;
@@ -186,7 +187,7 @@ public class ConiksServer{
                 ServerLogger.error("An error occured while trying to build the initial tree");
             }
             else {
-                ServerUtils.printStatusMsg(true, "An error occured while trying to build the initial tree");
+                Convert.printStatusMsg(true, "An error occured while trying to build the initial tree");
             }
             // just bail
             System.exit(-1);
@@ -195,7 +196,7 @@ public class ConiksServer{
         // init the history
          if (!ServerHistory.initHistory(initRoot, initEpoch, 0,
                                        new byte[Util.HASH_SIZE_BYTES])) {
-            ServerUtils.printStatusMsg(true, "Error initializing the history");
+            Convert.printStatusMsg(true, "Error initializing the history");
             System.exit(-1);
          }
 
@@ -225,7 +226,7 @@ public class ConiksServer{
                     ServerLogger.error("An error occured while trying to update the tree");
                 }
                 else {
-                    ServerUtils.printStatusMsg(true, "An error occured while trying to update the tree");
+                    Convert.printStatusMsg(true, "An error occured while trying to update the tree");
                 }
                 // let's not quite bail here
                 throw new UnsupportedOperationException("Next root was null");
@@ -241,7 +242,7 @@ public class ConiksServer{
                     ServerLogger.error("An error occured while trying to update the tree");
                 }
                 else {
-                    ServerUtils.printStatusMsg(true, "An error occured while trying to update the tree");
+                    Convert.printStatusMsg(true, "An error occured while trying to update the tree");
                 }
                 // let's not quite bail here
                 throw new UnsupportedOperationException("Next STR was null or malformed");
@@ -252,7 +253,7 @@ public class ConiksServer{
                 ServerLogger.log("Directory update successful. Next epoch: "+nextEpoch);
             }
             else {
-                ServerUtils.printStatusMsg(false, "Directory update successful. Next epoch: "+nextEpoch);
+                Convert.printStatusMsg(false, "Directory update successful. Next epoch: "+nextEpoch);
             }
         }
 

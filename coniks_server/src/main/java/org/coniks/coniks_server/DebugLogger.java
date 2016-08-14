@@ -39,6 +39,9 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.io.IOException;
 
+// coniks-java imports
+import org.coniks.util.Convert;
+
 /** Implements a logger used for debugging the CONIKS
  * server.
  *
@@ -62,8 +65,8 @@ public class DebugLogger {
 
         try {
              FileHandler handler = new FileHandler(debugLog, 
-                                                  ServerUtils.MAX_BYTES_LOGGED_PER_FILE,
-                                                  ServerUtils.MAX_NUM_LOG_FILES, true);
+                                                  Convert.MAX_BYTES_LOGGED_PER_FILE,
+                                                  Convert.MAX_NUM_LOG_FILES, true);
         
             // create a TXT formatter
             SimpleFormatter fmt = new SimpleFormatter();

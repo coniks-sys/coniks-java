@@ -41,6 +41,7 @@ import java.security.interfaces.RSAPublicKey;
 
 // coniks-java imports
 import org.coniks.crypto.Util;
+import org.coniks.util.Convert;
 
 import org.javatuples.*;
 
@@ -274,7 +275,7 @@ public class TreeBuilder{
             // while we're handing the same prefix,
             // insert as normal
             byte[] index = p.getValue0();
-            prefix = ServerUtils.getPrefixBytes(index);
+            prefix = Convert.getPrefixBytes(index);
 
             UserLeafNode toAdd = p.getValue1();
             Operation op = p.getValue2();

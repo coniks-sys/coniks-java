@@ -38,6 +38,7 @@ import com.google.protobuf.ByteString;
 // coniks-java imports
 import org.coniks.crypto.Signing;
 import org.coniks.crypto.Util;
+import org.coniks.util.Convert;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
 import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.Hash;
@@ -171,8 +172,8 @@ public class TransparencyOps{
 
         byte[] lookupIndex = ServerUtils.unameToIndex(uln.getUsername());
 
-        byte[] prefix = ServerUtils.getPrefixBytes(lookupIndex);
-        String prefixStr = ServerUtils.bytesToHex(prefix);
+        byte[] prefix = Convert.getPrefixBytes(lookupIndex);
+        String prefixStr = Convert.bytesToHex(prefix);
 
         // not worth doing this recursively
         int curOffset = 0;
@@ -182,7 +183,7 @@ public class TransparencyOps{
 
             // direction here is going to be false = left,
             //                               true = right
-            boolean direction = ServerUtils.getNthBit(lookupIndex, curOffset);
+            boolean direction = Convert.getNthBit(lookupIndex, curOffset);
 
             byte[] prunedChildHash = new byte[Util.HASH_SIZE_BYTES];
 

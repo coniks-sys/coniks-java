@@ -4,14 +4,14 @@ language: java
 
 env:
   global:
-    secure: B5ZEHKFRa11V7e9JZwr4vGFSdo1lvnbxijd00mm41qbvwT5YFSMZhEQLRVlDmxhsqcc6guC84Q49LsY3/4rlzspHe8fkByY2sQUM3aXuK13/lJJT8CeDXxYAicWMPBLvybpt3ML1wXcbskQzv5C7oNLgkeMwvpd2zw5pYMV2dHwRhRkfsYgH7hzlVgCOMnPLHfPiDgjuQK6KJUr1qlO4Y9vmFsCiCi94fLHIxu+MsvFy3XRnnlTERTGQCeBD2GGHTH5wjiwTL0GHdKX/ntpODyWZAnbYs8OYsLuCq7QQHJDk4uBVCnMIj1zt6lwxa0iiz+uuvxnL6msSeF/BkIWG/yxRkBjdVtdJL0WBEIDmfzeEugdNFke1I2dsH68Fe+R2syUwIjJ654HSoLZ/xL9Dbnxo8wmix2cO46ictXN3WVNrWwB4KUV5N+aGW/hB0KRqSsO2iUmXqweifJz7qfWm20Y//pgtMtVTnZVTneiSCPucY1QWQmiOgC0jcseV+oIbpFjbYArxGhhPhqJqAWYhJeR/7uX872zMwPqpyHRF3y1XQ+C2xI9IWC2SqjinCsgUnZei1pu7A4Qd34Isd8uCICrLMu8JPe98+Dc+jksGrH/SgOcDI/pffnD2rk/ablNU7JY8yE2t5me9B6SAxOEOyle60i5WiRHcM+pZukBwvwU=
+    secure: VUTAa09xW7yrfCAGBejmZpSDjSu6qcvFyzg2c0u613TVxnBPPS2CxgP0PLfv5C7m+2aOyXFXk79o2k7HzL8aVi7rqV1lEh1IknSGjdsJD+nu0sUruvlIHafDzkUyFDSdaUCSm/WDmG70n2UHMP1qgQOBaYCL2njub3iLV94G+B7cCxr1LaI/y34X8qR2jtSugJ8k7rtcpx+OKAQOw9TCIpT0jLVxONb9xXY+BbdLAtIOUOC3ikS3S5D+GHDBvdjRTyS/wRDg8fuTdYH9SToeScr+fVO2E3qzOGKWHUfDH5k1KWZb1brPnbi2U6Otcax/YDEaCNuW8M9CNe0crPeKj3LTrjSlzDy/vC17x7HCdbsMM8XH59oVLs3sspRUcZRFF3+jYnUnxsyrw+FBCMgdnBNE1PmA/42OLcGtV93OOUqonW5cuLfBPMNmO4TUI2adK0F3+WFINYCchTd7YcJofLD5q4OKj/MjAzvVrBp/XKXctQ5uNtNAJyhNG9scCbEXvxWEYBMZYRl0OydSHc8K06G6iOPIum4j7vuKul3J01ouMtx+0eX/27D+IZ0yrK2zih2GFXnPMfXSvBmk/LN90/eUCnE/SnvJHmwgoU5o4GWccfoGA9UILs4PneQNMpNyWuvWRAoIPYI26b7TikeyukN/df9vshGzSLV1/hA6OdM=
 
 script:
   # TODO check style
   - mvn test
 
+after_success:
+  - mvn clean -DTRAVIS_JOB_ID=$TRAVIS_JOB_ID -DrepoToken=$COVERALLS_TOKEN cobertura:cobertura coveralls:report
+
 notifications:
-  # Email notifications are disabled to not annoy anybody.
-  # See http://about.travis-ci.org/docs/user/build-configuration/ to learn more
-  # about configuring notification recipients and more.
   email: false

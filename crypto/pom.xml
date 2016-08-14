@@ -20,7 +20,4 @@
     Cryptographic algorithms and operations library for CONIKS.
   </description>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
 </project>

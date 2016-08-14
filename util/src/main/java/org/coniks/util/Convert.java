@@ -54,21 +54,6 @@ public class Convert {
 
     private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-    /** Prints server status and error messages.
-     * Used primarily for testing mode.
-     *
-     *@param isErr indicates whether this is an error message
-     *@param msg the status message to print
-     */
-    public static void printStatusMsg (boolean isErr, String msg) {
-        String status = msg;
-        if (isErr) {
-            status = "Error: "+status;
-        }
-
-        System.out.println(status);
-    }
-
     // from Stackoverflow 9655181
      /** Converts a {@code byte[]} into a String
      * of its hexadecimal representation.
@@ -98,9 +83,9 @@ public class Convert {
     public static byte[] longToBytes(long val) {
         byte[] byteArr = new byte[8];
 
-        for(int i = 0; i < 8; i++) {
-            byte nextByte = (byte)((val >> i*8) & 0xff);
-            byteArr[i] = nextByte;
+        for(int i = 7; i >= 0; i--) {
+            byteArr[i] = (byte)(val & 0xFF);
+            val >>= 8;
         }
 
         return byteArr;

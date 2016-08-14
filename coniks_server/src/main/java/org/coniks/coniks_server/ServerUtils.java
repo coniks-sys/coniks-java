@@ -106,7 +106,8 @@ public class ServerUtils{
      *@param isErr indicates whether this is an error message
      *@param msg the status message to print
      *
-     *@deprecated Moved to {@link org.coniks.util.Convert}.
+     *@deprecated Replaced with private method in
+     * {@link org.coniks.coniks_server.ConiksServer}.
      */
     @Deprecated
     public static void printStatusMsg (boolean isErr, String msg) {

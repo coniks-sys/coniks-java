@@ -48,6 +48,7 @@ import com.google.protobuf.*;
 // coniks-java imports
 import org.coniks.crypto.Signing;
 import org.coniks.crypto.Keys;
+import org.coniks.util.Logging;
 import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.ServerResp;
 import org.coniks.coniks_common.ServerErr;
@@ -143,7 +144,7 @@ public class TestClient {
             kp = Keys.generateDSAKeyPair();
         }
         catch(NoSuchAlgorithmException e) {
-            ClientLogger.error("[TestClient] "+e.getMessage());
+            Logging.error("[TestClient] "+e.getMessage());
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
 
@@ -216,7 +217,7 @@ public class TestClient {
         else {
             // we received some unexpected server message
             // receiveAuthPathProto gave us back something bad
-            ClientLogger.error("Got bad protobuf type from receiveAuthPath()");
+            Logging.error("Got bad protobuf type from receiveAuthPath()");
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
 
@@ -254,7 +255,7 @@ public class TestClient {
             newCk = Keys.generateDSAKeyPair();
         }
         catch(NoSuchAlgorithmException e) {
-            ClientLogger.error("[TestClient] "+e.getMessage());
+            Logging.error("[TestClient] "+e.getMessage());
             user.unloadChangePrivKey();
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
@@ -273,7 +274,7 @@ public class TestClient {
             sig = Signing.dsaSign(prKey, changeReq.toByteArray());
         }
         catch (NoSuchAlgorithmException e) {
-            ClientLogger.error("[TestClient] "+e.getMessage());
+            Logging.error("[TestClient] "+e.getMessage());
             user.unloadChangePrivKey();
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
@@ -283,7 +284,7 @@ public class TestClient {
 
          // double check that we actually got a signature
         if (sig == null) {
-            ClientLogger.error("Couldn't get a signature for the new key data");
+            Logging.error("Couldn't get a signature for the new key data");
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
 
@@ -386,7 +387,7 @@ public class TestClient {
             newCk = Keys.generateDSAKeyPair();
         }
         catch(NoSuchAlgorithmException e) {
-            ClientLogger.error("[TestClient] "+e.getMessage());
+            Logging.error("[TestClient] "+e.getMessage());
             user.unloadChangePrivKey();
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
@@ -403,7 +404,7 @@ public class TestClient {
             sig = Signing.dsaSign(prKey, changeReq.toByteArray());
         }
         catch (NoSuchAlgorithmException e) {
-            ClientLogger.error("[TestClient] "+e.getMessage());
+            Logging.error("[TestClient] "+e.getMessage());
             user.unloadChangePrivKey();
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
@@ -413,7 +414,7 @@ public class TestClient {
 
         // double check that we actually got a signature
         if (sig == null) {
-            ClientLogger.error("Couldn't get a signature for the new policy");
+            Logging.error("Couldn't get a signature for the new policy");
             return ClientUtils.INTERNAL_CLIENT_ERR;
         }
 
@@ -647,7 +648,7 @@ public class TestClient {
         }
 
         // set up logging
-        ClientLogger.setup(logPath+"/client-%g");
+        Logging.setup(logPath+"/client-%g", "Client");
 
         String cont = "y";
 

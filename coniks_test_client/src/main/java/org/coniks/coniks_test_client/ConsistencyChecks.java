@@ -45,7 +45,8 @@ import com.google.protobuf.ByteString;
 import org.javatuples.*;
 
 // coniks-java imports
-import org.coniks.crypto.Util;
+import org.coniks.crypto.Digest;
+import org.coniks.util.Logging;
 import org.coniks.coniks_common.ServerErr;
 import org.coniks.coniks_common.C2SProtos.RegistrationResp;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
@@ -103,21 +104,21 @@ public class ConsistencyChecks {
         ByteString index = apUln.getLookupIndex();
 
         // verify the input: expect the index to be the size of the hash
-        if(index.size() != Util.HASH_SIZE_BYTES){
-            ClientLogger.error("Bad index length");
+        if(index.size() != Digest.HASH_SIZE_BYTES){
+            Logging.error("Bad index length");
             return null;
         }
 
         byte[] lookupIndex = index.toByteArray();
         int numInteriors = apUln.getIntlevels();
 
-        byte[] ulnHash = Util.digest(ClientUtils.ulnProtoToBytes(apUln));
+        byte[] ulnHash = Digest.digest(ClientUtils.ulnProtoToBytes(apUln));
 
         ArrayList<AuthPath.InteriorNode> inList =
             new ArrayList<AuthPath.InteriorNode>(authPath.getInteriorList());
 
         if(inList.size() != numInteriors){
-            ClientLogger.error("Bad length of auth path");
+            Logging.error("Bad length of auth path");
             return null;
         }
 
@@ -130,7 +131,7 @@ public class ConsistencyChecks {
         AuthPath.RootNode root = authPath.getRoot();
 
         if(!root.hasPrunedchild() || !root.hasSubtree()){
-            ClientLogger.error("Root malformed");
+            Logging.error("Root malformed");
             return null;
         }
 
@@ -172,7 +173,7 @@ public class ConsistencyChecks {
         // compute the hash of the recomputed root
         byte[] recomputedRootHash = null;
         try {
-            recomputedRootHash = Util.digest(recomputedRoot);
+            recomputedRootHash = Digest.digest(recomputedRoot);
         }
         catch(NoSuchAlgorithmException e) {
             return ClientUtils.INTERNAL_CLIENT_ERR;

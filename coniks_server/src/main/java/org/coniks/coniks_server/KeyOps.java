@@ -43,7 +43,9 @@ import java.util.Scanner;
 import java.io.PrintWriter;
 import java.io.*;
 
+// coniks-java imports
 import org.coniks.coniks_common.C2SProtos.DSAPublicKeyProto;
+import org.coniks.util.Logging;
 
 /** Implements all encryption-key related operations that a
  * CONIKS server must perform.
@@ -91,19 +93,19 @@ public class KeyOps{
             return myPrivateKey;
         }
         catch(IOException e){
-            TimerLogger.error("KeyOps:loadSigningKey: Problem loading the keystore");
+            Logging.error("KeyOps:loadSigningKey: Problem loading the keystore");
         }
         catch(NoSuchAlgorithmException e){
-            TimerLogger.error("KeyOps:loadSigningKey: Problem with integrity check algorithm");
+            Logging.error("KeyOps:loadSigningKey: Problem with integrity check algorithm");
         }
         catch(CertificateException e){
-            TimerLogger.error("KeyOps:loadSigningKey: Problem with the cert(s) in keystore");
+            Logging.error("KeyOps:loadSigningKey: Problem with the cert(s) in keystore");
         }
         catch(KeyStoreException e){
-            TimerLogger.error("KeyOps:loadSigningKey: Problem getting Keystore instance");
+            Logging.error("KeyOps:loadSigningKey: Problem getting Keystore instance");
         }
         catch(UnrecoverableEntryException e){
-            TimerLogger.error("KeyOps:loadSigningKey: specified protParam were insufficient or invalid");
+            Logging.error("KeyOps:loadSigningKey: specified protParam were insufficient or invalid");
         }
         return null;
     }
@@ -148,19 +150,19 @@ public class KeyOps{
             return publicKey;
         }
         catch(IOException e){
-            ServerLogger.error("KeyOps:loadPublicKey: Problem loading the keystore");
+            Logging.error("KeyOps:loadPublicKey: Problem loading the keystore");
         }
         catch(NoSuchAlgorithmException e){
-            ServerLogger.error("KeyOps:loadPublicKey: Problem with integrity check algorithm");
+            Logging.error("KeyOps:loadPublicKey: Problem with integrity check algorithm");
         }
         catch(CertificateException e){
-            ServerLogger.error("KeyOps:loadPublicKey: Problem with the cert(s) in keystore");
+            Logging.error("KeyOps:loadPublicKey: Problem with the cert(s) in keystore");
         }
         catch(KeyStoreException e){
-            ServerLogger.error("KeyOps:loadPublicKey: Problem getting Keystore instance");
+            Logging.error("KeyOps:loadPublicKey: Problem getting Keystore instance");
         }
         catch(UnrecoverableEntryException e){
-            ServerLogger.error("KeyOps:loadPublicKey: specified protParam were insufficient or invalid");
+            Logging.error("KeyOps:loadPublicKey: specified protParam were insufficient or invalid");
         }
         return null;
     }
@@ -182,13 +184,13 @@ public class KeyOps{
             return (DSAPublicKey) keyFactory.generatePublic(publicKeySpec);
         }
         catch(InvalidParameterException e) {
-            TimerLogger.error("The given DSA key is invalid.");
+            Logging.error("The given DSA key is invalid.");
         }
         catch (InvalidKeySpecException e) {
-            TimerLogger.error("The given key params are invalid.");
+            Logging.error("The given key params are invalid.");
         }
         catch(NoSuchAlgorithmException e){
-            TimerLogger.error("DSA is invalid for some reason.");
+            Logging.error("DSA is invalid for some reason.");
         }
         return null;
     }

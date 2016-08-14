@@ -1,33 +1,33 @@
 /*
   Copyright (c) 2015-16, Princeton University.
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are 
+  modification, are permitted provided that the following conditions are
   met:
-  * Redistributions of source code must retain the above copyright 
+  * Redistributions of source code must retain the above copyright
   notice, this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above 
-  copyright notice, this list of conditions and the following disclaimer 
-  in the documentation and/or other materials provided with the 
+  * Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
   distribution.
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
-  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -41,6 +41,8 @@ import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+// coniks-java imports
+import org.coniks.util.Logging;
 import org.coniks.coniks_common.MsgType;
 import org.coniks.coniks_common.CommonMessaging;
 
@@ -89,8 +91,8 @@ public class ClientMessaging {
      */
     public static void sendRegistrationProto (ClientUser user,
                                               String server) {
-        
-        Registration reg = buildRegistrationMsgProto(user.getUsername(), user.getKeyData(), 
+
+        Registration reg = buildRegistrationMsgProto(user.getUsername(), user.getKeyData(),
                                                      user.getChangePubKey(), user.isAllowsUnsignedChanges(),
                                                      user.isAllowsPublicVisibility());
         sendMsgProto(MsgType.REGISTRATION, reg, server);
@@ -109,17 +111,17 @@ public class ClientMessaging {
 
     }
 
-    /** Sends a CommitmentReq protobuf message requesting {@code provider}'s 
+    /** Sends a CommitmentReq protobuf message requesting {@code provider}'s
      *  signed tree root for {@code epoch} from {@code server}.
-     *  If the server and provider are the same, {@code commitmentType} 
+     *  If the server and provider are the same, {@code commitmentType}
      *  is {@code SELF}, otherwise it is {@code WITNESSED}.
      * (Unused)
     */
     public static void sendCommitmentReqProto (
-                                               CommitmentReq.CommitmentType commitmentType, 
+                                               CommitmentReq.CommitmentType commitmentType,
                                                long epoch, String provider,
                                                String server) {
-        
+
         CommitmentReq commReq = buildCommitmentReqMsgProto(commitmentType, epoch, provider);
         sendMsgProto(MsgType.COMMITMENT_REQ, commReq, server);
 
@@ -129,15 +131,15 @@ public class ClientMessaging {
      * to the {@code server}.
      */
     public static void sendULNChangeReqProto(ClientUser user, String server) {
-        
+
         ULNChangeReq changeReq = buildULNChangeReqMsgProto(user.getUsername(), user.getKeyData(),
-                                                           user.getChangePubKey(), user.isAllowsUnsignedChanges(), 
+                                                           user.getChangePubKey(), user.isAllowsUnsignedChanges(),
                                                            user.isAllowsPublicVisibility());
         sendMsgProto(MsgType.ULNCHANGE_REQ, changeReq, server);
     }
 
     /** Sends a SignedULNChangeReq protobuf for the given user {@code user}
-     * including the signature on the the change message {@code sig} to 
+     * including the signature on the the change message {@code sig} to
      * the {@code server}.
      */
     public static void sendSignedULNChangeReqProto(ClientUser user,
@@ -151,12 +153,12 @@ public class ClientMessaging {
 
             // make sure we actually got a key from disk
             if (user.getChangePubKey() == null) {
-                ClientLogger.error("ClientMessaging: Could not load change public key");
+                Logging.error("ClientMessaging: Could not load change public key");
             }
         }
 
         ULNChangeReq changeReq = buildULNChangeReqMsgProto(user.getUsername(),
-                                                           user.getKeyData(), changePk, 
+                                                           user.getKeyData(), changePk,
                                                            user.isAllowsUnsignedChanges(), user.isAllowsPublicVisibility());
         SignedULNChangeReq signed = buildSignedULNChangeReqMsgProto(changeReq, sig);
         sendMsgProto(MsgType.SIGNED_ULNCHANGE_REQ, signed, server);
@@ -179,8 +181,8 @@ public class ClientMessaging {
             dout.flush();
         }
         catch (IOException e) {
-            ClientLogger.error("Sending msg proto "+msg.toString());
-            ClientLogger.error("Error: "+e.getMessage());
+            Logging.error("Sending msg proto "+msg.toString());
+            Logging.error("Error: "+e.getMessage());
         }
 
     }
@@ -209,7 +211,7 @@ public class ClientMessaging {
         KeyLookup.Builder keyLookupBuild = KeyLookup.newBuilder();
         keyLookupBuild.setName(username);
         keyLookupBuild.setEpoch(epoch);
-     
+
         return keyLookupBuild.build();
     }
 
@@ -217,17 +219,17 @@ public class ClientMessaging {
         {@code commType}, {@code epoch}, and {@code server}.
     */
     private static CommitmentReq buildCommitmentReqMsgProto (
-                                                            CommitmentReq.CommitmentType commType, 
+                                                            CommitmentReq.CommitmentType commType,
                                                             long epoch, String server) {
         CommitmentReq.Builder commReqBuild = CommitmentReq.newBuilder();
         commReqBuild.setType(commType);
         commReqBuild.setEpoch(epoch);
         commReqBuild.setProvider(server);
-     
+
         return commReqBuild.build();
     }
 
-    /** Builds the ULNChangeReq protobuf message with a given 
+    /** Builds the ULNChangeReq protobuf message with a given
      * {@code username} {@code blob} {@code changeKey}
      * {@code allowsUnsignedKeychange} {@code allowsPublicLookup}
      *  The blob and changeKey fields may be null if no change is requested
@@ -250,8 +252,8 @@ public class ClientMessaging {
         return ulnChangeBuilder.build();
     }
 
-    /** Builds the SignedULNChangeReq protobuf message with a given 
-        {@code changeReq} is a ULNChangeReq that was built previously 
+    /** Builds the SignedULNChangeReq protobuf message with a given
+        {@code changeReq} is a ULNChangeReq that was built previously
         {@code sig}.
     */
     private static SignedULNChangeReq buildSignedULNChangeReqMsgProto(ULNChangeReq changeReq,
@@ -260,7 +262,7 @@ public class ClientMessaging {
         SignedULNChangeReq.Builder ulnChangeBuilder = SignedULNChangeReq.newBuilder();
         ulnChangeBuilder.setReq(changeReq);
         ulnChangeBuilder.setSig(ByteString.copyFrom(sig));
-       
+
         return ulnChangeBuilder.build();
     }
 
@@ -269,11 +271,11 @@ public class ClientMessaging {
     /** Receives and parses a RegistrationResp protobuf message
      * from the server.
      *
-     *@return The AbstractMessage (either of type ServerResp or RegistrationResp) 
+     *@return The AbstractMessage (either of type ServerResp or RegistrationResp)
      *upon success. {@code null} otherwise.
      */
     public static AbstractMessage receiveRegistrationRespProto() {
-        
+
         // first receive the generic message from the server
         AbstractMessage serverMsg = receiveMsgProto();
 
@@ -285,7 +287,7 @@ public class ClientMessaging {
         else if (serverMsg != null && serverMsg instanceof RegistrationResp) {
             regResp = (RegistrationResp)serverMsg;
         }
-        
+
         return regResp;
 
     }
@@ -293,11 +295,11 @@ public class ClientMessaging {
      /** Receives and parses an AuthPath protobuf message
      * from the server.
      *
-     *@return The AbstractMessage (either of type ServerResp or AuthPath) 
+     *@return The AbstractMessage (either of type ServerResp or AuthPath)
      *upon success. {@code null} otherwise.
      */
     public static AbstractMessage receiveAuthPathProto() {
-        
+
         // first receive the generic message from the server
         AbstractMessage serverMsg = receiveMsgProto();
 
@@ -309,7 +311,7 @@ public class ClientMessaging {
         else if (serverMsg != null && serverMsg instanceof AuthPath) {
             authPath = (AuthPath)serverMsg;
         }
-        
+
         return authPath;
 
     }
@@ -317,11 +319,11 @@ public class ClientMessaging {
      /** Receives and parses a Commitment protobuf message
      * from the server. (Unused)
      *
-     *@return The AbstractMessage (either of type ServerResp or Commitment) 
+     *@return The AbstractMessage (either of type ServerResp or Commitment)
      *upon success. {@code null} otherwise.
      */
     public static AbstractMessage receiveCommitmentProto() {
-        
+
         // first receive the generic message from the server
         AbstractMessage serverMsg = receiveMsgProto();
 
@@ -333,7 +335,7 @@ public class ClientMessaging {
         else if (serverMsg != null && serverMsg instanceof Commitment) {
             comm = (Commitment)serverMsg;
         }
-        
+
         return comm;
 
     }
@@ -341,7 +343,7 @@ public class ClientMessaging {
     /* Helper functions for implementing the receiving functions */
 
     /** Receives a protobuf message from the server the client is currently
-     * connected to, and checks that the message is correctly formatted 
+     * connected to, and checks that the message is correctly formatted
      * for the expected message type.
      * The caller is responsible for handling the exact message type(s).
      *
@@ -349,17 +351,17 @@ public class ClientMessaging {
      * indicated by the server.
      */
     private static AbstractMessage receiveMsgProto () {
-        
+
         try {
             // get the message type of the message and read in the stream
             int msgType = din.readUnsignedByte();
-             
+
             // TODO: this should be a signed promise/temporary binding
             if (msgType == MsgType.REGISTRATION_RESP){
                 RegistrationResp regResp = RegistrationResp.parseDelimitedFrom(din);
-                
+
                 if(!regResp.hasInitEpoch() || !regResp.hasEpochInterval()){
-                    ClientLogger.error("Malformed registration response");
+                    Logging.error("Malformed registration response");
                 }
                 else {
                     return regResp;
@@ -367,9 +369,9 @@ public class ClientMessaging {
             }
             else if (msgType == MsgType.AUTH_PATH) {
                 AuthPath authPath = AuthPath.parseDelimitedFrom(din);
-                
+
                 if (!authPath.hasLeaf() || !authPath.hasRoot()) {
-                    ClientLogger.error("Malformed auth path");
+                    Logging.error("Malformed auth path");
                 }
                 else {
                     return authPath;
@@ -377,21 +379,21 @@ public class ClientMessaging {
             }
             else if (msgType == MsgType.COMMITMENT) {
                 Commitment comm = Commitment.parseDelimitedFrom(din);
-                
+
                 if (!comm.hasEpoch() || !comm.hasRootHash()) {
-                    ClientLogger.error("Malformed commitment");
+                    Logging.error("Malformed commitment");
                 }
                 else {
                     return comm;
                 }
             }
-            
+
             // Some error occurred so the server responded with a simple response
             else if (msgType == MsgType.SERVER_RESP) {
                 ServerResp resp = ServerResp.parseDelimitedFrom(din);
-                
+
                 if (!resp.hasMessage()) {
-                    ClientLogger.error("Malformed simple server response");
+                    Logging.error("Malformed simple server response");
                 }
                 else {
                     return resp;
@@ -399,10 +401,10 @@ public class ClientMessaging {
             }
         }
         catch (InvalidProtocolBufferException e) {
-            ClientLogger.error("parsing proto msg: "+e.getMessage());
+            Logging.error("parsing proto msg: "+e.getMessage());
         }
         catch (IOException e) {
-            ClientLogger.error("receiving data from the server: "+e.getMessage());
+            Logging.error("receiving data from the server: "+e.getMessage());
         }
         finally {
             CommonMessaging.close(din);
@@ -418,11 +420,11 @@ public class ClientMessaging {
     /** Establishes an SSL connection to {@code server} if in full operating mode.
      *
      *@param server the CONIKS server to which send the message
-     *@param isFullOp indicates whether the client is operating in full mode 
+     *@param isFullOp indicates whether the client is operating in full mode
      * or in testing mode
      *@throws an {@code IOException} if any of the socket operations fail.
      */
-    private static void connect (String server) 
+    private static void connect (String server)
         throws IOException {
 
         if (isFullOp) {
@@ -435,7 +437,7 @@ public class ClientMessaging {
         }
         dout = new DataOutputStream(sock.getOutputStream());
         din = new DataInputStream(sock.getInputStream());
-        
+
     }
 
 }

@@ -1,37 +1,40 @@
 /*
   Copyright (c) 2015-16, Princeton University.
   All rights reserved.
-  
+
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are 
+  modification, are permitted provided that the following conditions are
   met:
-  * Redistributions of source code must retain the above copyright 
+  * Redistributions of source code must retain the above copyright
   notice, this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above 
-  copyright notice, this list of conditions and the following disclaimer 
-  in the documentation and/or other materials provided with the 
+  * Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the following disclaimer
+  in the documentation and/or other materials provided with the
   distribution.
   * Neither the name of Princeton University nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
-  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
-  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
  */
 
 package org.coniks.coniks_server;
+
+// coniks-java imports
+import org.coniks.util.Logging;
 
 /** Represents the server's history. This history consists
  * of a linked list of signed tree roots forming a hash
@@ -41,7 +44,7 @@ package org.coniks.coniks_server;
  */
 public class ServerHistory {
 
-    /** The head of the directory history hash chain 
+    /** The head of the directory history hash chain
      * of {@link SignedTreeRoot}s.
      */
     private static SignedTreeRoot curSTR = null;
@@ -51,8 +54,8 @@ public class ServerHistory {
      */
     private static long length;
 
-    /** Initializes the server's history with the given from the root node 
-     * {@code root}, the epoch {@code ep}, the previous epoch 
+    /** Initializes the server's history with the given from the root node
+     * {@code root}, the epoch {@code ep}, the previous epoch
      * {@code prevEp}, and the previous STR's hash {@code prevStrHash}.
      *
      *@return whether the intialization succeeded.
@@ -60,7 +63,7 @@ public class ServerHistory {
     public static synchronized boolean initHistory(RootNode root, long ep,
                                                 long prevEp, byte[] prevStrHash) {
         if (curSTR != null) {
-            ServerLogger.error("Trying to override existing history");
+            Logging.error("Trying to override existing history");
             return false;
         }
 
@@ -69,14 +72,14 @@ public class ServerHistory {
 
         // want to make sure we didn't get a null STR
         if (curSTR == null) {
-            ServerLogger.error("Got a null STR from the init");
+            Logging.error("Got a null STR from the init");
             return false;
         }
 
         return true;
     }
 
-    /** Inserts the signed tree root for the next epoch at the head 
+    /** Inserts the signed tree root for the next epoch at the head
     * of the history hash chain.
     * Ensures that the epochs are monotonically increasing and at least
     * EPOCH_INTERVAL apart.
@@ -85,15 +88,15 @@ public class ServerHistory {
     *@return true if the STR is valid, false otherwise
     */
     public static synchronized boolean updateHistory(SignedTreeRoot newSTR) {
-        
+
         // sanity check the input
         if (newSTR == null) {
-            ServerLogger.error("Got null STR");
+            Logging.error("Got null STR");
             return false;
         }
 
         if (newSTR.getEpoch() < nextEpoch()) {
-            ServerLogger.error("Next epoch's STR has bad epoch");
+            Logging.error("Next epoch's STR has bad epoch");
             return false;
         }
 
@@ -104,7 +107,7 @@ public class ServerHistory {
 
         // increment the length of the history hash chain
         length++;
-        
+
         // TODO: evict oldest x STRs once length hits a certain value
 
         return true;
@@ -114,13 +117,13 @@ public class ServerHistory {
      * list representing the history.
      *
      *@return The signed tree root for epoch {@code ep}.
-     *@throws An {@code UnsupportedOperationException} in case the 
+     *@throws An {@code UnsupportedOperationException} in case the
      * head of the list is reached before the requested signed tree root is found.
      */
     public static synchronized SignedTreeRoot getSTR(long ep){
         SignedTreeRoot runner = curSTR;
-        
-        while(runner.getEpoch() > ep && runner != null){                
+
+        while(runner.getEpoch() > ep && runner != null){
                 // need to check if we reached the head of the list
                 if (runner.getPrev() == null) {
                     throw new UnsupportedOperationException("reached the head of the list!");
@@ -129,7 +132,7 @@ public class ServerHistory {
                     runner = runner.getPrev();
                 }
         }
-        
+
         return runner;
     }
 

@@ -85,14 +85,14 @@ public class ServerUtils{
 
     /** The maximum number of bytes logged per log file.
      *
-     *@deprecated Moved to {@link org.coniks.util.Util}.
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
     @Deprecated
     public static final int MAX_BYTES_LOGGED_PER_FILE = (1 << 15);
 
     /** The maximum number of log files per log.
      *
-     *@deprecated Moved to {@link org.coniks.util.Util}.
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
     @Deprecated
     public static final int MAX_NUM_LOG_FILES = 5;
@@ -106,7 +106,7 @@ public class ServerUtils{
      *@param isErr indicates whether this is an error message
      *@param msg the status message to print
      *
-     *@deprecated Moved to {@link org.coniks.util.Util}.
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
     @Deprecated
     public static void printStatusMsg (boolean isErr, String msg) {
@@ -179,7 +179,7 @@ public class ServerUtils{
      * of its hexadecimal representation.
      *
      *@return The hex representation of {@code bytes} as a String.
-     *@deprecated Moved to {@link org.coniks.util.Util}.
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
     @Deprecated
     public static String bytesToHex(byte[] bytes) {
@@ -194,7 +194,7 @@ public class ServerUtils{
 
     /** Converts a UTF-8 String {@code str} to an array of bytes.
      *
-     *@deprecated Moved to {@link org.coniks.util.Util}.
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
     @Deprecated
     public static byte[] strToBytes (String str) {
@@ -216,7 +216,7 @@ public class ServerUtils{
      /** Converts a long {@code val} into an array of bytes.
      *
      *@return The {@code byte[]} representation of the long value.
-     *@deprecated Moved to {@link org.coniks.util.Util}.
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
     @Deprecated
     public static byte[] longToBytes(long val) {
@@ -234,7 +234,7 @@ public class ServerUtils{
      * at offset {@code offset}, and determines whether it is 1 or 0.
      *
      *@return true if the nth bit is 1, false otherwise.
-     *@deprecated Moved to {@link org.coniks.util.Util}.
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
     @Deprecated
     public static boolean getNthBit(byte[] arr, int offset){
@@ -248,7 +248,7 @@ public class ServerUtils{
      *
      *@return the first 16 bits of {@code arr} or all zeros if the length
      * of the array is less than 2 bytes.
-     *@deprecated Moved to {@link org.coniks.util.Util}.
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
     @Deprecated
     public static byte[] getPrefixBytes(byte[] arr){

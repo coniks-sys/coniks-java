@@ -39,6 +39,9 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.io.IOException;
 
+// coniks-java imports
+import org.coniks.util.Convert;
+
 /** Implements the logger used for a CONIKS client.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
@@ -61,8 +64,8 @@ public class ClientLogger {
 
         try {
              FileHandler handler = new FileHandler(clientLog, 
-                                                  ClientUtils.MAX_BYTES_LOGGED_PER_FILE,
-                                                  ClientUtils.MAX_NUM_LOG_FILES, true);
+                                                  Convert.MAX_BYTES_LOGGED_PER_FILE,
+                                                  Convert.MAX_NUM_LOG_FILES, true);
         
             // create a TXT formatter
             SimpleFormatter fmt = new SimpleFormatter();

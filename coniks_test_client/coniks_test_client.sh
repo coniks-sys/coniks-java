@@ -34,7 +34,8 @@
 ## Runs or a CONIKS test client instance
 
 # Set all the configs here
-CLASS_DEST="target/classes" #use this for now, Maven puts classes here
+# mvn builds our jar with dependencies
+CLASS_DEST="./target/coniks_test_client-1.3-SNAPSHOT.jar"
 CLASSPATH="-cp $CLASS_DEST"
 CLIENT_BIN="org.coniks.coniks_test_client.TestClient"
 CONIKS_CLIENTCONFIG="config"

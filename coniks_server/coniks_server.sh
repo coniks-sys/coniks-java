@@ -34,12 +34,13 @@
 ## Runs or stops a CONIKS server instance
 
 # Set all the configs here
-CLASS_DEST="target/coniks_server-1.3-SNAPSHOT.jar" #use this for now
-CLASSPATH="-cp ../coniks_common/target/coniks_common-1.3-SNAPSHOT.jar;../crypto/target/coniks-crypto-1.3-SNAPSHOT.jar;$CLASS_DEST"
+# mvn builds our jar with dependencies
+CLASS_DEST="./target/coniks_server-1.3-SNAPSHOT.jar"
+CLASSPATH="-cp $CLASS_DEST"
 SERVER_BIN="org.coniks.coniks_server.ConiksServer"
 CONIKS_SERVERCONFIG="config" #change this if using a different config file
 CONIKS_SERVERLOGS="logs" #change this if storing the logs somewhere else
-RUN_CONIKS="java -Xmx512M $CLASSPATH $SERVER_BIN $CONIKS_SERVERCONFIG $CONIKS_SERVERLOGS"
+RUN_CONIKS="java $CLASSPATH $SERVER_BIN $CONIKS_SERVERCONFIG $CONIKS_SERVERLOGS"
 
 function usage() {
     echo "Usage: $0 <start | test | stop | clean>"

@@ -10,8 +10,8 @@ script:
   # TODO check style
   - mvn test
 
+after_success:
+  - mvn clean -DTRAVIS_JOB_ID=$TRAVIS_JOB_ID -DrepoToken=$COVERALLS_TOKEN cobertura:cobertura coveralls:report
+
 notifications:
-  # Email notifications are disabled to not annoy anybody.
-  # See http://about.travis-ci.org/docs/user/build-configuration/ to learn more
-  # about configuring notification recipients and more.
   email: false

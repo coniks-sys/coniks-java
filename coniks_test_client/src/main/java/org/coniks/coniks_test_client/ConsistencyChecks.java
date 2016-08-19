@@ -46,6 +46,7 @@ import org.javatuples.*;
 
 // coniks-java imports
 import org.coniks.crypto.Util;
+import org.coniks.util.Logging;
 import org.coniks.coniks_common.ServerErr;
 import org.coniks.coniks_common.C2SProtos.RegistrationResp;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
@@ -104,7 +105,7 @@ public class ConsistencyChecks {
 
         // verify the input: expect the index to be the size of the hash
         if(index.size() != Util.HASH_SIZE_BYTES){
-            ClientLogger.error("Bad index length");
+            Logging.error("Bad index length");
             return null;
         }
 
@@ -117,7 +118,7 @@ public class ConsistencyChecks {
             new ArrayList<AuthPath.InteriorNode>(authPath.getInteriorList());
 
         if(inList.size() != numInteriors){
-            ClientLogger.error("Bad length of auth path");
+            Logging.error("Bad length of auth path");
             return null;
         }
 
@@ -130,7 +131,7 @@ public class ConsistencyChecks {
         AuthPath.RootNode root = authPath.getRoot();
 
         if(!root.hasPrunedchild() || !root.hasSubtree()){
-            ClientLogger.error("Root malformed");
+            Logging.error("Root malformed");
             return null;
         }
 

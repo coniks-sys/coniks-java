@@ -42,6 +42,7 @@ import java.security.interfaces.RSAPublicKey;
 // coniks-java imports
 import org.coniks.crypto.Util;
 import org.coniks.util.Convert;
+import org.coniks.util.Logging;
 
 import org.javatuples.*;
 
@@ -238,7 +239,7 @@ public class TreeBuilder{
         }
 
         if(pendingQ == null) {
-            ServerLogger.error("Trying to extend using null pending queue");
+            Logging.error("Trying to extend using null pending queue");
             return null;
         }
 
@@ -248,7 +249,7 @@ public class TreeBuilder{
             r = extendTree(pendingQ, newRoot);
         }
         catch(NoSuchAlgorithmException e) {
-            ServerLogger.error("Trying to extend using null pending queue");
+            Logging.error("Trying to extend using null pending queue");
         }
         return r;
     }

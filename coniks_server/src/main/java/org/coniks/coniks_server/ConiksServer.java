@@ -35,6 +35,7 @@ package org.coniks.coniks_server;
 
 // coniks-java imports
 import org.coniks.crypto.Util;
+import org.coniks.util.Logging;
 import org.coniks.coniks_common.MsgType;
 import org.coniks.coniks_common.C2SProtos.Registration;
 import org.coniks.coniks_common.C2SProtos.CommitmentReq;
@@ -180,9 +181,7 @@ public class ConiksServer{
 
         // set some more configs
         initEpoch = ServerConfig.getStartupTime();
-        MsgHandlerLogger.setup(logPath+"/msg-handler-%g");
-        TimerLogger.setup(logPath+"/epoch-timer-%g");
-        ServerLogger.setup(logPath+"/server-%g");
+        Logging.setup(logPath+"/server-%g", "Server");
 
         System.setProperty("javax.net.ssl.keyStore", ServerConfig.getKeystorePath());
         System.setProperty("javax.net.ssl.keyStorePassword", ServerConfig.getKeystorePassword());
@@ -198,7 +197,7 @@ public class ConiksServer{
         // check that we got a good first tree
         if(initRoot == null) {
             if (isFullOp) {
-                ServerLogger.error("An error occured while trying to build the initial tree");
+                Logging.error("An error occured while trying to build the initial tree");
             }
             else {
                 printStatusMsg(true, "An error occured while trying to build the initial tree");
@@ -231,13 +230,13 @@ public class ConiksServer{
     private static class EpochTimerTask implements Runnable {
 
         public void run() {
-            TimerLogger.log("Timer task started.");
+            Logging.log("Timer task started.");
             RootNode nextRoot = DirectoryOps.updateDirectory();
 
             // check that we got a good first tree
             if(nextRoot == null) {
                 if (isFullOp) {
-                    ServerLogger.error("An error occured while trying to update the tree");
+                    Logging.error("An error occured while trying to update the tree");
                 }
                 else {
                     printStatusMsg(true, "An error occured while trying to update the tree");
@@ -253,7 +252,7 @@ public class ConiksServer{
 
             if (!ServerHistory.updateHistory(nextSTR)) {
                 if (isFullOp) {
-                    ServerLogger.error("An error occured while trying to update the tree");
+                    Logging.error("An error occured while trying to update the tree");
                 }
                 else {
                     printStatusMsg(true, "An error occured while trying to update the tree");
@@ -264,7 +263,7 @@ public class ConiksServer{
 
             // we're here so the update went well
             if (isFullOp) {
-                ServerLogger.log("Directory update successful. Next epoch: "+nextEpoch);
+                Logging.log("Directory update successful. Next epoch: "+nextEpoch);
             }
             else {
                 printStatusMsg(false, "Directory update successful. Next epoch: "+nextEpoch);

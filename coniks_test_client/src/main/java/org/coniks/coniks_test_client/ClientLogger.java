@@ -40,7 +40,7 @@ import java.util.logging.Level;
 import java.io.IOException;
 
 // coniks-java imports
-import org.coniks.util.Convert;
+import org.coniks.util.Logging;
 
 /** Implements the logger used for a CONIKS client.
  *
@@ -53,7 +53,11 @@ public class ClientLogger {
     /** Sets up a logger for the CONIKS client.
      *
      *@param clientLog the file name for this logger.
+     *
+     *@deprecated Replaced by
+     * {@link org.coniks.util.Logging#setup(String, String)}.
      */
+    @Deprecated
     public static void setup (String clientLog) {
         logger = Logger.getLogger("ConiksLogger-Client");
 
@@ -64,8 +68,8 @@ public class ClientLogger {
 
         try {
              FileHandler handler = new FileHandler(clientLog, 
-                                                  Convert.MAX_BYTES_LOGGED_PER_FILE,
-                                                  Convert.MAX_NUM_LOG_FILES, true);
+                                                  Logging.MAX_BYTES_LOGGED_PER_FILE,
+                                                  Logging.MAX_NUM_LOG_FILES, true);
         
             // create a TXT formatter
             SimpleFormatter fmt = new SimpleFormatter();
@@ -84,14 +88,22 @@ public class ClientLogger {
 
     /** Writes an information message {@code msg}
      * to the main client log.
+     *
+     *@deprecated Replaced by
+     * {@link org.coniks.util.Logging#log(String)}.
      */
+    @Deprecated
     public static void log (String msg) {
         logger.info(msg);
     }
 
     /** Writes a severe error message {@code msg}
      * to the main client log.
+     *
+     *@deprecated Replaced by
+     * {@link org.coniks.util.Logging#error(String)}.
      */
+    @Deprecated
     public static void error (String msg) {
         logger.severe(msg);
     }

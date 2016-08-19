@@ -48,6 +48,7 @@ import com.google.protobuf.ByteString;
 // coniks-java imports
 import org.coniks.crypto.*;
 import org.coniks.util.Convert;
+import org.coniks.util.Logging;
 
 import org.coniks.coniks_common.MsgType;
 import org.coniks.coniks_common.C2SProtos.Registration;
@@ -124,7 +125,7 @@ public class RequestHandler extends Thread{
 
         }
         catch(IOException e){
-            MsgHandlerLogger.error("Error connecting to client: "+e.getMessage());
+            Logging.error("Error connecting to client: "+e.getMessage());
             e.printStackTrace();
         }
 
@@ -133,12 +134,12 @@ public class RequestHandler extends Thread{
     /* Message handlers */
     private void handleRegistrationProto(Registration reg)
         throws IOException{
-        MsgHandlerLogger.log("Handling registration message... ");
+        Logging.log("Handling registration message... ");
 
         // I suppose we want to check the input again just in case
         if(!reg.hasBlob() || !reg.hasChangeKey() || !reg.hasAllowsUnsignedKeychange()
            || !reg.hasAllowsPublicLookup()){
-            MsgHandlerLogger.log("req handler: Malformed registration message");
+            Logging.log("req handler: Malformed registration message");
             ServerMessaging.sendSimpleResponseProto(ServerErr.MALFORMED_CLIENT_MSG_ERR,
                                                clientSocket);
             return;
@@ -150,7 +151,7 @@ public class RequestHandler extends Thread{
         UserLeafNode uln = DirectoryOps.findUser(name);
 
         if (uln != null) {
-            MsgHandlerLogger.error("Found: "+
+            Logging.error("Found: "+
                          Convert.bytesToHex(ServerUtils.unameToIndex(uln.getUsername()))+
                          "\n"+uln.getUsername()+" found when trying to insert "+name);
             ServerMessaging.sendSimpleResponseProto(ServerErr.NAME_EXISTS_ERR, clientSocket);
@@ -186,7 +187,7 @@ public class RequestHandler extends Thread{
             epoch = curEpoch;
         }
 
-        MsgHandlerLogger.log("Getting commitment for epoch "+epoch+"...");
+        Logging.log("Getting commitment for epoch "+epoch+"...");
 
         CommitmentReq.CommitmentType commType = commReq.getType();
 
@@ -211,15 +212,15 @@ public class RequestHandler extends Thread{
 
         String username = lookup.getName();
 
-        MsgHandlerLogger.log("Getting key for "+username+"... ");
+        Logging.log("Getting key for "+username+"... ");
 
-        MsgHandlerLogger.log("SHA256 of name: " + Convert.bytesToHex(ServerUtils.unameToIndex(username)));
+        Logging.log("SHA256 of name: " + Convert.bytesToHex(ServerUtils.unameToIndex(username)));
 
         RootNode root = ServerHistory.getSTR(epoch).getRoot();
         UserLeafNode uln = DirectoryOps.findUserInEpoch(username, epoch);
 
         if(uln == null){
-            MsgHandlerLogger.error(username + " not found...");
+            Logging.error(username + " not found...");
             ServerMessaging.sendSimpleResponseProto(ServerErr.NAME_NOT_FOUND_ERR, clientSocket);
             return;
         }
@@ -241,7 +242,7 @@ public class RequestHandler extends Thread{
 
         if (!changeReq.hasName() || !changeReq.hasNewBlob() || !changeReq.hasNewChangeKey() ||
             !changeReq.hasAllowsUnsignedKeychange() || !changeReq.hasAllowsPublicLookup()) {
-            MsgHandlerLogger.log("Malformed uln change req");
+            Logging.log("Malformed uln change req");
         }
 
         String username = changeReq.getName();
@@ -249,7 +250,7 @@ public class RequestHandler extends Thread{
         UserLeafNode uln = DirectoryOps.findUser(username);
 
         if(uln == null){
-            MsgHandlerLogger.error(username + " not found...");
+            Logging.error(username + " not found...");
             ServerMessaging.sendSimpleResponseProto(ServerErr.NAME_NOT_FOUND_ERR, clientSocket);
             return;
         }
@@ -257,7 +258,7 @@ public class RequestHandler extends Thread{
         // make sure the request has a signature if the user requires one
         // wew assume the signature has been verified at this point
         if (!uln.allowsUnsignedKeychange() && sig == null) {
-            MsgHandlerLogger.error("Required signature for "+username+" not found");
+            Logging.error("Required signature for "+username+" not found");
             ServerMessaging.sendSimpleResponseProto(ServerErr.MALFORMED_CLIENT_MSG_ERR, clientSocket);
             return;
         }
@@ -268,7 +269,7 @@ public class RequestHandler extends Thread{
         DSAPublicKey newChangeKey = changeReq.hasNewChangeKey() ? KeyOps.makeDSAPublicKeyFromProto(changeReq.getNewChangeKey()) : uln.getChangeKey();
 
         DirectoryOps.mappingChange(username, newBlob, newChangeKey, allowsUnsignedKC, allowsPublicLookup, newBlob.getBytes(), sig);
-        ServerLogger.log("ulnChange: " + Arrays.toString(changeReq.toByteArray()));
+        Logging.log("ulnChange: " + Arrays.toString(changeReq.toByteArray()));
 
         // If using a DB, insert the new user
 
@@ -287,7 +288,7 @@ public class RequestHandler extends Thread{
 
         if (!changeReq.hasName() || !changeReq.hasNewBlob() || !changeReq.hasNewChangeKey() ||
             !changeReq.hasAllowsUnsignedKeychange() || !changeReq.hasAllowsPublicLookup()) {
-            MsgHandlerLogger.log("Malformed uln change req");
+            Logging.log("Malformed uln change req");
         }
 
         String username = changeReq.getName();
@@ -296,7 +297,7 @@ public class RequestHandler extends Thread{
         UserLeafNode uln = DirectoryOps.findUser(username);
 
         if(uln == null){
-            MsgHandlerLogger.error(username + " not found...");
+            Logging.error(username + " not found...");
             ServerMessaging.sendSimpleResponseProto(ServerErr.NAME_NOT_FOUND_ERR, clientSocket);
             return;
         }
@@ -314,12 +315,12 @@ public class RequestHandler extends Thread{
         }
         // let's catch the panic here and log it
         catch (Exception e) {
-            ServerLogger.error("[RequestHandler] "+e.getMessage());
+            Logging.error("[RequestHandler] "+e.getMessage());
         }
 
         if (!res) {
-            MsgHandlerLogger.log("Failed to verify message");
-            MsgHandlerLogger.log("Failed sig said\n" + Arrays.toString(sig));
+            Logging.log("Failed to verify message");
+            Logging.log("Failed sig said\n" + Arrays.toString(sig));
             ServerMessaging.sendSimpleResponseProto(ServerErr.SIGNED_CHANGE_VERIF_ERR, clientSocket);
             return;
         }

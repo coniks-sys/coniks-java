@@ -33,6 +33,8 @@
 
 package org.coniks.coniks_test_client;
 
+// coniks-java imports
+import org.coniks.util.Logging;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
 import org.coniks.coniks_common.C2SProtos.*;
 
@@ -89,14 +91,14 @@ public class ClientUtils{
 
      /** The maximum number of bytes logged per log file.
      *
-     *@deprecated Moved to {@link org.coniks.util.Convert}.
+     *@deprecated Moved to {@link org.coniks.util.Logging}.
      */
     @Deprecated
     public static final int MAX_BYTES_LOGGED_PER_FILE = (1 << 15);
 
     /** The maximum number of log files per log.
      *
-     *@deprecated Moved to {@link org.coniks.util.Convert}.
+     *@deprecated Moved to {@link org.coniks.util.Logging}.
      */
     @Deprecated
     public static final int MAX_NUM_LOG_FILES = 5;
@@ -127,7 +129,7 @@ public class ClientUtils{
 
         }
         catch(NoSuchAlgorithmException e){
-            ClientLogger.error("SHA-256 is not a valid algorithm for some reason");
+            Logging.error("SHA-256 is not a valid algorithm for some reason");
         }
 
         return null; // should never get here
@@ -158,7 +160,7 @@ public class ClientUtils{
 
         }
         catch(NoSuchAlgorithmException e){
-            ClientLogger.error("SHA-256 is not a valid algorithm for some reason");
+            Logging.error("SHA-256 is not a valid algorithm for some reason");
         }
 
         return null; // should never get here
@@ -399,7 +401,7 @@ public class ClientUtils{
             AuthPath.InteriorNode in = inList.get(i);
 
             if(!in.hasPrunedchild() && !in.hasSubtree()){
-                ClientLogger.error("No pruned child at level: "+i);
+                Logging.error("No pruned child at level: "+i);
                 return null;
             }
 
@@ -409,7 +411,7 @@ public class ClientUtils{
             // verify the input
             ByteString subtreeHash = pcHash.getHash();
             if(subtreeHash.size() != ClientUtils.HASH_SIZE_BYTES){
-                ClientLogger.error("Bad hash length");
+                Logging.error("Bad hash length");
                 return null;
             }
 
@@ -441,7 +443,7 @@ public class ClientUtils{
         // verify the input
         ByteString subtreeHash = pcHash.getHash();
         if(subtreeHash.size() != ClientUtils.HASH_SIZE_BYTES){
-            ClientLogger.error("Bad hash length");
+            Logging.error("Bad hash length");
             return null;
         }
 

@@ -44,14 +44,6 @@ import java.nio.charset.Charset;
  */
 public class Convert {
 
-    /** The maximum number of bytes logged per log file.
-     */
-    public static final int MAX_BYTES_LOGGED_PER_FILE = (1 << 15);
-
-    /** The maximum number of log files per log.
-     */
-    public static final int MAX_NUM_LOG_FILES = 5;
-
     private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     // from Stackoverflow 9655181

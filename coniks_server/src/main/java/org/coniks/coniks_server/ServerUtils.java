@@ -34,6 +34,7 @@
 package org.coniks.coniks_server;
 
 import org.coniks.coniks_common.UtilProtos.Commitment;
+import org.coniks.util.Logging;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -85,14 +86,14 @@ public class ServerUtils{
 
     /** The maximum number of bytes logged per log file.
      *
-     *@deprecated Moved to {@link org.coniks.util.Convert}.
+     *@deprecated Moved to {@link org.coniks.util.Logging}.
      */
     @Deprecated
     public static final int MAX_BYTES_LOGGED_PER_FILE = (1 << 15);
 
     /** The maximum number of log files per log.
      *
-     *@deprecated Moved to {@link org.coniks.util.Convert}.
+     *@deprecated Moved to {@link org.coniks.util.Logging}.
      */
     @Deprecated
     public static final int MAX_NUM_LOG_FILES = 5;
@@ -137,7 +138,7 @@ public class ServerUtils{
 
         }
         catch(NoSuchAlgorithmException e){
-            ServerLogger.error("SHA-256 is not a valid algorithm for some reason");
+            Logging.error("SHA-256 is not a valid algorithm for some reason");
         }
 
         return null; // should never get here
@@ -168,7 +169,7 @@ public class ServerUtils{
 
         }
         catch(NoSuchAlgorithmException e){
-            TimerLogger.error("SHA-256 is not a valid algorithm for some reason");
+            Logging.error("SHA-256 is not a valid algorithm for some reason");
         }
 
         return null; // should never get here
@@ -399,7 +400,7 @@ public class ServerUtils{
         byte[] rootBytes = getRootNodeBytes(rn);
 
         if (rootBytes == null) {
-            ServerLogger.error("getSTRBytesForSig: Oops, couldn't get the root node bytes");
+            Logging.error("getSTRBytesForSig: Oops, couldn't get the root node bytes");
             return null;
         }
 
@@ -428,7 +429,7 @@ public class ServerUtils{
         byte[] rootBytes = getRootNodeBytes(str.getRoot());
 
         if (rootBytes == null) {
-            ServerLogger.error("getSTRBytes: Oops, couldn't get the root node bytes");
+            Logging.error("getSTRBytes: Oops, couldn't get the root node bytes");
             return null;
         }
 

@@ -40,6 +40,7 @@ import java.util.PriorityQueue;
 
 // coniks-java imports
 import org.coniks.util.Convert;
+import org.coniks.util.Logging;
 
 import org.javatuples.*;
 
@@ -129,7 +130,7 @@ public class DirectoryOps {
 
         // this should never be the case
         if(ServerHistory.getCurSTR() == null){
-            ServerLogger.error("Trying to update a server without a history.");
+            Logging.error("Trying to update a server without a history.");
             return null;
         }
 

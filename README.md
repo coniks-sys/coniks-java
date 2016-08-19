@@ -11,7 +11,16 @@ http://coniks.org
 CONIKS is a key management system that provides transparency and privacy for end-user public keys. CONIKS protects end-to-end encrypted communications against malicious or compromised communication providers and surveillance by storing users' encryption keys in tamper-evident and publicly auditable key directories on the server side. This allows messaging clients to verify the identity of users automatically, and prevents malicious/compromised servers from hijacking secure communications without getting caught.
 
 ##Java Library
-This software package serves as a Java library for the CONIKS system and includes reference implementations for the CONIKS server and client. The basic [CONIKS server](https://github.com/coniks-sys/coniks-java/tree/master/coniks_server) and simple [CONIKS test client](https://github.com/coniks-sys/coniks-java/tree/master/coniks_test_client) demonstrate the functionality of the system and the CONIKS protocols, so anyone interested in deploying CONIKS in their secure messaging system can then use this software package as a reference when implementing the service. This package also contains the [common message format definitions](https://github.com/coniks-sys/coniks-java/tree/master/coniks_common) that CONIKS servers and clients use to communicate.
+The pckages in this library implement the various components of the CONIKS system and may be imported as jar files individually.
+
+- `coniks_common`: Common message format definitions
+- `coniks_server`: Prototype key server
+- `coniks_test_client`: Prototype client CLI
+- `crypto`: Cryptographic algorithms and operations
+- `util`: Utility functions
+
+The `protos` directory contains the Protocol Buffer message definitions
+for the client-server messages.
 
 ## Disclaimer
 Please keep in mind that this CONIKS Java implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/coniks-sys/coniks-java/releases).

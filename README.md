@@ -15,6 +15,7 @@ The pckages in this library implement the various components of the CONIKS syste
 - `coniks_server`: Prototype key server
 - `coniks_test_client`: Prototype client CLI
 - `crypto`: Cryptographic algorithms and operations
+- `merkletree`: Merkle prefix tree and Persistent Authenticated Dictionary
 - `util`: Utility functions
 
 The `protos` directory contains the Protocol Buffer message definitions

@@ -68,7 +68,7 @@ public class ClientUtils{
     /** The size of the Merkle tree hashes in bits.
      * Current hashing algorithm: SHA-256
      *
-     *@deprecated Moved to {@link org.coniks.crypto.Util}.
+     *@deprecated Moved to {@link org.coniks.crypto.Digest}.
      */
     @Deprecated
     public static final int HASH_SIZE_BITS =  256;
@@ -76,7 +76,7 @@ public class ClientUtils{
     /** The size of the Merkle tree hashes in bytes.
      * Current hashing algorithm: SHA-256
      *
-     *@deprecated Moved to {@link org.coniks.crypto.Util}.
+     *@deprecated Moved to {@link org.coniks.crypto.Digest}.
      */
     @Deprecated
     public static final int HASH_SIZE_BYTES = HASH_SIZE_BITS/8;
@@ -115,7 +115,7 @@ public class ClientUtils{
      * Current hashing algorithm: SHA-256.
      *
      *@return The hash as a {@code byte[]} or null in case of an error.
-     *@deprecated Replaced with {@link org.coniks.crypto.Util#digest(byte[])}
+     *@deprecated Replaced with {@link org.coniks.crypto.Digest#digest(byte[])}
      */
     @Deprecated
     public static byte[] hash(byte[] input){

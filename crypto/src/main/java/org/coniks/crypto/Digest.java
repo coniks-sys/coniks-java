@@ -42,7 +42,7 @@ import java.security.NoSuchAlgorithmException;
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Michael Rochlin
  */
-public class Util {
+public class Digest {
 
      /** The size of a SHA-256 hash in bits.
      */

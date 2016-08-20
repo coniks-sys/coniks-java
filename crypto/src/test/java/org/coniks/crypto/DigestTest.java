@@ -44,9 +44,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 /**
- * Unit tests for Util.
+ * Unit tests for Digest.
  */
-public class UtilTest
+public class DigestTest
 {
 
     @Test
@@ -55,16 +55,16 @@ public class UtilTest
 
         byte[] msg = "message".getBytes();
 
-        byte[] hash = Util.digest(msg);
+        byte[] hash = Digest.digest(msg);
 
-        if(hash.length != Util.HASH_SIZE_BYTES) {
+        if(hash.length != Digest.HASH_SIZE_BYTES) {
             fail("Computation of hash failed - wrong length.");
         }
 
         assertNotNull("Computation of hash failed - null", hash);
 
         assertFalse("Computation of hash failed - hash is all zeros",
-                    Arrays.equals(hash, new byte[Util.HASH_SIZE_BYTES]));
+                    Arrays.equals(hash, new byte[Digest.HASH_SIZE_BYTES]));
 
     }
 }

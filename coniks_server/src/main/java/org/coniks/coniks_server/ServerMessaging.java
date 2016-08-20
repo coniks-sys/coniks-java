@@ -45,7 +45,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.javatuples.*;
 
 // coniks-java imports
-import org.coniks.crypto.Util;
+import org.coniks.crypto.Digest;
 import org.coniks.util.Logging;
 import org.coniks.coniks_common.*;
 import org.coniks.coniks_common.C2SProtos.*;
@@ -174,7 +174,7 @@ public class ServerMessaging {
         byte[] rootHashBytes = null;
 
         try {
-            rootHashBytes = Util.digest(rootBytes);
+            rootHashBytes = Digest.digest(rootBytes);
         }
         catch(NoSuchAlgorithmException e) {
             Logging.error("[ServerMessagging] "+e.getMessage());
@@ -182,7 +182,7 @@ public class ServerMessaging {
         }
 
         Hash.Builder rootHash = Hash.newBuilder();
-        if(rootHashBytes.length != Util.HASH_SIZE_BYTES){
+        if(rootHashBytes.length != Digest.HASH_SIZE_BYTES){
             Logging.error("Bad length of root hash: "+rootHashBytes.length);
             return null;
         }

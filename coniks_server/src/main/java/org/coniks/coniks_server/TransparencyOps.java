@@ -37,7 +37,7 @@ import com.google.protobuf.ByteString;
 
 // coniks-java imports
 import org.coniks.crypto.Signing;
-import org.coniks.crypto.Util;
+import org.coniks.crypto.Digest;
 import org.coniks.util.Convert;
 import org.coniks.util.Logging;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
@@ -105,7 +105,7 @@ public class TransparencyOps{
         byte[] prevStrHash = null;
 
         try {
-            prevStrHash = Util.digest(ServerUtils.getSTRBytes(ServerHistory.getCurSTR()));
+            prevStrHash = Digest.digest(ServerUtils.getSTRBytes(ServerHistory.getCurSTR()));
         }
         catch(NoSuchAlgorithmException e) {
             Logging.error("[TransparencyOps] "+e.getMessage());
@@ -186,7 +186,7 @@ public class TransparencyOps{
             //                               true = right
             boolean direction = Convert.getNthBit(lookupIndex, curOffset);
 
-            byte[] prunedChildHash = new byte[Util.HASH_SIZE_BYTES];
+            byte[] prunedChildHash = new byte[Digest.HASH_SIZE_BYTES];
 
             if (runner == null){
                 Logging.error("Null runner" + curOffset);
@@ -210,7 +210,7 @@ public class TransparencyOps{
                 }
 
                 Hash.Builder subtree = Hash.newBuilder();
-                if(prunedChildHash.length != Util.HASH_SIZE_BYTES){
+                if(prunedChildHash.length != Digest.HASH_SIZE_BYTES){
                     Logging.error("Bad length of pruned child hash: "+prunedChildHash.length);
                     return null;
                 }
@@ -239,7 +239,7 @@ public class TransparencyOps{
                     runner = curNodeI.getRight();
                 }
                 Hash.Builder subtree = Hash.newBuilder();
-                  if(prunedChildHash.length != Util.HASH_SIZE_BYTES){
+                  if(prunedChildHash.length != Digest.HASH_SIZE_BYTES){
                     Logging.error("Bad length of pruned child hash: "+prunedChildHash.length);
                     return null;
                 }

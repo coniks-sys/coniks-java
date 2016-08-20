@@ -34,7 +34,7 @@
 package org.coniks.coniks_server;
 
 // coniks-java imports
-import org.coniks.crypto.Util;
+import org.coniks.crypto.Digest;
 import org.coniks.util.Logging;
 import org.coniks.coniks_common.MsgType;
 import org.coniks.coniks_common.C2SProtos.Registration;
@@ -208,7 +208,7 @@ public class ConiksServer{
 
         // init the history
          if (!ServerHistory.initHistory(initRoot, initEpoch, 0,
-                                       new byte[Util.HASH_SIZE_BYTES])) {
+                                       new byte[Digest.HASH_SIZE_BYTES])) {
             printStatusMsg(true, "Error initializing the history");
             System.exit(-1);
          }

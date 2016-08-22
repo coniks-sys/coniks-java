@@ -33,71 +33,75 @@
 
 package org.coniks.crypto;
 
-import java.util.Random;
-import java.security.MessageDigest;
+import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
-/** Implements all cryptographic utility functions for CONIKS.
- * Currently supported hash algorithms: SHA-256.
+/** Implements a cryptographic commitment used in the CONIKS
+ * Merkle tree to hide users' key information.
+ *
+ * {@code commit = hash(salt || blob)}
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
- *@author Michael Rochlin
  */
-public class Digest {
+public class Commitment {
 
-     /** The size of a SHA-256 hash in bits.
-     */
-    public static final int HASH_SIZE_BITS =  256;
+    private byte[] salt;
+    private byte[] value;
 
-    /** The size of a SHA-256 hash in bytes.
-     */
-    public static final int HASH_SIZE_BYTES = HASH_SIZE_BITS/8;
-
-    /** The supported hashing scheme.
-     */
-    public static final String HASH_ID = "SHA-256";
-
-    /** RNG used for {@link makeRand}.
-     */
-    private static Random random = new Random();
-
-    /** Generates the cryptographic hash of {@code input}.
-     * Current hashing algorithm: SHA-256.
+    /** Generate a new commitment to protect CONIKS users' data.
+     * The commitment consists of a random salt and the value.
      *
-     *@return The hash as a {@code byte[]} or null in case of an error.
+     *@throws a {@link java.security.NoSuchAlgorithmException}
+     * if an error occurs in the underlying hash function.
      */
-    public static byte[] digest(byte[] input)
+    public Commitment(byte[] data)
         throws NoSuchAlgorithmException {
 
-        byte [] digest = null;
-        try{
-            MessageDigest md = MessageDigest.getInstance(HASH_ID);
-            digest = md.digest(input);
-        }
-        // let's panic if an exception occurs
-        finally {
-            return digest;
-        }
+        this.salt = Digest.makeRand();
+
+        byte[] d = serialize(data);
+        this.value = Digest.digest(d);
     }
 
-    /** Generate a random byte array and hash it.
-     * See https://github.com/coniks-sys/coniks-go/issues
-     * for rationale.
+    /** Gets this commitment's random salt.
      *
-     *@return a hashed random byte array
+     *@return the commitment salt
      */
-    public static byte[] makeRand()
+    public byte[] getSalt() {
+        return this.salt;
+    }
+
+    /** Gets this commitment's value.
+     *
+     *@return the commitment value as {@code hash(salt || blob)}
+     */
+    public byte[] getValue() {
+        return this.value;
+    }
+
+    private byte[] serialize(byte[] data) {
+        byte[] d = new byte[Digest.HASH_SIZE_BYTES+data.length];
+        ByteBuffer buf = ByteBuffer.wrap(d);
+        buf.put(this.salt);
+        buf.put(data);
+
+        return buf.array();
+    }
+
+    /** Verifies the commitment.
+     *
+     *@param opening the opening of the commitment to verify
+     *@return {@code true} if the commitment is valid, {@code} false
+     * otherwise.
+     */
+    public boolean verify(byte[] opening)
         throws NoSuchAlgorithmException {
 
-        byte[] digest = null;
-        byte[] r = new byte[HASH_SIZE_BYTES];
-        try {
-            random.nextBytes(r);
-            digest = digest(r);
-        }
-        // let's panic if an exception occurs
-        finally {
-            return digest(r);
-        }
+        byte[] c = Digest.digest(serialize(opening));
+
+        return Arrays.equals(c, this.value);
+
     }
+
 }

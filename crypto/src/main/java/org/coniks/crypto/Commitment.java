@@ -35,6 +35,7 @@ package org.coniks.crypto;
 
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /** Implements a cryptographic commitment used in the CONIKS
  * Merkle tree to hide users' key information.
@@ -54,17 +55,13 @@ public class Commitment {
      *@throws a {@link java.security.NoSuchAlgorithmException}
      * if an error occurs in the underlying hash function.
      */
-    public Commitment(byte[] val)
+    public Commitment(byte[] data)
         throws NoSuchAlgorithmException {
 
         this.salt = Digest.makeRand();
 
-        byte[] v = new byte[Digest.HASH_SIZE_BYTES+val.length];
-        ByteBuffer buf = ByteBuffer.wrap(v);
-        buf.put(salt);
-        buf.put(val);
-
-        this.value = Digest.digest(buf.array());
+        byte[] d = serialize(data);
+        this.value = Digest.digest(d);
     }
 
     /** Gets this commitment's random salt.
@@ -81,6 +78,30 @@ public class Commitment {
      */
     public byte[] getValue() {
         return this.value;
+    }
+
+    private byte[] serialize(byte[] data) {
+        byte[] d = new byte[Digest.HASH_SIZE_BYTES+data.length];
+        ByteBuffer buf = ByteBuffer.wrap(d);
+        buf.put(this.salt);
+        buf.put(data);
+
+        return buf.array();
+    }
+
+    /** Verifies the commitment.
+     *
+     *@param opening the opening of the commitment to verify
+     *@return {@code true} if the commitment is valid, {@code} false
+     * otherwise.
+     */
+    public boolean verify(byte[] opening)
+        throws NoSuchAlgorithmException {
+
+        byte[] c = Digest.digest(serialize(opening));
+
+        return Arrays.equals(c, this.value);
+
     }
 
 }

@@ -6,12 +6,12 @@
   <parent>
     <groupId>org.coniks</groupId>
     <artifactId>coniks-java</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>0.4.0</version>
   </parent>
 
   <groupId>org.coniks.util</groupId>
   <artifactId>coniks-util</artifactId>
-  <version>1.3-SNAPSHOT</version>
+  <version>0.4.0</version>
   <packaging>jar</packaging>
 
   <name>CONIKS [Util]</name>

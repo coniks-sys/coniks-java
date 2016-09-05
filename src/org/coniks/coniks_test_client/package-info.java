@@ -7,6 +7,6 @@
  * key changes and key consistency checks. It is designed to communicate 
  * with the reference implementation of a CONIKS server.
  *
- *@since 1.1.0
+ *@since 0.2.0
  */
 package org.coniks.coniks_test_client;

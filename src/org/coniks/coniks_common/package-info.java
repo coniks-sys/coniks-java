@@ -4,6 +4,6 @@
  * protocol buffers message formats CONIKS clients and servers 
  * use to communicate.
  *
- *@since 1.1.0
+ *@since 0.2.0
  */
 package org.coniks.coniks_common;

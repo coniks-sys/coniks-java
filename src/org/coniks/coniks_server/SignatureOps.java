@@ -33,8 +33,11 @@
 
 package org.coniks.coniks_server;
 
+// coniks-java imports
+import org.coniks.util.Logging;
 import org.coniks.coniks_common.*;
 import org.coniks.coniks_common.C2SProtos.*;
+
 import java.security.*;
 import javax.crypto.*;
 import java.security.spec.*;
@@ -58,7 +61,7 @@ public class SignatureOps{
      * of the {@code input}.
      *@throws A RuntimeException if there is a problem with the private key
      * loaded from the server's keystore.
-     *@deprecated Replaced with {@link org.coniks.crypto.Signing#rsaSign(RSAPublicKey, byte[])}.
+     *@deprecated Replaced with {@link org.coniks.crypto.Signing#rsaSign(RSAPrivateKey, byte[])}.
      */
     @Deprecated
     public static byte[] sign(byte[] input) {
@@ -80,13 +83,13 @@ public class SignatureOps{
             return signed;
         }
         catch(NoSuchAlgorithmException e){
-            TimerLogger.error("RSA is invalid for some reason.");
+            Logging.error("RSA is invalid for some reason.");
         }
         catch(InvalidKeyException e){
-            TimerLogger.error("The given key is invalid.");
+            Logging.error("The given key is invalid.");
         }
   catch(SignatureException e){
-            TimerLogger.error("The format of the sig input is invalid.");
+            Logging.error("The format of the sig input is invalid.");
         }
 
         return signed;
@@ -114,13 +117,13 @@ public class SignatureOps{
             return verifier.verify(signature);
         }
         catch(NoSuchAlgorithmException e){
-            TimerLogger.error("SHA256withRSA is invalid for some reason.");
+            Logging.error("SHA256withRSA is invalid for some reason.");
         }
         catch(InvalidKeyException e){
-            TimerLogger.error("The given key is invalid.");
+            Logging.error("The given key is invalid.");
         }
         catch(SignatureException e){
-            TimerLogger.error("The format of the input is invalid: "+e.getMessage());
+            Logging.error("The format of the input is invalid: "+e.getMessage());
         }
 
         return false;
@@ -138,22 +141,22 @@ public class SignatureOps{
             verifyalg.initVerify(pk);
             verifyalg.update(msg);
             if (!verifyalg.verify(sig)) {
-                TimerLogger.error("Failed to validate signature");
-                TimerLogger.error("Sig was:\n" + Arrays.toString(sig));
+                Logging.error("Failed to validate signature");
+                Logging.error("Sig was:\n" + Arrays.toString(sig));
                 return false;
             }
-            TimerLogger.error("Good Sig was:\n" + Arrays.toString(sig));
+            Logging.error("Good Sig was:\n" + Arrays.toString(sig));
             return true;
         }
         catch(NoSuchAlgorithmException e){
-            TimerLogger.error("DSA is invalid for some reason.");
+            Logging.error("DSA is invalid for some reason.");
         }
         catch(InvalidKeyException e){
-            TimerLogger.error("The given DSA key to verify is invalid.");
+            Logging.error("The given DSA key to verify is invalid.");
         }
         catch(SignatureException e){
-            TimerLogger.error("The format of the dsa input is invalid: "+ e.getMessage());
-            TimerLogger.error("Sig was:\n" + Arrays.toString(sig));
+            Logging.error("The format of the dsa input is invalid: "+ e.getMessage());
+            Logging.error("Sig was:\n" + Arrays.toString(sig));
         }
         return false;
     }

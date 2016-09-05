@@ -8,6 +8,6 @@
  * key changes. It is designed to communicate with the simple CONIKS 
  * test client.
  *
- * @since 1.1.0
+ * @since 0.2.0
  */
 package org.coniks.coniks_server;

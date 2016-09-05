@@ -39,6 +39,9 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.io.IOException;
 
+// coniks-java imports
+import org.coniks.util.Logging;
+
 /** Implements the epoch timer logger used for a CONIKS
  * server.
  *
@@ -51,7 +54,11 @@ public class TimerLogger {
     /** Sets up a timer logger for the CONIKS server.
      *
      *@param epochTimerLog the file name for this logger.
+     *
+     *@deprecated Replaced by
+     * {@link org.coniks.util.Logging#setup(String, String)}.
      */
+    @Deprecated
     public static void setup (String epochTimerLog) {
         logger = Logger.getLogger("ConiksLogger-Timer");
 
@@ -62,8 +69,8 @@ public class TimerLogger {
 
         try {
              FileHandler handler = new FileHandler(epochTimerLog, 
-                                                  ServerUtils.MAX_BYTES_LOGGED_PER_FILE,
-                                                  ServerUtils.MAX_NUM_LOG_FILES, true);
+                                                  Logging.MAX_BYTES_LOGGED_PER_FILE,
+                                                  Logging.MAX_NUM_LOG_FILES, true);
         
             // create a TXT formatter
             SimpleFormatter fmt = new SimpleFormatter();
@@ -82,14 +89,22 @@ public class TimerLogger {
 
     /** Writes an information message {@code msg}
      * to the epoch timer log.
+     *
+     *@deprecated Replaced by
+     * {@link org.coniks.util.Logging#log(String)}.
      */
+    @Deprecated
     public static void log (String msg) {
         logger.info(msg);
     }
 
     /** Writes a severe error message {@code msg}
      * to the epoch timer log.
+     *
+     *@deprecated Replaced by
+     * {@link org.coniks.util.Logging#error(String)}.
      */
+    @Deprecated
     public static void error (String msg) {
         logger.severe(msg);
     }

@@ -37,7 +37,9 @@ import com.google.protobuf.ByteString;
 
 // coniks-java imports
 import org.coniks.crypto.Signing;
-import org.coniks.crypto.Util;
+import org.coniks.crypto.Digest;
+import org.coniks.util.Convert;
+import org.coniks.util.Logging;
 import org.coniks.coniks_common.C2SProtos.AuthPath;
 import org.coniks.coniks_common.C2SProtos.*;
 import org.coniks.coniks_common.UtilProtos.Hash;
@@ -81,7 +83,7 @@ public class TransparencyOps{
             sig = Signing.rsaSign(key, strBytesPreSig);
         }
         catch (Exception e) {
-            ServerLogger.error("[RequestHandler] "+e.getMessage());
+            Logging.error("[RequestHandler] "+e.getMessage());
             return null;
         }
 
@@ -103,10 +105,10 @@ public class TransparencyOps{
         byte[] prevStrHash = null;
 
         try {
-            prevStrHash = Util.digest(ServerUtils.getSTRBytes(ServerHistory.getCurSTR()));
+            prevStrHash = Digest.digest(ServerUtils.getSTRBytes(ServerHistory.getCurSTR()));
         }
         catch(NoSuchAlgorithmException e) {
-            ServerLogger.error("[TransparencyOps] "+e.getMessage());
+            Logging.error("[TransparencyOps] "+e.getMessage());
             return null;
         }
 
@@ -120,7 +122,7 @@ public class TransparencyOps{
             sig = Signing.rsaSign(key, strBytesPreSig);
         }
         catch (Exception e) {
-            ServerLogger.error("[TransparencyOps] "+e.getMessage());
+            Logging.error("[TransparencyOps] "+e.getMessage());
             return null;
         }
 
@@ -171,8 +173,8 @@ public class TransparencyOps{
 
         byte[] lookupIndex = ServerUtils.unameToIndex(uln.getUsername());
 
-        byte[] prefix = ServerUtils.getPrefixBytes(lookupIndex);
-        String prefixStr = ServerUtils.bytesToHex(prefix);
+        byte[] prefix = Convert.getPrefixBytes(lookupIndex);
+        String prefixStr = Convert.bytesToHex(prefix);
 
         // not worth doing this recursively
         int curOffset = 0;
@@ -182,12 +184,12 @@ public class TransparencyOps{
 
             // direction here is going to be false = left,
             //                               true = right
-            boolean direction = ServerUtils.getNthBit(lookupIndex, curOffset);
+            boolean direction = Convert.getNthBit(lookupIndex, curOffset);
 
-            byte[] prunedChildHash = new byte[Util.HASH_SIZE_BYTES];
+            byte[] prunedChildHash = new byte[Digest.HASH_SIZE_BYTES];
 
             if (runner == null){
-                ServerLogger.error("Null runner" + curOffset);
+                Logging.error("Null runner" + curOffset);
             }
 
             if (runner instanceof RootNode) {
@@ -208,8 +210,8 @@ public class TransparencyOps{
                 }
 
                 Hash.Builder subtree = Hash.newBuilder();
-                if(prunedChildHash.length != Util.HASH_SIZE_BYTES){
-                    ServerLogger.error("Bad length of pruned child hash: "+prunedChildHash.length);
+                if(prunedChildHash.length != Digest.HASH_SIZE_BYTES){
+                    Logging.error("Bad length of pruned child hash: "+prunedChildHash.length);
                     return null;
                 }
                 subtree.setLen(prunedChildHash.length);
@@ -237,8 +239,8 @@ public class TransparencyOps{
                     runner = curNodeI.getRight();
                 }
                 Hash.Builder subtree = Hash.newBuilder();
-                  if(prunedChildHash.length != Util.HASH_SIZE_BYTES){
-                    ServerLogger.error("Bad length of pruned child hash: "+prunedChildHash.length);
+                  if(prunedChildHash.length != Digest.HASH_SIZE_BYTES){
+                    Logging.error("Bad length of pruned child hash: "+prunedChildHash.length);
                     return null;
                 }
                 subtree.setLen(prunedChildHash.length);
@@ -247,7 +249,7 @@ public class TransparencyOps{
                 interiorList.add(0, inBuilder.build());
 
                 if (runner == null){
-                    ServerLogger.error("such sadness...");
+                    Logging.error("such sadness...");
                 }
 
                 curOffset++;

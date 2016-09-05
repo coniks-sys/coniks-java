@@ -34,6 +34,7 @@
 package org.coniks.coniks_server;
 
 import org.coniks.coniks_common.UtilProtos.Commitment;
+import org.coniks.util.Logging;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -62,7 +63,7 @@ public class ServerUtils{
     /** The size of the Merkle tree hashes in bits.
      * Current hashing algorithm: SHA-256
      *
-     *@deprecated Moved to {@link org.coniks.crypto.Util}.
+     *@deprecated Moved to {@link org.coniks.crypto.Digest}.
      */
     @Deprecated
     public static final int HASH_SIZE_BITS =  256;
@@ -70,7 +71,7 @@ public class ServerUtils{
     /** The size of the Merkle tree hashes in bytes.
      * Current hashing algorithm: SHA-256
      *
-     *@deprecated Moved to {@link org.coniks.crypto.Util}.
+     *@deprecated Moved to {@link org.coniks.crypto.Digest}.
      */
     @Deprecated
     public static final int HASH_SIZE_BYTES = HASH_SIZE_BITS/8;
@@ -84,13 +85,20 @@ public class ServerUtils{
     public static final int SIG_SIZE_BYTES = 256;
 
     /** The maximum number of bytes logged per log file.
+     *
+     *@deprecated Moved to {@link org.coniks.util.Logging}.
      */
+    @Deprecated
     public static final int MAX_BYTES_LOGGED_PER_FILE = (1 << 15);
 
     /** The maximum number of log files per log.
+     *
+     *@deprecated Moved to {@link org.coniks.util.Logging}.
      */
+    @Deprecated
     public static final int MAX_NUM_LOG_FILES = 5;
 
+    @Deprecated
     private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     /** Prints server status and error messages.
@@ -98,7 +106,11 @@ public class ServerUtils{
      *
      *@param isErr indicates whether this is an error message
      *@param msg the status message to print
+     *
+     *@deprecated Replaced with private method in
+     * {@link org.coniks.coniks_server.ConiksServer}.
      */
+    @Deprecated
     public static void printStatusMsg (boolean isErr, String msg) {
         String status = msg;
         if (isErr) {
@@ -112,7 +124,7 @@ public class ServerUtils{
      * Current hashing algorithm: SHA-256.
      *
      *@return The hash as a {@code byte[]} or null in case of an error.
-     *@deprecated Replaced with {@link org.coniks.crypto.Util#digest(byte[])}
+     *@deprecated Replaced with {@link org.coniks.crypto.Digest#digest(byte[])}
      */
     @Deprecated
     public static byte[] hash(byte[] input){
@@ -126,7 +138,7 @@ public class ServerUtils{
 
         }
         catch(NoSuchAlgorithmException e){
-            ServerLogger.error("SHA-256 is not a valid algorithm for some reason");
+            Logging.error("SHA-256 is not a valid algorithm for some reason");
         }
 
         return null; // should never get here
@@ -157,7 +169,7 @@ public class ServerUtils{
 
         }
         catch(NoSuchAlgorithmException e){
-            TimerLogger.error("SHA-256 is not a valid algorithm for some reason");
+            Logging.error("SHA-256 is not a valid algorithm for some reason");
         }
 
         return null; // should never get here
@@ -169,7 +181,9 @@ public class ServerUtils{
      * of its hexadecimal representation.
      *
      *@return The hex representation of {@code bytes} as a String.
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
+    @Deprecated
     public static String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         for ( int j = 0; j < bytes.length; j++ ) {
@@ -181,7 +195,10 @@ public class ServerUtils{
     }
 
     /** Converts a UTF-8 String {@code str} to an array of bytes.
+     *
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
+    @Deprecated
     public static byte[] strToBytes (String str) {
         return str.getBytes(Charset.forName("UTF-8"));
     }
@@ -201,7 +218,9 @@ public class ServerUtils{
      /** Converts a long {@code val} into an array of bytes.
      *
      *@return The {@code byte[]} representation of the long value.
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
+    @Deprecated
     public static byte[] longToBytes(long val) {
         byte[] byteArr = new byte[8];
 
@@ -217,7 +236,9 @@ public class ServerUtils{
      * at offset {@code offset}, and determines whether it is 1 or 0.
      *
      *@return true if the nth bit is 1, false otherwise.
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
+    @Deprecated
     public static boolean getNthBit(byte[] arr, int offset){
         int arrayOffset = offset / 8;
         int bitOfByte = offset % 8;
@@ -229,7 +250,9 @@ public class ServerUtils{
      *
      *@return the first 16 bits of {@code arr} or all zeros if the length
      * of the array is less than 2 bytes.
+     *@deprecated Moved to {@link org.coniks.util.Convert}.
      */
+    @Deprecated
     public static byte[] getPrefixBytes(byte[] arr){
         byte[] out = new byte[2];
 
@@ -247,7 +270,9 @@ public class ServerUtils{
     /** Compares two byte buffers for byte-by-byte equality.
      *
      *@return true if the buffers are identical, false otherwise.
+     *@deprecated Use {@link java.util.Arrays#equals(byte[], byte[])}
      */
+    @Deprecated
     public static boolean compareByteBuffers(byte[] buf1, byte[] buf2){
         if (buf1.length != buf2.length) {
             return false;
@@ -375,7 +400,7 @@ public class ServerUtils{
         byte[] rootBytes = getRootNodeBytes(rn);
 
         if (rootBytes == null) {
-            ServerLogger.error("getSTRBytesForSig: Oops, couldn't get the root node bytes");
+            Logging.error("getSTRBytesForSig: Oops, couldn't get the root node bytes");
             return null;
         }
 
@@ -404,7 +429,7 @@ public class ServerUtils{
         byte[] rootBytes = getRootNodeBytes(str.getRoot());
 
         if (rootBytes == null) {
-            ServerLogger.error("getSTRBytes: Oops, couldn't get the root node bytes");
+            Logging.error("getSTRBytes: Oops, couldn't get the root node bytes");
             return null;
         }
 

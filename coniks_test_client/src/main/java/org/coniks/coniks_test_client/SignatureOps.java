@@ -85,7 +85,7 @@ public class SignatureOps{
     /** Signs {@code msg} using DSAPrivateKey {@code prk}
      *
      *@return the signature or null on an error
-     *@deprecated Replaced with {@link org.coniks.crypto.Signing#dsaSign(DSAPublicKey, byte[], byte[])}.
+     *@deprecated Replaced with {@link org.coniks.crypto.Signing#dsaSign(DSAPrivateKey, byte[])}.
      */
     @Deprecated
     public static byte[] signDSA(byte[] msg, DSAPrivateKey prk) throws InvalidKeyException {

@@ -37,7 +37,8 @@ import java.util.Random;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/** Implements all cryptographic utility functions for CONIKS.
+/** Implements cryptographic hashing and hashed random number
+ * generation for CONIKS.
  * Currently supported hash algorithms: SHA-256.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)

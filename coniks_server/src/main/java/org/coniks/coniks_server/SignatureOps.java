@@ -61,7 +61,7 @@ public class SignatureOps{
      * of the {@code input}.
      *@throws A RuntimeException if there is a problem with the private key
      * loaded from the server's keystore.
-     *@deprecated Replaced with {@link org.coniks.crypto.Signing#rsaSign(RSAPublicKey, byte[])}.
+     *@deprecated Replaced with {@link org.coniks.crypto.Signing#rsaSign(RSAPrivateKey, byte[])}.
      */
     @Deprecated
     public static byte[] sign(byte[] input) {

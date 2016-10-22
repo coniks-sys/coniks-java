@@ -19,6 +19,11 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.whispersystems</groupId>
+      <artifactId>curve25519-java</artifactId>
+      <version>0.3.0</version>
+    </dependency>
   </dependencies>
 
   <modules>

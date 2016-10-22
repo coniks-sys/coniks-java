@@ -34,6 +34,7 @@
 package org.coniks.coniks_server;
 
 import org.coniks.coniks_common.UtilProtos.Commitment;
+import org.coniks.util.Convert;
 import org.coniks.util.Logging;
 
 import java.security.MessageDigest;
@@ -204,14 +205,19 @@ public class ServerUtils{
     }
 
     /** Converts a {@code username} to a CONIKS lookup
-     * index using a verifiable unpredicctable function (VUF).
-     * Current VUF algorithm: SHA-256.
+     * index using a verifiable unpredictable function (VUF).
+     * Current VUF algorithm: VXEDDSA
+     * for details see:
+     * https://whispersystems.org/docs/specifications/xeddsa/#vxeddsa
      *
      *@return The {@code byte[]} representation of the
      * lookup index.
      */
     public static byte[] unameToIndex (String uname){
-        byte[] b = strToBytes(uname);
+        byte[] b = Convert.strToBytes(uname);
+        // TODO call the VRF instead.
+        // Also, the signature of this method needs to be refactored:
+        // either add a the VRF-private-key as a parameter or
         return ServerUtils.hash(b);
     }
 

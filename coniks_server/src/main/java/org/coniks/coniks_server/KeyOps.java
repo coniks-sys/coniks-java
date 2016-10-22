@@ -38,9 +38,6 @@ import java.security.interfaces.*;
 import java.security.spec.*;
 import java.security.cert.CertificateException;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.io.PrintWriter;
 import java.io.*;
 
 // coniks-java imports
@@ -73,9 +70,7 @@ public class KeyOps{
             // get user password and file input stream
             char[] ks_password = ServerConfig.getKeystorePassword().toCharArray();
 
-            FileInputStream fis = null;
-
-            fis = new FileInputStream(ServerConfig.getKeystorePath());
+            FileInputStream fis = new FileInputStream(ServerConfig.getKeystorePath());
             ks.load(fis, ks_password);
 
             if(ks.isKeyEntry(ServerConfig.getName())){
@@ -117,21 +112,17 @@ public class KeyOps{
      * the case of an Exception.
      */
     public static RSAPublicKey loadPublicKey(String keyOwner){
-
-        KeyStore ks = null;
-        RSAPublicKey publicKey = null;
-
         try{
-            ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
             char[] ts_password =
                 ServerConfig.getTruststorePassword().toCharArray();
 
-            FileInputStream fis = null;
-
-            fis = new FileInputStream(ServerConfig.getTruststorePath());
+            FileInputStream fis =
+                    new FileInputStream(ServerConfig.getTruststorePath());
             ks.load(fis, ts_password);
 
+            RSAPublicKey publicKey;
             if(ks.isKeyEntry(keyOwner)){
                 KeyStore.ProtectionParameter protParam =
                     new KeyStore.PasswordProtection(ts_password);

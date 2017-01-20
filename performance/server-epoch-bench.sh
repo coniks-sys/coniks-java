@@ -43,4 +43,7 @@ TRIALS="10"
 NUM_INSERTS="1000"
 RUN_CONIKS="java $CLASSPATH $BENCH_BIN $NUM_USERS $TRIALS $NUM_INSERTS"
 
-$RUN_CONIKS >> data/server-epoch.csv
+PROC=`cat /proc/cpuinfo | grep "model name" | cut -d " " -f 5 | head -1`
+RAM=`cat /proc/meminfo | grep "MemTotal" | cut -d " " -f 9``cat /proc/meminfo | grep "MemTotal" | cut -d " " -f 10`
+
+$RUN_CONIKS >> data/server_epoch\_$PROC\_$RAM.csv

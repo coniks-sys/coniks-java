@@ -69,9 +69,10 @@ public class DirectoryOps {
      *@param allowsPublicVisibility flag indicating the user's key visibility policy
      */
     public static synchronized void register(String uname, String pk, DSAPublicKey ck,
-                                             boolean allowsUnsignedChanges, boolean allowsPublicVisibility){
+                                             boolean allowsUnsignedChanges, boolean allowsPublicVisibility,
+                                             long regEpoch){
         byte[] index = ServerUtils.unameToIndex(uname);
-        UserLeafNode uln = new UserLeafNode(uname, pk, ServerHistory.nextEpoch(), 0,
+        UserLeafNode uln = new UserLeafNode(uname, pk, regEpoch, 0,
                                             allowsUnsignedChanges, allowsPublicVisibility, ck, index);
         pendingQueue.add(Triplet.with(index, uln, (Operation)new Register()));
     }

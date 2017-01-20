@@ -169,7 +169,7 @@ public class RequestHandler extends Thread{
 
         // we register the user in the pendingQueue
         DirectoryOps.register(name, reg.getBlob(), ck, reg.getAllowsUnsignedKeychange(),
-                              reg.getAllowsPublicLookup());
+                              reg.getAllowsPublicLookup(), this.regEpoch);
 
         ServerMessaging.sendRegistrationRespProto(regEpoch,
                                                   ServerConfig.getEpochInterval(), clientSocket);

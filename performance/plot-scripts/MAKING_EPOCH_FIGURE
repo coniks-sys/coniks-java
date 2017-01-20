@@ -1,0 +1,3 @@
+# TO MAKE THE EPOCH FIGURE, RUN THE FOLLOWING FROM THIS DIRECTORY
+
+python compute-sd-mean.py means ../data/server-epoch.csv /tmp/server-epoch-throughput.csv ; sh ./server-epoch-tput.sh ; cp /tmp/server-epoch-tput.pdf ../../../pets15_paper/diagrams/

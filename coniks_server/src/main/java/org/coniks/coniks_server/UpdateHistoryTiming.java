@@ -11,18 +11,9 @@ public class UpdateHistoryTiming{
 
         public static void main(String[] args){
 
-                int numUsers = 0;
-                try{
-                        numUsers = Integer.parseInt(args[0]);
-                }
-                catch(NumberFormatException e){
-                        System.err.println("Wrong format - numUsers");
-                        return;
-                }
-
                 int numTrials = 0;
                 try{
-                        numTrials = Integer.parseInt(args[1]);
+                        numTrials = Integer.parseInt(args[0]);
                 }
                 catch(NumberFormatException e){
                         System.err.println("Wrong format - numTrials");
@@ -31,10 +22,19 @@ public class UpdateHistoryTiming{
 
                 int numInserts = 0;
                 try{
-                        numInserts = Integer.parseInt(args[2]);
+                        numInserts = Integer.parseInt(args[1]);
                 }
                 catch(NumberFormatException e){
                         System.err.println("Wrong format - numInserts");
+                        return;
+                }
+
+                int numUsers = 0;
+                try{
+                        numUsers = Integer.parseInt(args[2]);
+                }
+                catch(NumberFormatException e){
+                        System.err.println("Wrong format - numUsers");
                         return;
                 }
 

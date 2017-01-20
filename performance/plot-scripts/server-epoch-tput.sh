@@ -1,4 +1,7 @@
 #!/bin/sh
+
+python compute-sd-mean.py means ../data/server_epoch\_$1.csv /tmp/server-epoch-$1-throughput.csv
+
 gnuplot << EOF
 # Note you need gnuplot 4.4 for the pdfcairo terminal.
 
@@ -54,9 +57,9 @@ set style line 6 linecolor rgbcolor green_025 lw 2
 set style line 7 linecolor rgbcolor red_050 lw 2
 set style line 8 linecolor rgbcolor brown_050 lw 2
 
-set output "/tmp/server-epoch-tput.pdf"
+set output "../diagrams/server_epoch_$1_tput.pdf"
 
-set ylabel "Time for 1k updates (s)"
+set ylabel "Time for 1k updates (s)" offset 0,-1
 set xlabel "Number of existing users"
 
 #set key outside horiz center bottom
@@ -80,7 +83,7 @@ set key off
 
 # col 1 -> x, col 2 -> y, col 3 -> ydelta (stdev)
 
-plot '/tmp/server-epoch-throughput.csv' u 1:2 notitle w l ls 1, \
-'/tmp/server-epoch-throughput.csv' using 1:2:3 with errorbars ls 1
+plot '/tmp/server-epoch-$1-throughput.csv' u 1:2 notitle w l ls 1, \
+'/tmp/server-epoch-$1-throughput.csv' using 1:2:3 with errorbars ls 1
 
 EOF

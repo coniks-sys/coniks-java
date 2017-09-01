@@ -45,6 +45,18 @@ public class TreeNode implements Serializable {
 
     transient TreeNode parent; // the parent of the node
     int level; // indicates the level in the tree
+    String name; // for debugging
+
+    /** Construct a generic TreeNode with the parent {@code p}
+     * and at level {@code level}.
+     *@param p the node's parent node
+     *@param level the node's level in the Merkle tree
+     */
+    public TreeNode(TreeNode parent, int level) {
+        this.parent = parent;
+        this.level = level;
+        this.name = "node";
+    }
 
     /** Gets this tree node's parent.
      *
@@ -71,18 +83,6 @@ public class TreeNode implements Serializable {
      */
     public String getName() {
         return name;
-    }
-
-    /** Sets this tree node's left subtree to {@code n}
-     */
-    public void setLeft(TreeNode n){
-        this.left = n;
-    }
-
-    /** Sets this tree node's right subtree to {@code n}
-     */
-    public void setRight(TreeNode n){
-        this.right = n;
     }
 
     /** Sets this tree node's parent to {@code n}
@@ -123,7 +123,7 @@ public class TreeNode implements Serializable {
      *
      *@throws An UnsupportedOperationException.
      */
-    public byte[] serialize(){
+    public byte[] serialize(MerkleTree tree){
         throw new UnsupportedOperationException();
     }
 
@@ -135,7 +135,7 @@ public class TreeNode implements Serializable {
      *
      *@throws An UnsupportedOperationException.
      */
-    public byte[] hash() {
+    public byte[] hash(MerkleTree tree) {
         throw new UnsupportedOperationException();
     }
 

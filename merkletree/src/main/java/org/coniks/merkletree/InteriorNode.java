@@ -47,26 +47,22 @@ import org.coniks.crypto.Digest;
  */
 public class InteriorNode extends TreeNode {
 
-    protected TreeNode left; // the left child of the node
-    protected TreeNode right; // the right child of the node
+    protected TreeNode leftChild; // the left child of the node
+    protected TreeNode rightChild; // the right child of the node
     protected byte[] leftHash;
     protected byte[] rightHash;
-    protected boolean hasLeaf;
 
     /** Constructs an interior node with the given
      * parent tree node {@code p} and its level {@code lvl}
      * within the tree.
      */
     public InteriorNode(TreeNode p, int lvl){
-
-        this.left = null;
-        this.right = null;
-        this.parent = p;
-        this.level = lvl;
+        super(p, lvl);
+        this.leftChild = null;
+        this.rightChild = null;
         this.leftHash = null;
         this.rightHash = null;
-        this.hasLeaf = false;
-        this.name = ""; // for debugging
+        this.setName(""); // for debugging
 
     }
 
@@ -93,16 +89,16 @@ public class InteriorNode extends TreeNode {
      *
      *@return The left subtree as a {@link TreeNode}.
      */
-    public TreeNode getLeft(){
-        return left;
+    public TreeNode getLeftChild(){
+        return leftChild;
     }
 
     /** Gets this tree node's right subtree.
      *
      *@return The right subtree as a {@link TreeNode}.
      */
-    public TreeNode getRight(){
-        return right;
+    public TreeNode getRightChild(){
+        return rightChild;
     }
 
     /** Gets the hash of the left subtree.
@@ -121,47 +117,6 @@ public class InteriorNode extends TreeNode {
      */
     public byte[] getRightHash(){
         return this.rightHash;
-    }
-
-    /** Checks whether the interior node has at least one
-     * leaf node child.
-     *
-     *@return {@code true} if the interior node has a leaf node child,
-     * {@code false} otherwise.
-     */
-    public boolean hasLeaf() {
-        return this.hasLeaf;
-    }
-
-    /** Sets the left and right subtrees of the interior node to
-     * tree nodes {@code l} and {@code r}, respectively.
-     */
-    public void setChildren(TreeNode l, TreeNode r){
-        this.left = l;
-        this.right = r;
-    }
-
-     /** Sets the hashes of the left and right subtrees of
-      * the interior node to {@code byte[]}s {@code l} and {@code r},
-      * respectively.
-     */
-    public void setHashes(byte[] l, byte[] r){
-        this.leftHash = l;
-        this.rightHash= r;
-    }
-
-    /** Sets the parent of the interior node to tree node
-     * {@code n}.
-     */
-    public void setParent(TreeNode n){
-        this.parent = n;
-    }
-
-    /** Sets the {@code hasLeaf} flag to the boolean value given
-     * by {@code l}.
-     */
-    public void setHasLeaf(boolean l) {
-        this.hasLeaf = true;
     }
 
     /** Clones (i.e. duplicates) this interior node with the
@@ -205,10 +160,10 @@ public class InteriorNode extends TreeNode {
      */
     public byte[] hash() {
         if (this.leftHash == null) {
-            this.leftHash = this.left.hash();
+            this.leftHash = this.leftChild.hash();
         }
         if (this.rightHash == null) {
-            this.rightHash = this.right.hash();
+            this.rightHash = this.rightChild.hash();
         }
         return Digest.digest(this.serialize());
     }

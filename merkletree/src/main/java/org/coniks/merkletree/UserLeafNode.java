@@ -34,8 +34,6 @@
 package org.coniks.merkletree;
 
 import java.io.Serializable;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.RSAPublicKey;
 
 // coniks-java imports
 import org.coniks.crypto.Commitment;
@@ -109,30 +107,36 @@ public class UserLeafNode extends TreeNoe {
     public UserLeafNode clone(TreeNode parent){
 
         UserLeafNode cloneN = new UserLeafNode(this.key, this.value,
-                                               this.index, this.Commitment);
-        cloneN.parent = parent;
-        cloneN.level = this.level;
+                                               this.index, this.commit);
+        cloneN.setParent(parent);
+        cloneN.setLevel(this.level);
 
         return cloneN;
     }
 
-    protected byte[] serialize() {
+    public byte[] serialize(MerkleTree tree) {
 
         byte[] leafId = Convert.strToBytes(LEAF_IDENTIFIER);
         byte[] lvlBytes = Convert.intToBytes(this.level);
         byte[] commVal = this.commit.getValue();
 
-        byte[] leafBytes = new byte[this.leafId.length+nonce.length+this.index.length+
+        byte[] leafBytes = new byte[this.leafId.length+
+                                    tree.getNonce().length+
+                                    this.index.length+
                                     lvlBytes.length+commVal.length];
 
         ByteBuffer arr = ByteBuffer.wrap(leafBytes);
         arr.put(leafId);
-        arr.put(nonce);
+        arr.put(tree.getNonce());
         arr.put(this.index);
         arr.put(lvlBytes);
         arr.put(commVal);
 
         return arr.array();
+    }
+
+    public byte[] hash(MerkleTree tree) {
+        return Digest.digest(this.serialize(tree));
     }
 
 } // ends UserLeafNode

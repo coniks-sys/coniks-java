@@ -34,52 +34,34 @@
 package org.coniks.crypto;
 
 import org.junit.Test;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import static org.hamcrest.core.StringContains.containsString;
-
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 /**
- * Unit tests for Digest.
+ * Unit tests for Commitment.
  */
-public class DigestTest
+public class CommitmentTest
 {
 
     @Test
-    public void testDigest()
+    public void testCommitment()
         throws NoSuchAlgorithmException {
 
         byte[] msg = "message".getBytes();
 
-        byte[] hash = Digest.digest(msg);
+        Commitment comm = new Commitment(msg);
 
-        if(hash.length != Digest.HASH_SIZE_BYTES) {
-            fail("Computation of hash failed - wrong length.");
+        if(comm.getValue().length != Digest.HASH_SIZE_BYTES) {
+            fail("Computation of commitment failed - wrong length.");
         }
 
-        assertNotNull("Computation of hash failed - null", hash);
+        assertNotNull("Computation of commitment failed - null",
+                      comm.getValue());
 
-        assertFalse("Computation of hash failed - hash is all zeros",
-                    Arrays.equals(hash, new byte[Digest.HASH_SIZE_BYTES]));
+        assertTrue("Invalid commitment", comm.verify(msg));
 
-    }
-
-    @Test
-    public void testMakeRand()
-        throws NoSuchAlgorithmException {
-
-        byte[] r = Digest.makeRand();
-
-        assertFalse("makeRand failed - hash of all zeros",
-                    Arrays.equals(r,
-                    Digest.digest(new byte[Digest.HASH_SIZE_BYTES])));
-
-        if (r.length != Digest.HASH_SIZE_BYTES) {
-            fail("Digest of random number failed - wrong length.");
-        }
     }
 }

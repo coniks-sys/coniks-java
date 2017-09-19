@@ -45,7 +45,8 @@ import org.coniks.crypto.Digest;
  *@author Aaron Blankstein
  *@author Michael Rochlin
  */
-public class InteriorNode extends TreeNode {
+public class InteriorNode extends TreeNode
+    implements MerkleNode {
 
     protected TreeNode leftChild; // the left child of the node
     protected TreeNode rightChild; // the right child of the node
@@ -136,7 +137,6 @@ public class InteriorNode extends TreeNode {
             cloneN.right = this.right.clone(cloneN);
 
         return cloneN;
-
     }
 
     /** Serializes the left and right hashes of this interior node
@@ -144,7 +144,7 @@ public class InteriorNode extends TreeNode {
      *
      *@return the serialized interior node
      */
-    protected byte[] serialize(){
+    public byte[] serialize(){
         byte[] nodeBytes = new byte[this.leftHash.length+this.rightHash.length];
 
         ByteBuffer arr = ByteBuffer.wrap(nodeBytes);

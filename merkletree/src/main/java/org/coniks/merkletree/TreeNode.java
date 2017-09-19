@@ -45,6 +45,7 @@ public class TreeNode implements Serializable {
 
     transient TreeNode parent; // the parent of the node
     int level; // indicates the level in the tree
+
     String name; // for debugging
 
     /** Construct a generic TreeNode with the parent {@code p}
@@ -101,42 +102,6 @@ public class TreeNode implements Serializable {
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /** Cloning is not supported by generic {@link TreeNode}s,
-     * only by their sub classes as these specify the more
-     * specific data that needs to be duplicated when rebuilding
-     * the CONIKS Merkle tree. Therefore each sub class of
-     * TreeNode must specify its own cloning function.
-     *
-     *@throws An UnsupportedOperationException.
-     */
-    public TreeNode clone(TreeNode parent){
-        throw new UnsupportedOperationException();
-    }
-
-    /** Serialization is not supported by generic {@link TreeNode}s,
-     * only by their sub classes as these specify the more
-     * specific fields that need to be serialized when hashing
-     * the nodes. Therefore each sub class of
-     * TreeNode must specify its own serialization function.
-     *
-     *@throws An UnsupportedOperationException.
-     */
-    public byte[] serialize(MerkleTree tree){
-        throw new UnsupportedOperationException();
-    }
-
-    /** Hashing is not supported by generic {@link TreeNode}s,
-     * only by their sub classes as these specify the more
-     * specific fields that need to be included for hashing
-     * the nodes. Therefore each sub class of
-     * TreeNode must specify its own hashing function.
-     *
-     *@throws An UnsupportedOperationException.
-     */
-    public byte[] hash(MerkleTree tree) {
-        throw new UnsupportedOperationException();
     }
 
 } //ends TreeNode class

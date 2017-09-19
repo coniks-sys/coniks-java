@@ -40,14 +40,15 @@ import org.coniks.crypto.Commitment;
 import org.coniks.crypto.Digest;
 import org.coniks.util.Convert;
 
-/** Represents a leaf node containing a user's entry in the CONIKS key directory
- *  in the CONIKS binary Merkle prefix tree.
+/** Represents a leaf node containing a user's entry in the CONIKS key
+ * directory in the CONIKS binary Merkle prefix tree.
  *
  *@author Marcela S. Melara (melara@cs.princeton.edu)
  *@author Aaron Blankstein
  *@author Michael Rochlin
  */
-public class UserLeafNode extends TreeNoe {
+public class UserLeafNode extends TreeNode
+    implements MerkleNode {
 
     public static final String LEAF_IDENTIFIER = "L";
 

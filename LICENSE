@@ -1,4 +1,5 @@
-Copyright (c) 2015 Marcela S. Melara
+Copyright (c) 2015 Princeton University
+Copyright (c) 2017 Marcela S. Melara
 
 This license does not apply to the following incorporated code:
 - Protocol Buffers, located in coniks_common/src/com/google/protobuf/

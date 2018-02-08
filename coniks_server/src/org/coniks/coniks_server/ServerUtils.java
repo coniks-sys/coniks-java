@@ -1,0 +1,493 @@
+/*
+  Copyright (c) 2015, Princeton University.
+  All rights reserved.
+  
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are 
+  met:
+  * Redistributions of source code must retain the above copyright 
+  notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above 
+  copyright notice, this list of conditions and the following disclaimer 
+  in the documentation and/or other materials provided with the 
+  distribution.
+  * Neither the name of Princeton University nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  POSSIBILITY OF SUCH DAMAGE.
+ */
+
+package org.coniks.coniks_server;
+
+import org.coniks.coniks_common.UtilProtos.Commitment;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.interfaces.DSAParams;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Comparator;
+
+import org.javatuples.Pair;
+
+/** Implements various utility functions
+ * used by various components of a CONIKS
+ * server.
+ *
+ *@author Marcela S. Melara (melara@cs.princeton.edu)
+ */
+public class ServerUtils{
+
+    /** The size of the Merkle tree hashes in bits.
+     * Current hashing algorithm: SHA-256
+     */
+    public static final int HASH_SIZE_BITS =  256; 
+
+    /** The size of the Merkle tree hashes in bytes.
+     * Current hashing algorithm: SHA-256
+     */
+    public static final int HASH_SIZE_BYTES = HASH_SIZE_BITS/8;
+    
+    /** The size of the CONIKS server's STR signatures in bytes.
+     * Server signature scheme: RSAwithSHA256.
+     */
+    public static final int SIG_SIZE_BYTES = 256;
+
+    /** The maximum number of bytes logged per log file.
+     */
+    public static final int MAX_BYTES_LOGGED_PER_FILE = (1 << 15);
+
+    /** The maximum number of log files per log.
+     */
+    public static final int MAX_NUM_LOG_FILES = 5;
+
+    private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
+
+    /** Defines the <i>specific<i> responses a server can
+     * present to a CONIKS client.
+     */
+    public enum RespType {
+        SUCCESS,
+        NAME_NOT_FOUND_ERR, //name is not in server's chat namespace
+        SERVER_ERR,
+        NAME_EXISTS_ERR, //name is already in server's Coniks namespace
+        MALFORMED_ERR,
+        COMMITMENT_RESP,
+        AUTH_PATH
+     }
+
+    /** Generates the cryptographic hash of {@code input}.
+     * Current hashing algorithm: SHA-256.
+     *
+     *@return The hash as a {@code byte[]} or null in case of an error.
+     */
+    public static byte[] hash(byte[] input){
+
+	try{
+	    MessageDigest md = MessageDigest.getInstance("SHA-256");
+	   
+	    byte[] digest = md.digest(input);
+
+	    return digest;
+
+	}
+	catch(NoSuchAlgorithmException e){
+	    ServerLogger.error("SHA-256 is not a valid algorithm for some reason");
+	}
+
+	return null; // should never get here
+    }
+
+    /** Generates the cryptographic hash of the {@code left} 
+     * and {@code right} subtree hashes of a Merkle tree node.
+     * This is really just a wrapper around {@link ClientUtils#hash(byte[])}.
+     *
+     *@return The hash as a {@code byte[]} or null in case of an error.
+     */
+    public static byte[] hashChildren(byte[] left, byte[] right){
+
+	byte[] childrenBytes = new byte[left.length+right.length];
+	
+	ByteBuffer arr = ByteBuffer.wrap(childrenBytes);
+	arr.put(left);
+	arr.put(right);
+
+	byte[] children = arr.array();
+
+	try{
+	    MessageDigest md = MessageDigest.getInstance("SHA-256");
+	   
+	    byte[] digest = md.digest(children);
+
+	    return digest;
+
+	}
+	catch(NoSuchAlgorithmException e){
+	    TimerLogger.error("SHA-256 is not a valid algorithm for some reason");
+	}
+
+	return null; // should never get here
+
+    }
+
+    // from Stackoverflow 9655181
+     /** Converts a {@code byte[]} into a String
+     * of its hexadecimal representation.
+     *
+     *@return The hex representation of {@code bytes} as a String.
+     */
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
+    /** Converts a {@code byte[]} into a list of integers.
+     * This utility is needed for building protobuf messages that
+     * contain fields representing byte buffers.
+     *
+     *@return The {@code arr} as an {@link java.util.ArrayList} of
+     * integers.
+     */
+    public static ArrayList<Integer> byteArrToIntList(byte[] arr){
+        ArrayList<Integer> list = new ArrayList<Integer>();
+       
+        for(int i = 0; i < arr.length; i++){
+            int nextInt = arr[i] & 0xff; 
+            list.add(new Integer(nextInt));
+        }
+        
+        return list;
+    }
+
+     /** Converts a list of integers into a {@code byte[]}.
+     * This utility is needed for parsing protobuf messages that
+     * contain fields representing byte buffers.
+     *
+     *@return The {@link java.util.ArrayList} of integers as a {@code byte[]}.
+     */
+    public static byte[] intListToByteArr(ArrayList<Integer> list){
+        byte[] arr = new byte[list.size()];
+       
+        for(int i = 0; i < list.size(); i++){
+            byte nextByte = list.get(i).byteValue();
+            arr[i] = nextByte;
+        }
+        
+        return arr;
+    }
+
+    /** Converts a UTF-8 String {@code str} to an array of bytes.
+     */
+    public static byte[] strToBytes (String str) {
+        return str.getBytes(Charset.forName("UTF-8"));
+    }
+
+    /** Converts a {@code username} to a CONIKS lookup
+     * index using a verifiable unpredicctable function (VUF).
+     * Current VUF algorithm: SHA-256.
+     *
+     *@return The {@code byte[]} representation of the 
+     * lookup index.
+     */
+    public static byte[] unameToIndex (String uname){
+	byte[] b = strToBytes(uname);
+	return ServerUtils.hash(b);
+    }
+
+     /** Converts a long {@code val} into an array of bytes.
+     *
+     *@return The {@code byte[]} representation of the long value.
+     */
+    public static byte[] longToBytes(long val) {
+        byte[] byteArr = new byte[8];
+        
+        for(int i = 0; i < 8; i++) {
+            byte nextByte = (byte)((val >> i*8) & 0xff);
+            byteArr[i] = nextByte;
+        }
+
+        return byteArr;
+    }
+
+    /** Finds the byte in the byte array {@code arr} 
+     * at offset {@code offset}, and determines whether it is 1 or 0.
+     *
+     *@return true if the nth bit is 1, false otherwise.
+     */
+    public static boolean getNthBit(byte[] arr, int offset){
+	int arrayOffset = offset / 8;
+	int bitOfByte = offset % 8;
+	int maskedBit = arr[arrayOffset] & (1 << (7 - bitOfByte));
+	return (maskedBit != 0);
+    }
+
+    /** Gets the 16-bit prefix of a byte array {@code arr}.
+     *
+     *@return the first 16 bits of {@code arr} or all zeros if the length
+     * of the array is less than 2 bytes.
+     */
+    public static byte[] getPrefixBytes(byte[] arr){
+	byte[] out = new byte[2];
+
+        if (arr.length < 2) {
+            out[0] = 0;
+            out[1] = 0;
+        }
+        else {
+            out[0] = arr[0];
+            out[1] = arr[1];
+        }
+	return out;
+    }
+
+    /** Compares two byte buffers for byte-by-byte equality.
+     *
+     *@return true if the buffers are identical, false otherwise.
+     */
+    public static boolean compareByteBuffers(byte[] buf1, byte[] buf2){
+        if (buf1.length != buf2.length) {
+            return false;
+        }
+
+	for(int i = 0; i < buf1.length; i++){
+	    if(buf1[i] != buf2[i]){
+		return false;
+	    }
+	}
+	return true;
+    }
+    
+
+    /** Converts an RSAPublicKey {@code pub} to a hashable array of bytes.
+     * This function is currently unused.
+     *
+     *@return The {@code byte[]} containing the serialized RSAPublicKey.
+     */
+    public static byte[] convertRSAPubKey(RSAPublicKey pub){
+	byte[] exp = pub.getPublicExponent().toByteArray();
+	byte[] mod = pub.getModulus().toByteArray();
+
+	byte[] pubKey = new byte[exp.length+mod.length];
+
+	ByteBuffer arr = ByteBuffer.wrap(pubKey);
+	arr.put(exp);
+	arr.put(mod);
+
+	return arr.array();
+    }
+
+    /** Converts an DSAPublicKey {@code pub} to a hashable array of bytes.
+     * This function is currently unused.
+     *
+     *@return The {@code byte[]} containing the serialized DSAPublicKey.
+     */
+    public static byte[] convertDSAPubKey(DSAPublicKey pub){
+	byte[] g = pub.getParams().getG().toByteArray();
+        byte[] p = pub.getParams().getP().toByteArray();
+        byte[] q = pub.getParams().getQ().toByteArray();
+        byte[] y = pub.getY().toByteArray();
+
+	byte[] pubKey = new byte[g.length+p.length+q.length+y.length];
+
+	ByteBuffer arr = ByteBuffer.wrap(pubKey);
+	arr.put(g);
+        arr.put(p);
+        arr.put(q);
+	arr.put(y);
+
+	return arr.array();
+    }
+
+    // TODO: use real dsa keys
+    /** Converts a {@link UserLeafNode} {@code uln} to a hashable array of bytes.
+     *
+     *@return The {@code byte[]} containing the serialized UserLeafNode.
+     */
+    public static byte[] convertUserLeafNode(UserLeafNode uln){
+        byte[] pubKey = strToBytes(uln.getPublicKey());
+	byte[] usr = strToBytes(uln.getUsername());
+        byte[] ep_add = longToBytes(uln.getEpochAdded());
+        byte[] auk = new byte[]{(byte)(uln.allowsUnsignedKeychange() ? 0x01 : 0x00)};
+        byte[] apl = new byte[]{(byte)(uln.allowsPublicLookups() ? 0x01 : 0x00)};
+
+	byte[] leafBytes = new byte[pubKey.length+usr.length+ep_add.length+auk.length+
+                                    apl.length];
+	
+	ByteBuffer arr = ByteBuffer.wrap(leafBytes);
+	arr.put(usr);
+	arr.put(pubKey);
+	arr.put(ep_add);
+	arr.put(auk);
+        arr.put(apl);
+
+	return arr.array();
+    }
+
+     /** Converts a {@link InteriorNode} {@code in} to a hashable array of bytes.
+     *
+     *@return The {@code byte[]} containing the serialized InteriorNode.
+     */
+    public static byte[] convertInteriorNode(InteriorNode in){
+	byte[] left = in.getLeftHash();
+	byte[] right = in.getRightHash();
+
+	byte[] nodeBytes = new byte[left.length+right.length];
+	
+	ByteBuffer arr = ByteBuffer.wrap(nodeBytes);
+	arr.put(left);
+	arr.put(right);
+
+	return arr.array();
+    }
+
+     /** Converts a {@link RootNode} {@code rn} to a hashable array of bytes.
+     *
+     *@return The {@code byte[]} containing the serialized RootNode.
+     */
+    public static byte[] convertRootNode(RootNode rn){
+	byte[] left = rn.getLeftHash();
+	byte[] right = rn.getRightHash();
+	byte[] prev = rn.getPrev();
+	byte[] ep = longToBytes(rn.getEpoch());
+
+	byte[] rootBytes = new byte[left.length+right.length+prev.length+ep.length];
+	
+	ByteBuffer arr = ByteBuffer.wrap(rootBytes);
+	arr.put(left);
+	arr.put(right);
+	arr.put(prev);
+	arr.put(ep);
+
+	return arr.array();
+    }
+
+    // TODO: move this to it's own class
+    /** Represents a link in the hash chain of signed tree roots
+     * that forms the server's history.
+     *
+     *@author Marcela S. Melara (melara@cs.princeton.edu)
+     */
+    public static class Record{
+	RootNode root;
+	long epoch;
+        byte[] str;
+	Record prev;
+
+        /** Constructs a hash chain record containing the RootNode
+         * {@code r}, the STR {@code str}, and the previous link
+         * in the chain {@code p} for epoch {@code ep}.
+         */
+	public Record(RootNode r, long ep, byte[] str, 
+                      Record p){
+	    this.root = r;
+	    this.epoch = ep;
+            this.str = str;
+	    this.prev = p;
+	}
+
+        /** Gets this record's root node.
+         *
+         *@return This record's {@link RootNode}.
+         */
+	public RootNode getRoot(){
+	    return this.root;
+	}
+
+        /** Gets this record's epoch.
+         *
+         *@return This record's epoch as a {@code long}.
+         */
+	public long getEpoch(){
+	    return this.epoch;
+	}
+
+        /** Gets this record's STR.
+         *
+         *@return This record's STR as a {@code byte[]}.
+         */
+        public byte[] getSTR(){
+            return this.str;
+        }
+
+        /** Gets the record preceding this record.
+         *
+         *@return This record's preceding {@link ServerUtils.Record}.
+         */
+	public Record getPrev(){
+	    return this.prev;
+	}
+
+        /** Sets this record's epoch.
+         */
+        public void setEpoch(long ep){
+            this.epoch = ep;
+        }
+
+        /** Sets this record's predecessor.
+         */
+        public void setPrev(Record p) {
+            this.prev = p;
+        }
+
+    }
+
+    /** Comparator for ordering the pendingQueue in
+     * increasing order of a data binding lookup index's
+     * first 24 bits.
+     *
+     *@author Marcela S. Melara (melara@cs.princeton.edu)
+     */
+    public static class PrefixComparator implements Comparator<Pair<byte[], UserLeafNode>> {
+	
+        
+        /** Compares the first 24 bits of two data binding lookup indeces.
+         *
+         *@return 0 if they are equal, 1 if the lookup index of {@code p1} is greater, and
+         * -1 if the lookup index of {@code p2} is greater.
+         *@throws A RuntimeException if either of the {@code byte[]} of the lookup indeces
+         *is smaller than 3 bytes.
+         */
+        @Override
+	public int compare(Pair<byte[], UserLeafNode> p1,  Pair<byte[], UserLeafNode> p2) {
+	    byte[] buf1 = p1.getValue0();
+	    byte[] buf2 = p2.getValue0();
+
+	    if (buf1.length < 3 || buf2.length < 3) {
+		throw new RuntimeException("bad byte array length");
+	    }
+	    
+	    for(int i = 0; i < 3; i++){
+		if(buf1[i] > buf2[i]){
+		    return 1;
+		}else if (buf1[i] < buf2[i]){
+		    return -1;
+		}
+	    }
+	    return 0;
+	}
+    }
+
+} //ends ServerUtils class

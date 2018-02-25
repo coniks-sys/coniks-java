@@ -48,23 +48,22 @@ import org.coniks.crypto.Digest;
 public class InteriorNode extends TreeNode
     implements MerkleNode {
 
-    protected TreeNode leftChild; // the left child of the node
-    protected TreeNode rightChild; // the right child of the node
-    protected byte[] leftHash;
-    protected byte[] rightHash;
+    private MerkleNode left; // the left child of the node
+    private MerkleNode right; // the right child of the node
+    private byte[] leftHash;
+    private byte[] rightHash;
 
     /** Constructs an interior node with the given
      * parent tree node {@code p} and its level {@code lvl}
      * within the tree.
      */
-    public InteriorNode(TreeNode p, int lvl){
+    public InteriorNode(MerkleNode p, int lvl){
         super(p, lvl);
-        this.leftChild = null;
-        this.rightChild = null;
+        this.left = new EmptyNode(p, lvl);
+        this.right = new EmptyNode(p, lvl);
         this.leftHash = null;
         this.rightHash = null;
         this.setName(""); // for debugging
-
     }
 
     /** Protected constructor for an interior node specified
@@ -74,32 +73,46 @@ public class InteriorNode extends TreeNode
      * the flag {@code hasLeaf} indicating whether the interior node
      * has at least one leaf node as a child.
      */
-    protected InteriorNode(TreeNode l, TreeNode r, TreeNode p, int lvl, byte[] lh, byte[] rh,
-                           boolean hasLeaf){
+    private InteriorNode(MerkleNode p, int lvl, MerkleNode l, MerkleNode r,
+                         byte[] lh, byte[] rh) {
+        super(p, lvl);
         this.left = l;
         this.right = r;
-        this.parent = p;
-        this.level = lvl;
         this.leftHash = lh;
         this.rightHash = rh;
-        this.hasLeaf = hasLeaf;
         this.name = ""; // for debugging
     }
 
     /** Gets this tree node's left subtree.
      *
-     *@return The left subtree as a {@link TreeNode}.
+     *@return The left subtree as a {@link MerkleNode}.
      */
-    public TreeNode getLeftChild(){
-        return leftChild;
+    public MerkleNode getLeft(){
+        return left;
     }
 
     /** Gets this tree node's right subtree.
      *
-     *@return The right subtree as a {@link TreeNode}.
+     *@return The right subtree as a {@link MerkleNode}.
      */
-    public TreeNode getRightChild(){
-        return rightChild;
+    public MerkleNode getRight(){
+        return right;
+    }
+
+    /** Sets this tree node's left subtree.
+     *
+     *@param n The MerkleNode to set as the left subtree.
+     */
+    public void setLeft(MerkleNode n){
+        this.left = n;
+    }
+
+    /** Sets this tree node's right subtree.
+     *
+     *@param n The MerkleNode to set as the right subtree.
+     */
+    public void setRight(MerkleNode n){
+        this.right = n;
     }
 
     /** Gets the hash of the left subtree.
@@ -120,6 +133,18 @@ public class InteriorNode extends TreeNode
         return this.rightHash;
     }
 
+    /** Sets the hash of the left subtree to {@code null}.
+     */
+    public void resetLeftHash(){
+        this.leftHash = null;
+    }
+
+    /** Sets the hash of the right subtree to {@code null}.
+     */
+    public void getRightHash(){
+        this.rightHash = null;
+    }
+
     /** Clones (i.e. duplicates) this interior node with the
      * given {@code parent} tree node. It then recursively
      * calls this function on the original interior node's two subtrees.
@@ -128,14 +153,18 @@ public class InteriorNode extends TreeNode
      * rebuilding process at the beginning of every epoch.
      *@return The cloned interior node.
      */
-    public TreeNode clone(TreeNode parent){
-        InteriorNode cloneN = new InteriorNode(null, null, parent, this.level,
-                                               this.leftHash, this.rightHash, false);
-        if (this.left != null)
-            cloneN.left = this.left.clone(cloneN);
-        if (this.right != null)
-            cloneN.right = this.right.clone(cloneN);
-
+    public MerkleNode clone(InteriorNode parent){
+        // FIXME: this needs to do a full copy of the hashes
+        InteriorNode cloneN = new InteriorNode(parent, this.level,
+                                               null, null,
+                                               this.leftHash,
+                                               this.rightHash, false);
+        if (this.left == null || this.right == null) {
+            // FIXME
+            throw new UnsupportedOperationException("child is null!");
+        }
+        cloneN.left = this.left.clone(cloneN);
+        cloneN.right = this.right.clone(cloneN);
         return cloneN;
     }
 
@@ -145,7 +174,8 @@ public class InteriorNode extends TreeNode
      *@return the serialized interior node
      */
     public byte[] serialize(){
-        byte[] nodeBytes = new byte[this.leftHash.length+this.rightHash.length];
+        byte[] nodeBytes = new byte[this.leftHash.length+
+                                    this.rightHash.length];
 
         ByteBuffer arr = ByteBuffer.wrap(nodeBytes);
         arr.put(this.leftHash);
@@ -158,14 +188,25 @@ public class InteriorNode extends TreeNode
      *
      *@return the hash of this interior node and its children
      */
-    public byte[] hash() {
+    public byte[] hash(MerkleTree tree) {
         if (this.leftHash == null) {
-            this.leftHash = this.leftChild.hash();
+            this.leftHash = this.left.hash(tree);
         }
         if (this.rightHash == null) {
-            this.rightHash = this.rightChild.hash();
+            this.rightHash = this.right.hash(tree);
         }
-        return Digest.digest(this.serialize());
+
+        byte[] nodeBytes = new byte[this.leftHash.length+
+                                    this.rightHash.length];
+        ByteBuffer arr = ByteBuffer.wrap(nodeBytes);
+        arr.put(this.leftHash);
+        arr.put(this.rightHash);
+
+        return Digest.digest(arr.array());
+    }
+
+    public boolean isEmpty() {
+        return false;
     }
 
 } // ends InteriorNode

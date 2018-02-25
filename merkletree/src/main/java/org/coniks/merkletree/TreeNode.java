@@ -43,8 +43,8 @@ import java.io.Serializable;
  */
 public class TreeNode implements Serializable {
 
-    transient TreeNode parent; // the parent of the node
-    int level; // indicates the level in the tree
+    transient MerkleNode parent; // the parent of the node
+    private int level; // indicates the level in the tree
 
     String name; // for debugging
 
@@ -53,7 +53,7 @@ public class TreeNode implements Serializable {
      *@param p the node's parent node
      *@param level the node's level in the Merkle tree
      */
-    public TreeNode(TreeNode parent, int level) {
+    public TreeNode(MerkleNode parent, int level) {
         this.parent = parent;
         this.level = level;
         this.name = "node";
@@ -61,10 +61,10 @@ public class TreeNode implements Serializable {
 
     /** Gets this tree node's parent.
      *
-     *@return The parent as a {@link TreeNode}. Will be {@code null}
+     *@return The parent as a {@link MerkleNode}. Will be {@code null}
      * if the tree node is a {@link RootNode}.
      */
-    public TreeNode getParent(){
+    public MerkleNode getParent(){
         return parent;
     }
 
@@ -88,7 +88,7 @@ public class TreeNode implements Serializable {
 
     /** Sets this tree node's parent to {@code n}
      */
-    public void setParent(TreeNode n){
+    public void setParent(MerkleNode n){
         this.parent = n;
     }
 

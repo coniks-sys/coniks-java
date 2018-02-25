@@ -64,6 +64,11 @@ public class Commitment {
         this.value = Digest.digest(d);
     }
 
+    private Commitment(byte[] s, byte[] v) {
+        this.salt = s;
+        this.value = v;
+    }
+
     /** Gets this commitment's random salt.
      *
      *@return the commitment salt
@@ -102,6 +107,15 @@ public class Commitment {
 
         return Arrays.equals(c, this.value);
 
+    }
+
+    /** Duplicates the commitment.
+     *
+     *@return A fresh copy of the commitment.
+     */
+    public Commitment clone() {
+        Commitment cloneC = new Commitment(this.salt, this.value);
+        return cloneC;
     }
 
 }

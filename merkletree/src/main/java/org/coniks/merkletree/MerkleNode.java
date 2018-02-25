@@ -4,8 +4,8 @@ package org.coniks.merkletree;
  */
 public interface MerkleNode {
 
-    public TreeNode clone(TreeNode parent);
-    public byte[] serialize(MerkleTree tree);
+    public MerkleNode clone(InteriorNode parent);
     public byte[] hash(MerkleTree tree);
+    public boolean isEmpty();
 
 }

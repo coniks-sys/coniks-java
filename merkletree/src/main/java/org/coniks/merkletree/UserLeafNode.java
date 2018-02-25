@@ -57,9 +57,9 @@ public class UserLeafNode extends TreeNode
     private byte[] index;
     private Commitment commit;
 
-    public UserLeafNode(String k, byte[] v, byte[] idx, Commitment comm) {
-        this.parent = null;
-        this.level = 0;
+    public UserLeafNode(MerkleNode p, int lvl, String k, byte[] v,
+                        byte[] idx, Commitment comm) {
+        super(p, lvl);
         this.key = k;
         this.value = v;
         this.index = idx;
@@ -105,18 +105,16 @@ public class UserLeafNode extends TreeNode
      * rebuilding process at the beginning of every epoch.
      *@return The cloned user leaf node.
      */
-    public UserLeafNode clone(TreeNode parent){
+    public MerkleNode clone(InteriorNode parent){
 
-        UserLeafNode cloneN = new UserLeafNode(this.key, this.value,
-                                               this.index, this.commit);
-        cloneN.setParent(parent);
-        cloneN.setLevel(this.level);
-
+        // FIXME: this needs to do a full copy of the index and value
+        UserLeafNode cloneN = new UserLeafNode(parent, this.level, this.key,
+                                               this.value, this.index,
+                                               this.commit.clone());
         return cloneN;
     }
 
-    public byte[] serialize(MerkleTree tree) {
-
+    public byte[] hash(MerkleTree tree) {
         byte[] leafId = Convert.strToBytes(LEAF_IDENTIFIER);
         byte[] lvlBytes = Convert.intToBytes(this.level);
         byte[] commVal = this.commit.getValue();
@@ -133,11 +131,11 @@ public class UserLeafNode extends TreeNode
         arr.put(lvlBytes);
         arr.put(commVal);
 
-        return arr.array();
+        return Digest.digest(arr.array());
     }
 
-    public byte[] hash(MerkleTree tree) {
-        return Digest.digest(this.serialize(tree));
+    public boolean isEmpty() {
+        return false;
     }
 
 } // ends UserLeafNode

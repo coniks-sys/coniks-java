@@ -95,6 +95,20 @@ public class Convert {
         return (maskedBit != 0);
     }
 
+    /** Converts a byte array into an array of bits.
+     *
+     *@param buf the byte buffer to convert.
+     *@return a boolean array representing each bit of the
+     * given byte array.
+     */
+    public static boolean[] bytesToBits(byte[] buf) {
+        boolean[] bits = new boolean[buf.length*8];
+        for (int i = 0; i < bits.length; i++) {
+            bits[i] = (buf[i/8] & (1 << (7 - (i%8)))) != 0;
+        }
+        return bits;
+    }
+
     /** Gets the 16-bit prefix of a byte array {@code arr}.
      *
      *@return the first 16 bits of {@code arr} or all zeros if the length

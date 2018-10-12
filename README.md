@@ -23,7 +23,7 @@ for the client-server messages.
 ## Disclaimer
 Please keep in mind that this CONIKS Java implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/coniks-sys/coniks-java/releases).
 
-##Documentation
+## Documentation
 [Read the package's Java API (javadoc)](https://coniks-sys.github.io/coniks-java/)
 
 ## Current Core Developers

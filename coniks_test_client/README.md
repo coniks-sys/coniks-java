@@ -1,11 +1,11 @@
-#CONIKS Test Client
+# CONIKS Test Client
 
 http://coniks.org
 
-##Introduction
+## Introduction
 This is a simple test client for the CONIKS key management system. It supports new key registrations, key lookups, key changes (**new feature**), and user policy changes (e.g. key change policy) (**new feature**). It is designed to communicate with the basic implementation of a [CONIKS server](https://github.com/coniks-sys/coniks-java/tree/master/coniks_server).
 
-##Building the Test Client - With Maven
+## Building the Test Client - With Maven
 The coniks_test_client build is managed using Maven. (Instructions for building without Maven coming soon)
 
 1) Install Apache Maven, if you don't have it. Visit the [Maven downloads page](https://maven.apache.org/download.cgi) for details.
@@ -21,7 +21,7 @@ The build configuration for coniks_test_client assembles all dependencies,
 and includes them in the generated .jar file, so you can run the server
 only using the coniks_test_client .jar file.
 
-##Using the Test Client
+## Using the Test Client
 
 The CONIKS test client has two operating modes: Test Mode and Full Operation.
 Running the client in test mode allows you to still test all CONIKS
@@ -53,7 +53,7 @@ Defaults are already set, but you may change the following variables:
 ```CONIKS_CLIENTCONFIG``` if you're using a different config file
 ```CONIKS_CLIENTLOGS``` to store the client logs somewhere other than a *logs* directory
 
-###Running
+### Running
 We provide a run script for the CONIKS test client *coniks_test_client.sh*, which allows you to run
 the test client in full operation mode and test mode.
 
@@ -87,5 +87,5 @@ Some examples:
 ## Disclaimer
 Please keep in mind that this CONIKS Java implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/coniks-sys/coniks-java/releases).
 
-##Documentation
+## Documentation
 [Read the test client's Java API (javadoc)](https://coniks-sys.github.io/coniks-java/org/coniks/coniks_test_client/package-summary.html)

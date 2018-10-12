@@ -1,11 +1,11 @@
-#CONIKS Protos
+# CONIKS Protos
 
 http://coniks.org
 
-##Introduction
+## Introduction
 These are protobuf source files that define the message format for all communication between the CONIKS test client and the basic server. They are based on [Google Protobufs](https://github.com/google/protobuf) (proto2) and require you to have the protocol buffer compiler protoc installed.
 
-##Using the Protobufs
+## Using the Protobufs
 ### Editing
 Extensive documentation on developing protocol buffers can be found [here](https://developers.google.com/protocol-buffers/).
 
@@ -30,5 +30,5 @@ This command will automatically place the generated Java code in the appropriate
 ## Disclaimer
 Please keep in mind that this CONIKS Java implementation is under active development. The repository may contain experimental features that aren't fully tested. We recommend using a [tagged release](https://github.com/coniks-sys/coniks-java/releases).
 
-##Documentation
+## Documentation
 [Read the official Google Protobuf documentation](https://developers.google.com/protocol-buffers/)

@@ -357,7 +357,9 @@ public class ServerUtils{
      /** Converts a {@link InteriorNode} {@code in} to a hashable array of bytes.
      *
      *@return The {@code byte[]} containing the serialized InteriorNode.
+     *@deprecated Use more general {@link org.coniks.merkletree.InteriorNode#serialize()}.
      */
+    @Deprecated
     public static byte[] getInteriorNodeBytes(InteriorNode in){
         byte[] left = in.getLeftHash();
         byte[] right = in.getRightHash();
